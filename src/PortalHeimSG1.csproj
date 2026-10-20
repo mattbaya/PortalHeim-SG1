@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>PortalHeimSG1</AssemblyName>
+    <RootNamespace>PortalHeimSG1</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <RestoreAdditionalProjectSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.bepinex.dev/v3/index.json
+    </RestoreAdditionalProjectSources>
+
+    <!--
+      Folder holding the game's managed assemblies (assembly_valheim.dll, UnityEngine*.dll, ...).
+      Override with: dotnet build -p:ValheimManaged=/path/to/valheim_Data/Managed
+      or the VALHEIM_MANAGED environment variable.
+    -->
+    <ValheimManaged Condition="'$(ValheimManaged)' == ''">$(VALHEIM_MANAGED)</ValheimManaged>
+    <ValheimManaged Condition="'$(ValheimManaged)' == ''">$(MSBuildProjectDirectory)/../libs/Managed</ValheimManaged>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Core" Version="5.4.21" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Publicized so we can reach private portal fields and methods (m_nview, HaveTarget, ...) directly. -->
+    <Reference Include="assembly_valheim" Publicize="true">
+      <HintPath>$(ValheimManaged)/assembly_valheim.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="assembly_utils"><HintPath>$(ValheimManaged)/assembly_utils.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine"><HintPath>$(ValheimManaged)/UnityEngine.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(ValheimManaged)/UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.AudioModule"><HintPath>$(ValheimManaged)/UnityEngine.AudioModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.UnityWebRequestModule"><HintPath>$(ValheimManaged)/UnityEngine.UnityWebRequestModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.UnityWebRequestAudioModule"><HintPath>$(ValheimManaged)/UnityEngine.UnityWebRequestAudioModule.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+
+</Project>

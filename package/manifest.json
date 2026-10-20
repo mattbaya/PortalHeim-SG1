@@ -1,0 +1,10 @@
+{
+  "name": "PortalHeim_SG1",
+  "author": "Svaha",
+  "version_number": "0.1.0",
+  "website_url": "https://github.com/mattbaya/PortalHeim-SG1",
+  "description": "Turns portals into stone ring gates with Norse runes and chevrons that lock one by one when a portal connects. Bring your own sound clips.",
+  "dependencies": [
+    "denikson-BepInExPack_Valheim-5.4.2351"
+  ]
+}
