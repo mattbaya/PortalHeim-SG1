@@ -13,9 +13,9 @@ namespace PortalHeimSG1
 
         public static readonly Color Dark = new Color(0.16f, 0.14f, 0.12f);
 
-        // Seconds the ring spins before each chevrune locks, and how long each lock holds.
-        private const float SpinSeconds = 0.7f;
-        private const float SpinDegreesPerSecond = 130f;
+        // Part of each step spent turning the ring before the Chevrune locks; it turns one Chevrune's width per step.
+        private const float SpinShareOfStep = 0.65f;
+        private const float DegreesPerStep = 40f;
         // Beyond this distance there's no point animating; the gate just snaps to its state.
         private const float AnimateRange = 70f;
 
@@ -90,13 +90,14 @@ namespace PortalHeimSG1
         private void UpdateDialing()
         {
             _phaseTime += Time.deltaTime;
-            float seconds = Mathf.Max(0.2f, PortalHeimSG1Plugin.LockSeconds.Value);
+            float seconds = Mathf.Max(0.1f, PortalHeimSG1Plugin.LockSeconds.Value);
+            float spinSeconds = seconds * SpinShareOfStep;
 
             // The ring spins for the first part of each step, then stops while the chevrune locks.
-            if (_phaseTime < SpinSeconds)
-                _inner.Rotate(0f, 0f, _spinDirection * SpinDegreesPerSecond * Time.deltaTime);
+            if (_phaseTime < spinSeconds)
+                _inner.Rotate(0f, 0f, _spinDirection * (DegreesPerStep / spinSeconds) * Time.deltaTime);
 
-            if (_phaseTime >= SpinSeconds && _spinSource.isPlaying) _spinSource.Stop();
+            if (_phaseTime >= spinSeconds && _spinSource.isPlaying) _spinSource.Stop();
 
             if (_phaseTime >= seconds)
             {

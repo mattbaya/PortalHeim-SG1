@@ -6,18 +6,27 @@ using UnityEngine;
 
 namespace PortalHeimSG1
 {
+    public enum ShadingMode
+    {
+        /// <summary>Reuse the portal's own shader for the stone (safest: it's known to render).</summary>
+        PortalShader,
+        /// <summary>Use Unity's Standard shader instead (try this if the ring looks wrong or missing).</summary>
+        Standard
+    }
+
     [BepInPlugin(Guid, Name, Version)]
     public class PortalHeimSG1Plugin : BaseUnityPlugin
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.1.1";
+        public const string Version = "0.1.2";
 
         internal static ManualLogSource Log;
 
         internal static ConfigEntry<bool> Reskin;
         internal static ConfigEntry<Color> ChevruneColor;
         internal static ConfigEntry<float> LockSeconds;
+        internal static ConfigEntry<ShadingMode> Shading;
         internal static ConfigEntry<float> Volume;
 
         private Harmony _harmony;
@@ -31,8 +40,11 @@ namespace PortalHeimSG1
                 "(restart the game to be sure). Set to false to leave portals as they are.");
             ChevruneColor = Config.Bind("Look", "ChevruneColor", new Color(1f, 0.45f, 0.1f, 1f),
                 "The glow colour of a locked chevrune.");
-            LockSeconds = Config.Bind("Look", "SecondsPerChevrune", 1.0f,
-                new ConfigDescription("How long each chevrune takes to lock when a gate connects.", new AcceptableValueRange<float>(0.3f, 4f)));
+            LockSeconds = Config.Bind("Look", "SecondsPerChevrune", 0.5f,
+                new ConfigDescription("Seconds between each Chevrune lighting up when a gate connects (nine in all).", new AcceptableValueRange<float>(0.1f, 4f)));
+            Shading = Config.Bind("Look", "Shading", ShadingMode.PortalShader,
+                "How the stone is shaded. PortalShader reuses the portal's own shader. If the ring looks wrong or is missing, try Standard. " +
+                "Takes effect on next game start.");
             Volume = Config.Bind("Sound", "Volume", 1.0f,
                 new ConfigDescription("Volume of the gate sounds you provide (also follows the game's sound-effects volume).", new AcceptableValueRange<float>(0f, 1f)));
 

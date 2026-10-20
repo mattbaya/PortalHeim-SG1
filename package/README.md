@@ -27,7 +27,8 @@ A missing file stays silent (or keeps the game's own sound). Restart the game af
 | --- | --- | --- |
 | Look / Reskin | true | Set to false to keep ordinary portals |
 | Look / ChevruneColor | orange | Glow colour of a locked Chevrune |
-| Look / SecondsPerChevrune | 1.0 | Speed of the connect sequence |
+| Look / SecondsPerChevrune | 0.5 | Seconds between each Chevrune lighting up (nine in all) |
+| Look / Shading | PortalShader | If the ring looks wrong or is missing, try `Standard` (restart the game) |
 | Sound / Volume | 1.0 | Also follows the game's sound-effects volume |
 
 ## Roadmap

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.2
+- Chevrunes now light one at a time, half a second apart by default (`SecondsPerChevrune`). The inner ring turns one step between each.
+- Hides every part of the wooden frame much more thoroughly (previously just its main model).
+- If building the gate art fails, it now retries on the next portal and logs exactly which step failed, instead of leaving every portal vanilla for the whole session.
+- New `Shading` option (`PortalShader` or `Standard`) in case the stone doesn't render right.
+- The log now records what happened for the first gates, to make problems easy to diagnose.
+
 ## 0.1.1
 - The glowing runic chevrons are now called **Chevrunes**. Config and sound names follow: `ChevruneColor`, `SecondsPerChevrune`, and the sound file `chevrune` (was `chevron`).
 

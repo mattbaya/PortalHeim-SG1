@@ -36,6 +36,7 @@
     <Reference Include="assembly_utils"><HintPath>$(ValheimManaged)/assembly_utils.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine"><HintPath>$(ValheimManaged)/UnityEngine.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.CoreModule"><HintPath>$(ValheimManaged)/UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule"><HintPath>$(ValheimManaged)/UnityEngine.ParticleSystemModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.AudioModule"><HintPath>$(ValheimManaged)/UnityEngine.AudioModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.UnityWebRequestModule"><HintPath>$(ValheimManaged)/UnityEngine.UnityWebRequestModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.UnityWebRequestAudioModule"><HintPath>$(ValheimManaged)/UnityEngine.UnityWebRequestAudioModule.dll</HintPath><Private>false</Private></Reference>
