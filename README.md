@@ -1,6 +1,6 @@
 # PortalHeim-SG1
 
-A [BepInEx](https://thunderstore.io/c/valheim/p/denikson/BepInExPack_Valheim/) mod for Valheim that turns portals into stone ring gates with Norse runes and chevrons, **inspired by** a famous sci-fi gate (not a copy: runes instead of glyphs, original geometry). Thunderstore package: `PortalHeim_SG1` (Thunderstore names can't contain hyphens).
+A [BepInEx](https://thunderstore.io/c/valheim/p/denikson/BepInExPack_Valheim/) mod for Valheim that turns portals into stone ring gates with Norse runes and glowing **Chevrunes**, **inspired by** a famous sci-fi gate (not a copy: runes instead of glyphs, original geometry). Thunderstore package: `PortalHeim_SG1` (Thunderstore names can't contain hyphens).
 
 Player-facing docs: [package/README.md](package/README.md).
 
@@ -18,7 +18,7 @@ Player-facing docs: [package/README.md](package/README.md).
 
 ## How it works
 
-A Harmony postfix on `TeleportWorld.Awake` hides the wooden frame (`forceRenderingOff` on `m_model`) and adds a procedurally built ring, rune ring and nine chevrons. `GateRing` watches the portal's connection state and animates the connect sequence. Sounds are loaded from the user's own files and never bundled.
+A Harmony postfix on `TeleportWorld.Awake` hides the wooden frame (`forceRenderingOff` on `m_model`) and adds a procedurally built ring, rune ring and nine Chevrunes. `GateRing` watches the portal's connection state and animates the connect sequence. Sounds are loaded from the user's own files and never bundled.
 
 ## Building
 

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace PortalHeimSG1
 {
-    /// <summary>Builds the gate's ring and chevron meshes in code (there's no Unity editor to model them in).</summary>
+    /// <summary>Builds the gate's ring and chevrune meshes in code (there's no Unity editor to model them in).</summary>
     internal static class GateMeshes
     {
         // The portal's opening is about 3 m across; these keep the ring inside the vanilla frame's footprint.
@@ -13,8 +13,8 @@ namespace PortalHeimSG1
         public const float InnerRingOut = 1.42f;
         public const float OuterHalfDepth = 0.16f;
         public const float InnerHalfDepth = 0.11f;
-        public const float ChevronProtrusion = 0.05f;
-        public const int ChevronCount = 9;
+        public const float ChevruneProtrusion = 0.05f;
+        public const int ChevruneCount = 9;
 
         private const int Segments = 96;
 
@@ -63,10 +63,10 @@ namespace PortalHeimSG1
             new Vector2((mirror ? -p.x : p.x) / reference + 0.5f, p.y / reference + 0.5f);
 
         /// <summary>
-        /// A chevron: a "&lt;" band pointing toward the gate's centre, as a block running through the
+        /// A chevrune: a "&lt;" band pointing toward the gate's centre, as a block running through the
         /// ring so it shows on both faces. Local +X is radially outward.
         /// </summary>
-        public static Mesh Chevron()
+        public static Mesh Chevrune()
         {
             // Drawn at a convenient size, then centred (the shape runs x = -0.20..0.12) and scaled to fit the ring band.
             var shape = new[]
@@ -78,7 +78,7 @@ namespace PortalHeimSG1
             var poly = new Vector2[shape.Length];
             for (int i = 0; i < shape.Length; i++)
                 poly[i] = new Vector2((shape[i].x + 0.04f) * scale, shape[i].y * scale);
-            float h = OuterHalfDepth + ChevronProtrusion;
+            float h = OuterHalfDepth + ChevruneProtrusion;
             var b = new Builder();
 
             // Caps: the "<" splits into two convex quads.
@@ -106,7 +106,7 @@ namespace PortalHeimSG1
                 b.Quad(new Vector3(p.x, p.y, -h), new Vector3(p.x, p.y, h), new Vector3(q.x, q.y, h), new Vector3(q.x, q.y, -h),
                        n, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero);
             }
-            return b.ToMesh("SG1Chevron");
+            return b.ToMesh("SG1Chevrune");
         }
 
         private static void Cap(Builder b, Vector3 normal, float z, Vector2 a, Vector2 bb, Vector2 c, Vector2 d) =>

@@ -22,7 +22,7 @@ namespace PortalHeimSG1.Art
             var c = StoneBase(outerRadius, ringIn, ringOut, 14, 96, 90, 80);
             float k = Size / (2f * outerRadius);
             float mid = (ringIn + ringOut) * 0.5f * k;
-            // Two shallow grooves running around the ring, inside and outside the chevron line.
+            // Two shallow grooves running around the ring, inside and outside the chevrune line.
             Circle(c, mid - (ringOut - ringIn) * 0.28f * k, 3f, 54, 50, 44);
             Circle(c, mid + (ringOut - ringIn) * 0.28f * k, 3f, 54, 50, 44);
             return c;

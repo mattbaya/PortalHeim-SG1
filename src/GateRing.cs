@@ -3,7 +3,7 @@ using UnityEngine;
 namespace PortalHeimSG1
 {
     /// <summary>
-    /// Brings a gate to life: when the portal connects, the rune ring spins and the chevrons lock one by
+    /// Brings a gate to life: when the portal connects, the rune ring spins and the chevrunes lock one by
     /// one before the gate opens; when it disconnects they go dark again. It only watches the portal's own
     /// state and never changes what the portal does.
     /// </summary>
@@ -13,7 +13,7 @@ namespace PortalHeimSG1
 
         public static readonly Color Dark = new Color(0.16f, 0.14f, 0.12f);
 
-        // Seconds the ring spins before each chevron locks, and how long each lock holds.
+        // Seconds the ring spins before each chevrune locks, and how long each lock holds.
         private const float SpinSeconds = 0.7f;
         private const float SpinDegreesPerSecond = 130f;
         // Beyond this distance there's no point animating; the gate just snaps to its state.
@@ -21,7 +21,7 @@ namespace PortalHeimSG1
 
         private TeleportWorld _portal;
         private Transform _inner;
-        private Renderer[] _chevrons;
+        private Renderer[] _chevrunes;
         private AudioSource _template;
         private AudioSource _idleSource;
         private AudioSource _spinSource;
@@ -33,11 +33,11 @@ namespace PortalHeimSG1
         private bool _wasConnected;
         private bool _wasHumming;
 
-        public void Setup(TeleportWorld portal, Transform inner, Renderer[] chevrons)
+        public void Setup(TeleportWorld portal, Transform inner, Renderer[] chevrunes)
         {
             _portal = portal;
             _inner = inner;
-            _chevrons = chevrons;
+            _chevrunes = chevrunes;
             _template = portal.m_target_found != null ? portal.m_target_found.GetComponentInChildren<AudioSource>() : null;
 
             _idleSource = GateSounds.Configure(gameObject.AddComponent<AudioSource>(), _template, loop: true);
@@ -83,7 +83,7 @@ namespace PortalHeimSG1
             _locked = 0;
             _phaseTime = 0f;
             _spinDirection = 1f;
-            for (int i = 0; i < _chevrons.Length; i++) SetChevron(i, false);
+            for (int i = 0; i < _chevrunes.Length; i++) SetChevrune(i, false);
             StartSpinSound();
         }
 
@@ -92,7 +92,7 @@ namespace PortalHeimSG1
             _phaseTime += Time.deltaTime;
             float seconds = Mathf.Max(0.2f, PortalHeimSG1Plugin.LockSeconds.Value);
 
-            // The ring spins for the first part of each step, then stops while the chevron locks.
+            // The ring spins for the first part of each step, then stops while the chevrune locks.
             if (_phaseTime < SpinSeconds)
                 _inner.Rotate(0f, 0f, _spinDirection * SpinDegreesPerSecond * Time.deltaTime);
 
@@ -100,13 +100,13 @@ namespace PortalHeimSG1
 
             if (_phaseTime >= seconds)
             {
-                SetChevron(_locked, true);
-                GateSounds.PlayAt(GateSounds.Chevron, transform.position, _template);
+                SetChevrune(_locked, true);
+                GateSounds.PlayAt(GateSounds.Chevrune, transform.position, _template);
                 _locked++;
                 _phaseTime = 0f;
                 _spinDirection = -_spinDirection;
 
-                if (_locked >= _chevrons.Length)
+                if (_locked >= _chevrunes.Length)
                 {
                     _spinSource.Stop();
                     _phase = Phase.Open;
@@ -135,15 +135,15 @@ namespace PortalHeimSG1
         private void SnapTo(Phase phase)
         {
             _phase = phase;
-            for (int i = 0; i < _chevrons.Length; i++) SetChevron(i, phase == Phase.Open);
+            for (int i = 0; i < _chevrunes.Length; i++) SetChevrune(i, phase == Phase.Open);
         }
 
-        private void SetChevron(int index, bool lit)
+        private void SetChevrune(int index, bool lit)
         {
-            if (index < 0 || index >= _chevrons.Length) return;
+            if (index < 0 || index >= _chevrunes.Length) return;
             // Swap between two shared materials (the game's hover/damage highlighting can clear
             // per-renderer overrides, but it leaves material assignments alone).
-            _chevrons[index].sharedMaterial = lit ? GateBuilder.ChevronOn : GateBuilder.ChevronOff;
+            _chevrunes[index].sharedMaterial = lit ? GateBuilder.ChevruneOn : GateBuilder.ChevruneOff;
         }
 
         // ---------------------------------------------------------------- sound

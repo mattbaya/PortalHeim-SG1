@@ -11,12 +11,12 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.1.0";
+        public const string Version = "0.1.1";
 
         internal static ManualLogSource Log;
 
         internal static ConfigEntry<bool> Reskin;
-        internal static ConfigEntry<Color> ChevronColor;
+        internal static ConfigEntry<Color> ChevruneColor;
         internal static ConfigEntry<float> LockSeconds;
         internal static ConfigEntry<float> Volume;
 
@@ -27,12 +27,12 @@ namespace PortalHeimSG1
             Log = Logger;
 
             Reskin = Config.Bind("Look", "Reskin", true,
-                "Turn every portal into a ring gate with runes and chevrons. Takes effect for portals loaded after this is changed " +
+                "Turn every portal into a ring gate with runes and chevrunes. Takes effect for portals loaded after this is changed " +
                 "(restart the game to be sure). Set to false to leave portals as they are.");
-            ChevronColor = Config.Bind("Look", "ChevronColor", new Color(1f, 0.45f, 0.1f, 1f),
-                "The glow colour of a locked chevron.");
-            LockSeconds = Config.Bind("Look", "SecondsPerChevron", 1.0f,
-                new ConfigDescription("How long each chevron takes to lock when a gate connects.", new AcceptableValueRange<float>(0.3f, 4f)));
+            ChevruneColor = Config.Bind("Look", "ChevruneColor", new Color(1f, 0.45f, 0.1f, 1f),
+                "The glow colour of a locked chevrune.");
+            LockSeconds = Config.Bind("Look", "SecondsPerChevrune", 1.0f,
+                new ConfigDescription("How long each chevrune takes to lock when a gate connects.", new AcceptableValueRange<float>(0.3f, 4f)));
             Volume = Config.Bind("Sound", "Volume", 1.0f,
                 new ConfigDescription("Volume of the gate sounds you provide (also follows the game's sound-effects volume).", new AcceptableValueRange<float>(0f, 1f)));
 

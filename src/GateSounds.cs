@@ -14,7 +14,7 @@ namespace PortalHeimSG1
     internal static class GateSounds
     {
         // The sound moments, and the file names (any of .ogg .wav .mp3) that fill them.
-        public const string Chevron = "chevron";     // each chevron locks
+        public const string Chevrune = "chevrune";     // each chevrune locks
         public const string Spin = "spin";           // the inner ring turning (loops while it spins)
         public const string Activate = "activate";   // the gate opens
         public const string Idle = "idle";           // the open gate's hum (loops)
@@ -41,7 +41,7 @@ namespace PortalHeimSG1
                 if (!File.Exists(note))
                     File.WriteAllText(note,
                         "Put your own sound clips here (.ogg, .wav or .mp3). PortalHeim_SG1 doesn't ship any.\n\n" +
-                        "chevron   - plays as each chevron locks\n" +
+                        "chevrune   - plays as each chevrune locks\n" +
                         "spin      - the inner ring turning (loops while it spins)\n" +
                         "activate  - the gate opens\n" +
                         "idle      - the open gate's hum (loops; replaces the game's own portal hum)\n" +
