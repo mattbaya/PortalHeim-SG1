@@ -19,8 +19,8 @@ namespace PortalHeimSG1.Art
             var px = new Pixels(Size, Size);
             float cx = (Size - 1) * 0.5f, cy = 71f;
             const float outer = 56f, inner = 35f;
-            // The ring is buried below this line; the ramp sits under it. (Origin is the bottom-left.)
-            const float ground = 27f;
+            // The ring is buried below this line, so the floor of the opening is level with the ground. (Origin is the bottom-left.)
+            const float ground = 35.5f;   // the bottom of the opening (cy - inner), where the ramp's top sits too
 
             // Nine arrows, the top one first, each pointing at the centre.
             var tris = new float[9][];
@@ -52,8 +52,8 @@ namespace PortalHeimSG1.Art
                 }
             }
 
-            // The ramp: a low wedge in front of the buried base, wider at the bottom.
-            px.FillConvex(new[] { 32f, 96f, 118f, 10f }, new[] { 20f, 20f, 5f, 5f }, R, G, B);
+            // The ramp: its top is flush with the floor of the opening, widening as it comes down to the ground.
+            px.FillConvex(new[] { 20f, 108f, 122f, 6f }, new[] { 36.5f, 36.5f, 22f, 22f }, R, G, B);
 
             return px;
         }
