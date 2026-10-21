@@ -3,7 +3,7 @@ using System;
 namespace PortalHeimSG1.Art
 {
     /// <summary>
-    /// The little gate that marks a gate on the map: the stone ring, nine light-blue Chevrunes pointing in, and water inside,
+    /// The little gate that marks a gate on the map: the stone ring, nine orange Chevrunes pointing in, and light-blue water inside,
     /// with a dark outline so it stands out on the parchment. Drawn in code like the rest of the artwork.
     /// </summary>
     public static class MapIcon
@@ -33,7 +33,7 @@ namespace PortalHeimSG1.Art
 
                     // The water, brighter in the middle.
                     float depth = Math.Max(0f, 1f - d / inner);
-                    byte wr = (byte)(16 + 24 * depth), wg = (byte)(58 + 50 * depth), wb = (byte)(104 + 56 * depth);
+                    byte wr = (byte)(96 + 56 * depth), wg = (byte)(176 + 44 * depth), wb = (byte)(230 + 20 * depth);
                     px.Blend(x, y, wr, wg, wb, Cover(inner - d));
                 }
             }
@@ -52,8 +52,8 @@ namespace PortalHeimSG1.Art
                 float grow = 1.7f;
                 var gx = new[] { c + ux * (tip - grow), c + ux * (baseR + grow) + tx * (half + grow), c + ux * (baseR + grow) - tx * (half + grow) };
                 var gy = new[] { c + uy * (tip - grow), c + uy * (baseR + grow) + ty * (half + grow), c + uy * (baseR + grow) - ty * (half + grow) };
-                px.FillConvex(gx, gy, 14, 48, 86);
-                px.FillConvex(xs, ys, 150, 220, 255);
+                px.FillConvex(gx, gy, 70, 30, 6);
+                px.FillConvex(xs, ys, 255, 150, 40);
             }
 
             return px;

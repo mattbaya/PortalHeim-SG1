@@ -70,7 +70,7 @@ With PortalHeim_SG1 on the **server** as well as on each player's game, gates ca
 | Dialing / Enabled | true | Dialing on or off (set it on the server to switch it off for everyone) |
 | Dialing / OnlyShowVisitedGates | true | `false` lists and pins every gate in the world |
 | Dialing / ShowGatePins | true | Gate pins on the map |
-| Dialing / GateIconOnMap | true | Mark gates with the mod's own gate icon (light-blue Chevrunes) |
+| Dialing / GateIconOnMap | true | Mark gates with the mod's own gate icon (orange Chevrunes, light-blue water) |
 | Dialing / PinIcon | Icon4 | Built-in map icon used when GateIconOnMap is off |
 | Dialing / CloseAfterIdleSeconds | 15 | Server: a dialed gate closes this long after the last player leaves |
 | Dialing / MaxOpenSeconds | 300 | Server: a dialed gate always closes after this long |
