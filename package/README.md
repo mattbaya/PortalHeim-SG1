@@ -2,7 +2,7 @@
 
 Turns every portal into a **stone ring gate**: an outer ring with nine glowing **Chevrunes** (chevrons set with runes), and an inner ring of **Elder Futhark runes** that spins when a portal connects while the Chevrunes **lock one by one** and glow. It's *inspired by* a certain famous gate, but built from Norse runes and a design of its own.
 
-When a gate is live (someone is standing at either end), the opening **fills with a rippling pool of water**; it drains away when everyone has gone. On a long portal trip the loading screen becomes an **endless swirling tunnel** (a blue time-vortex flying toward a bright light) instead of the game's spinner. (Prefer the game's own swirl? Set `Interior` to `Vanilla`.)
+When someone walks up to a connected gate (at either end), it **starts up**: the ring spins and the **Chevrunes** (arrows that turn into glowing runes) lock on in pairs, bottom to top, then the opening **fills with a rippling pool of water**. When everyone has gone it shuts down again. A connected gate that nobody is near glows faintly. Gentle **ramps** on both sides let anyone walk in, even when overencumbered. On a long portal trip the loading screen becomes an **endless swirling tunnel** (a blue time-vortex flying toward a bright light) instead of the game's spinner. (Prefer the game's own swirl? Set `Interior` to `Vanilla`.)
 
 It only changes how portals **look and sound**. Portals work exactly as before, and it's **client-side only**: nobody else needs the mod, and other players see normal portals.
 
@@ -43,7 +43,10 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 | --- | --- | --- |
 | Look / Reskin | true | Set to false to keep ordinary portals |
 | Look / ChevruneColor | orange | Glow colour of a locked Chevrune |
-| Look / SecondsPerChevrune | 0.5 | Seconds between each Chevrune lighting up (nine in all) |
+| Look / Ramps | true | A gentle ramp up to the portal's base on both sides |
+| Look / SinkRing | true | The ring sits low so the opening is level with the ground |
+| Look / DormantGlow | 0.3 | How brightly a connected but idle gate's Chevrunes glow (0 = dark) |
+| Look / SecondsPerChevrune | 0.5 | Seconds between start-up steps (five steps: bottom pair, then up the sides, top last) |
 | Diagnostics / PreviewKey | F8 | Stand near a gate and press it to replay the opening sequence and sounds |
 | Diagnostics / ShowStatusOnSpawn | true | Shows a status line a few seconds after you spawn (turn off once it all works) |
 | Look / TravelScreen | Tunnel | `Tunnel` = endless swirling tunnel, `Gate` = a miniature gate, `Vanilla` = the game's own spinner (reload a world to apply) |

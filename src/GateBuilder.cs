@@ -9,12 +9,26 @@ namespace PortalHeimSG1
     /// <summary>Attaches the stone ring, rotating rune ring and chevrunes to a portal, and hides its wooden frame.</summary>
     internal static class GateBuilder
     {
-        // Centre of the vanilla portal's opening, in the portal's own space (its swirl effect sits at y = 1.37).
-        private static readonly Vector3 GateCenter = new Vector3(0f, 1.50f, 0f);
+        // Where the ring is centred, in the portal's own space. By default it sits low enough that the bottom of
+        // the opening is level with the ground (the outer ring's lower part is buried), so there's no lip to step over.
+        // (The vanilla swirl sits at y = 1.37, which is where an unsunk ring would be centred.)
+        private static Vector3 GateCenter => new Vector3(0f, PortalHeimSG1Plugin.SinkRing.Value ? GateMeshes.InnerRingIn + 0.02f : 1.50f, 0f);
+
+        // The portal's base slab: about 3 m wide, 0.8 m deep, 0.1 m tall. The ramps lead up to its top edge.
+        private const float SlabHalfDepth = 0.395f;
+        private const float SlabTop = 0.10f;
+        private const float RampHalfWidth = 1.45f;
+        private const float RampLength = 1.25f;
+        private static Mesh _ramp;
 
         private const int MaxBuildAttempts = 3;
 
         private static Mesh _outerRing, _innerRing, _chevrune, _waterDisc;
+        private static Mesh[] _runes;
+
+        // The rune on each Chevrune, in ring order starting from the top and going round: Othala (home) at the top,
+        // then V-A-L-H-E-I-M (Wunjo, Ansuz, Laguz, Hagalaz, Ehwaz, Isa, Mannaz), then Dagaz.
+        private static readonly int[] RuneAt = { 23, 7, 3, 20, 8, 18, 10, 19, 22 };
         private static Material _outerMaterial, _innerMaterial;
         private static bool _built;
         private static int _failures;
@@ -23,6 +37,7 @@ namespace PortalHeimSG1
         /// <summary>Shared chevrune materials: one dark, one glowing. Chevrunes just switch between them.</summary>
         public static Material ChevruneOff { get; private set; }
         public static Material ChevruneOn { get; private set; }
+        public static Material ChevruneDim { get; private set; }
 
         public static void Attach(TeleportWorld portal)
         {
@@ -37,19 +52,30 @@ namespace PortalHeimSG1
             Add(root, "OuterRing", _outerRing, _outerMaterial);
             var inner = Add(root, "InnerRing", _innerRing, _innerMaterial);
 
-            var chevrunes = new List<MeshRenderer>();
+            if (PortalHeimSG1Plugin.Ramps.Value) AddRamps(portal, root);
+
+            var chevrunes = new List<ChevruneParts>();
             float radius = (GateMeshes.OuterRingIn + GateMeshes.OuterRadius) * 0.5f;
             for (int i = 0; i < GateMeshes.ChevruneCount; i++)
             {
                 // The first chevrune sits at the top; the rest follow around the ring.
                 float angle = 90f + 360f * i / GateMeshes.ChevruneCount;
-                var go = Add(root, $"Chevrune{i}", _chevrune, ChevruneOff);
-                go.transform.localPosition = Quaternion.Euler(0, 0, angle) * new Vector3(radius, 0, 0);
-                go.transform.localRotation = Quaternion.Euler(0, 0, angle);
-                var chevruneRenderer = go.GetComponent<MeshRenderer>();
-                chevruneRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-                chevruneRenderer.receiveShadows = false;
-                chevrunes.Add(chevruneRenderer);
+                var holder = new GameObject($"Chevrune{i}").transform;
+                holder.SetParent(root, false);
+                holder.localPosition = Quaternion.Euler(0, 0, angle) * new Vector3(radius, 0, 0);
+                holder.localRotation = Quaternion.Euler(0, 0, angle);
+
+                // The arrow it shows while idle, and the rune it turns into when it locks (hidden until then).
+                var arrow = Add(holder, "Arrow", _chevrune, ChevruneOff).GetComponent<MeshRenderer>();
+                var rune = Add(holder, "Rune", _runes[i], ChevruneOff).GetComponent<MeshRenderer>();
+                foreach (var r in new[] { arrow, rune })
+                {
+                    r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                    r.receiveShadows = false;
+                }
+                rune.enabled = false;
+                rune.transform.localScale = Vector3.zero;
+                chevrunes.Add(new ChevruneParts { Arrow = arrow, Rune = rune });
             }
 
             int hidden = HideWoodenFrame(portal, root);
@@ -81,6 +107,35 @@ namespace PortalHeimSG1
                     $"Gate #{_attached} attached to '{portal.name}': hid {hidden} frame renderer(s), " +
                     $"ring at {root.position}, stone shader '{_outerMaterial.shader.name}', " +
                     $"portal enabled={portal.enabled}.");
+        }
+
+        /// <summary>A gentle ramp up to the base slab on each side, with collision, so anyone can walk in (even overencumbered).</summary>
+        private static void AddRamps(TeleportWorld portal, Transform gateRoot)
+        {
+            // Take the layer of the portal's own base collider, so the ramps behave like part of the portal
+            // (including for the hammer's hover and removal).
+            int layer = 0;
+            foreach (var collider in portal.GetComponentsInChildren<Collider>(true))
+                if (!collider.isTrigger && !collider.transform.IsChildOf(gateRoot)) { layer = collider.gameObject.layer; break; }
+
+            foreach (float side in new[] { 1f, -1f })
+            {
+                // Parented under the gate (so the frame-hiding leaves it alone) but placed in portal space.
+                var holder = new GameObject(side > 0 ? "RampFront" : "RampBack");
+                holder.transform.SetParent(gateRoot, false);
+                holder.transform.localPosition = -gateRoot.localPosition;
+                holder.transform.localRotation = Quaternion.Euler(0f, side > 0 ? 0f : 180f, 0f);
+                holder.layer = layer;
+
+                holder.AddComponent<MeshFilter>().sharedMesh = _ramp;
+                var renderer = holder.AddComponent<MeshRenderer>();
+                renderer.sharedMaterial = _outerMaterial;
+                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+
+                var collision = holder.AddComponent<MeshCollider>();
+                collision.sharedMesh = _ramp;
+                collision.convex = true;
+            }
         }
 
         private static GameObject Add(Transform parent, string name, Mesh mesh, Material material)
@@ -149,6 +204,8 @@ namespace PortalHeimSG1
                 _outerRing = GateMeshes.Annulus("SG1OuterRing", GateMeshes.OuterRingIn, GateMeshes.OuterRadius, GateMeshes.OuterHalfDepth);
                 _innerRing = GateMeshes.Annulus("SG1InnerRing", GateMeshes.InnerRingIn, GateMeshes.InnerRingOut, GateMeshes.InnerHalfDepth);
                 _chevrune = GateMeshes.Chevrune();
+                _runes = System.Array.ConvertAll(RuneAt, GateMeshes.Rune);
+                _ramp = GateMeshes.Ramp(RampHalfWidth, SlabHalfDepth, SlabHalfDepth + RampLength, SlabTop, -0.40f);
                 // Slightly wider than the opening so its edge tucks under the inner ring.
                 _waterDisc = GateMeshes.Disc(GateMeshes.InnerRingIn + 0.03f, 64);
 
@@ -167,10 +224,16 @@ namespace PortalHeimSG1
                 var flat = Shader.Find("Unlit/Color") ?? Shader.Find("Sprites/Default") ?? _outerMaterial.shader;
                 ChevruneOff = Flat(flat, "SG1ChevruneOff", GateRing.Dark);
                 ChevruneOn = Flat(flat, "SG1ChevruneOn", PortalHeimSG1Plugin.ChevruneColor.Value);
-                PortalHeimSG1Plugin.ChevruneColor.SettingChanged += (_, __) => Tint(ChevruneOn, PortalHeimSG1Plugin.ChevruneColor.Value);
+                ChevruneDim = Flat(flat, "SG1ChevruneDim", DimColor());
+                PortalHeimSG1Plugin.ChevruneColor.SettingChanged += (_, __) =>
+                {
+                    Tint(ChevruneOn, PortalHeimSG1Plugin.ChevruneColor.Value);
+                    Tint(ChevruneDim, DimColor());
+                };
+                PortalHeimSG1Plugin.DormantGlow.SettingChanged += (_, __) => Tint(ChevruneDim, DimColor());
 
                 // Valheim unloads unused assets when you leave a world; keep ours so the next world still has them.
-                foreach (var obj in new UnityEngine.Object[] { _outerRing, _innerRing, _chevrune, _waterDisc, _outerMaterial, _innerMaterial, ChevruneOff, ChevruneOn })
+                foreach (var obj in new UnityEngine.Object[] { _outerRing, _innerRing, _chevrune, _waterDisc, _ramp, _outerMaterial, _innerMaterial, ChevruneOff, ChevruneOn, ChevruneDim })
                     if (obj != null) obj.hideFlags |= HideFlags.DontUnloadUnusedAsset;
 
                 _built = true;
@@ -193,6 +256,10 @@ namespace PortalHeimSG1
         {
             "_BumpMap", "_MetallicGlossMap", "_EmissiveTex", "_EmissionMap", "_OcclusionMap", "_ParallaxMap", "_DetailAlbedoMap", "_DetailNormalMap",
         };
+
+        /// <summary>How a connected gate's Chevrunes look while nobody is near: the lit colour, faded toward dark.</summary>
+        private static Color DimColor() =>
+            Color.Lerp(GateRing.Dark, PortalHeimSG1Plugin.ChevruneColor.Value, Mathf.Clamp01(PortalHeimSG1Plugin.DormantGlow.Value));
 
         private static Material Flat(Shader shader, string name, Color color)
         {

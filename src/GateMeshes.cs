@@ -76,6 +76,104 @@ namespace PortalHeimSG1
             return mesh;
         }
 
+        // ---------------------------------------------------------------- ramps
+
+        /// <summary>
+        /// A wedge that rises from below ground out in front of the portal up to the top of its base slab, so
+        /// walking in is a gentle slope even for someone overencumbered. Drawn on the +Z side (rotate it for the back).
+        /// Doubles as the collision shape (it's convex).
+        /// </summary>
+        public static Mesh Ramp(float halfWidth, float zStart, float zEnd, float yTop, float yBottom)
+        {
+            var b = new Builder();
+            float w = halfWidth;
+            var topL = new Vector3(-w, yTop, zStart);    var topR = new Vector3(w, yTop, zStart);
+            var farL = new Vector3(-w, yBottom, zEnd);   var farR = new Vector3(w, yBottom, zEnd);
+            var botL = new Vector3(-w, yBottom, zStart); var botR = new Vector3(w, yBottom, zStart);
+
+            // The slope: up and outward, perpendicular to the way it runs.
+            float rise = yTop - yBottom, run = zEnd - zStart;
+            float len = Mathf.Sqrt(rise * rise + run * run);
+            var slope = new Vector3(0f, run / len, rise / len);
+
+            Vector2 Uv(Vector3 p) => new Vector2(0.5f + p.x * 0.25f, 0.5f + p.z * 0.25f);
+            void Face(Vector3 a, Vector3 bb, Vector3 c, Vector3 d, Vector3 n) => b.Quad(a, bb, c, d, n, Uv(a), Uv(bb), Uv(c), Uv(d));
+
+            Face(topL, topR, farR, farL, slope);                          // the walkable slope
+            Face(topL, topR, botR, botL, new Vector3(0, 0, -1));          // back, against the slab
+            Face(botL, botR, farR, farL, new Vector3(0, -1, 0));          // underneath
+            Face(topL, farL, botL, botL, new Vector3(-1, 0, 0));          // left end (a triangle)
+            Face(topR, farR, botR, botR, new Vector3(1, 0, 0));           // right end (a triangle)
+            return b.ToMesh("SG1Ramp");
+        }
+
+        // ---------------------------------------------------------------- runes
+
+        // How big a rune is on the ring, and how thick its strokes and raised plates are.
+        private const float RuneScale = 0.125f;
+        private const float RuneStroke = 0.034f;
+        private const float RunePlate = 0.035f;
+
+        /// <summary>
+        /// A rune as raised strokes on both faces of the ring: the front plate reads correctly from the +Z side
+        /// and the back plate (mirrored) from the -Z side. Local +X is radially outward, like the chevrune arrow.
+        /// </summary>
+        public static Mesh Rune(int glyph)
+        {
+            var b = new Builder();
+            float outer = OuterHalfDepth + ChevruneProtrusion;
+            foreach (var line in Art.Runes.Lines(glyph))
+            {
+                for (int k = 0; k + 3 < line.Length; k += 2)
+                {
+                    // Glyph "up" runs radially outward, glyph "right" runs along the ring (as on the inner ring).
+                    var p = new Vector2((line[k + 1] - 1f) * RuneScale, (line[k] - 0.5f) * RuneScale * 1.2f);
+                    var q = new Vector2((line[k + 3] - 1f) * RuneScale, (line[k + 2] - 0.5f) * RuneScale * 1.2f);
+                    Stroke(b, p, q, outer, outer - RunePlate, mirror: false);
+                    Stroke(b, p, q, -outer, -outer + RunePlate, mirror: true);
+                }
+            }
+            return b.ToMesh($"SG1Rune{glyph}");
+        }
+
+        /// <summary>One straight stroke as a thin raised bar, with squared ends that overlap neighbours at the joints.</summary>
+        private static void Stroke(Builder b, Vector2 p, Vector2 q, float zOuter, float zInner, bool mirror)
+        {
+            if (mirror) { p = new Vector2(p.x, -p.y); q = new Vector2(q.x, -q.y); }
+            float dx = q.x - p.x, dy = q.y - p.y;
+            float len = Mathf.Sqrt(dx * dx + dy * dy);
+            if (len < 1e-5f) return;
+            float ux = dx / len, uy = dy / len;        // along the stroke
+            float nx = -uy, ny = ux;                    // across it
+            float half = RuneStroke * 0.5f;
+
+            var corners = new[]
+            {
+                new Vector2(p.x - ux * half + nx * half, p.y - uy * half + ny * half),
+                new Vector2(q.x + ux * half + nx * half, q.y + uy * half + ny * half),
+                new Vector2(q.x + ux * half - nx * half, q.y + uy * half - ny * half),
+                new Vector2(p.x - ux * half - nx * half, p.y - uy * half - ny * half),
+            };
+
+            // Top face (the one you see) and the four sides down to the ring.
+            var top = new Vector3(0, 0, Mathf.Sign(zOuter));
+            b.Quad(new Vector3(corners[0].x, corners[0].y, zOuter), new Vector3(corners[1].x, corners[1].y, zOuter),
+                   new Vector3(corners[2].x, corners[2].y, zOuter), new Vector3(corners[3].x, corners[3].y, zOuter),
+                   top, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero);
+
+            for (int i = 0; i < 4; i++)
+            {
+                var a = corners[i]; var c = corners[(i + 1) % 4];
+                float ex = c.x - a.x, ey = c.y - a.y, el = Mathf.Sqrt(ex * ex + ey * ey);
+                // Outward from the bar's centre, whichever way the corners were wound.
+                var mid = new Vector2((corners[0].x + corners[2].x) * 0.5f, (corners[0].y + corners[2].y) * 0.5f);
+                var normal = new Vector3(ey / el, -ex / el, 0f);
+                if (normal.x * ((a.x + c.x) * 0.5f - mid.x) + normal.y * ((a.y + c.y) * 0.5f - mid.y) < 0f) normal = normal * -1f;
+                b.Quad(new Vector3(a.x, a.y, zInner), new Vector3(a.x, a.y, zOuter), new Vector3(c.x, c.y, zOuter), new Vector3(c.x, c.y, zInner),
+                       normal, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero);
+            }
+        }
+
         private static void Wall(Builder b, Vector2 d0, Vector2 d1, float radius, float halfDepth, bool outward, float reference)
         {
             var n0 = new Vector3(d0.x, d0.y, 0) * (outward ? 1f : -1f);

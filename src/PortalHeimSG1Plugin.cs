@@ -37,13 +37,16 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.1.9";
+        public const string Version = "0.2.0";
 
         internal static ManualLogSource Log;
 
         internal static ConfigEntry<bool> Reskin;
         internal static ConfigEntry<Color> ChevruneColor;
         internal static ConfigEntry<float> LockSeconds;
+        internal static ConfigEntry<float> DormantGlow;
+        internal static ConfigEntry<bool> Ramps;
+        internal static ConfigEntry<bool> SinkRing;
         internal static ConfigEntry<ShadingMode> Shading;
         internal static ConfigEntry<InteriorMode> Interior;
         internal static ConfigEntry<TravelMode> Travel;
@@ -67,6 +70,15 @@ namespace PortalHeimSG1
                 "The glow colour of a locked chevrune.");
             LockSeconds = Config.Bind("Look", "SecondsPerChevrune", 0.5f,
                 new ConfigDescription("Seconds between each Chevrune lighting up when a gate connects (nine in all).", new AcceptableValueRange<float>(0.1f, 4f)));
+            Ramps = Config.Bind("Look", "Ramps", true,
+                "Add a gentle ramp up to the portal's base on both sides, so anyone can walk in, even when overencumbered. " +
+                "Takes effect for portals loaded after this is changed.");
+            SinkRing = Config.Bind("Look", "SinkRing", true,
+                "Sit the ring low so the bottom of the opening is level with the ground (the lower part of the outer ring is buried), " +
+                "instead of having a stone lip to step over. Takes effect for portals loaded after this is changed.");
+            DormantGlow = Config.Bind("Look", "DormantGlow", 0.3f,
+                new ConfigDescription("How brightly a connected gate's Chevrunes glow while nobody is near it (0 = dark, 1 = fully lit). " +
+                    "They light up fully, one at a time, when someone walks up.", new AcceptableValueRange<float>(0f, 1f)));
             Interior = Config.Bind("Look", "Interior", InteriorMode.Water,
                 "What fills an open gate: Water (a rippling pool) or Vanilla (the portal's own swirl). Takes effect for portals loaded after this is changed.");
             Travel = Config.Bind("Look", "TravelScreen", TravelMode.Tunnel,

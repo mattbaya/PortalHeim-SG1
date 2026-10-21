@@ -2,10 +2,19 @@ using UnityEngine;
 
 namespace PortalHeimSG1
 {
+    internal enum ChevruneState { Off, Dim, Lit }
+
+    /// <summary>One Chevrune: the arrow it shows while idle, and the rune it turns into when it locks.</summary>
+    internal class ChevruneParts
+    {
+        public MeshRenderer Arrow;
+        public MeshRenderer Rune;
+    }
+
     /// <summary>
-    /// Brings a gate to life: when the portal connects, the rune ring spins and the chevrunes lock one
-    /// by one before the gate opens and fills with water; when it disconnects they go dark again. It only
-    /// watches the portal's own state and never changes what the portal does.
+    /// Brings a gate to life. When a gate goes live (someone walks up to either end of a connected portal),
+    /// the rune ring spins and the Chevrunes lock one by one, then the gate opens and fills with water. When
+    /// everyone has gone it shuts down again. It only watches the portal and never changes what it does.
     /// </summary>
     internal class GateRing : MonoBehaviour
     {
@@ -15,16 +24,33 @@ namespace PortalHeimSG1
 
         // Part of each step spent turning the ring before the Chevrune locks; it turns one Chevrune's width per step.
         private const float SpinShareOfStep = 0.65f;
-        private const float DegreesPerStep = 40f;
-        // Beyond this distance there's no point animating; the gate just snaps to its state.
-        private const float AnimateRange = 70f;
+        private const float DegreesPerStep = 72f;
+        // How long an arrow takes to turn into its rune (and back).
+        private const float MorphSeconds = 0.22f;
+
+        // Which Chevrunes lock on each step. They sit around the ring starting from the top (0), going round:
+        // so 4 and 5 are the bottom pair, then the pairs climb the sides, and the top one locks last.
+        private static readonly int[][] LockOrder =
+        {
+            new[] { 4, 5 },
+            new[] { 3, 6 },
+            new[] { 2, 7 },
+            new[] { 1, 8 },
+            new[] { 0 },
+        };
+        // Sounds are only made for gates this close (they can't be heard from further anyway).
+        private const float SoundRange = 45f;
+        // A gate stays live this long after the last person leaves range, so standing at the edge doesn't flicker it.
+        private const float LiveGraceSeconds = 2f;
         // The water splashes open, then settles; it drains away faster than it fills.
         private const float WaterFillSeconds = 0.9f;
         private const float WaterDrainSeconds = 0.25f;
 
         private TeleportWorld _portal;
         private Transform _inner;
-        private Renderer[] _chevrunes;
+        private ChevruneParts[] _chevrunes;
+        private ChevruneState[] _state;
+        private float[] _morph;              // 0 = arrow, 1 = rune
         private MeshRenderer _water;
         private ParticleSystemRenderer[] _swirl;
         private AudioSource _template;
@@ -38,18 +64,20 @@ namespace PortalHeimSG1
         private float _waterProgress;       // 0 = empty, 1 = full
         private bool _waterCounted;
         private bool _swirlHidden;
-        private bool _wasConnected;
         private bool _wasHumming;
         private bool _previewing;
         private float _previewHoldUntil;
-        private bool _occupied;            // someone is standing at one end of this gate
-        private float _nextOccupancyCheck;
+        private float _nextLiveCheck;
+        private float _liveUntil;
+        private ChevruneState? _idleLook;   // what the Chevrunes show while idle, to avoid redoing it every frame
 
-        public void Setup(TeleportWorld portal, Transform inner, Renderer[] chevrunes, MeshRenderer water, ParticleSystemRenderer[] swirl)
+        public void Setup(TeleportWorld portal, Transform inner, ChevruneParts[] chevrunes, MeshRenderer water, ParticleSystemRenderer[] swirl)
         {
             _portal = portal;
             _inner = inner;
             _chevrunes = chevrunes;
+            _state = new ChevruneState[chevrunes.Length];
+            _morph = new float[chevrunes.Length];
             _water = water;
             _swirl = swirl ?? new ParticleSystemRenderer[0];
             _template = portal.m_target_found != null ? portal.m_target_found.GetComponentInChildren<AudioSource>() : null;
@@ -57,14 +85,16 @@ namespace PortalHeimSG1
             _idleSource = GateSounds.Configure(gameObject.AddComponent<AudioSource>(), _template, loop: true);
             _spinSource = GateSounds.Configure(gameObject.AddComponent<AudioSource>(), _template, loop: true);
 
-            _wasConnected = Connected();
-            SnapTo(_wasConnected ? Phase.Open : Phase.Idle);
-            if (_wasConnected) _waterProgress = 1f; // already open when the world loads: no splash
+            ShowIdleLook(Connected());
+            for (int i = 0; i < _chevrunes.Length; i++) ApplyMorph(i);
         }
 
         private void OnDisable() => CountWater(false);
 
         private void OnDestroy() => CountWater(false);
+
+        private bool Near => Player.m_localPlayer != null
+            && Vector3.Distance(Player.m_localPlayer.transform.position, transform.position) < SoundRange;
 
         private bool Connected() => _portal != null && _portal.enabled && _portal.m_nview != null && _portal.m_nview.IsValid() && _portal.HaveTarget();
 
@@ -73,132 +103,40 @@ namespace PortalHeimSG1
             if (_portal == null) return;
 
             bool connected = Connected();
-            bool near = Player.m_localPlayer != null
-                && Vector3.Distance(Player.m_localPlayer.transform.position, transform.position) < AnimateRange;
-
-            if (connected != _wasConnected)
-            {
-                _wasConnected = connected;
-                if (!connected) Close(near);
-                else if (near) StartDialing();
-                else SnapTo(Phase.Open);
-            }
+            UpdateLive(connected);
+            // A gate is active when it's connected and someone is at either end (or while previewing).
+            bool active = (connected && Time.time < _liveUntil) || _previewing;
 
             switch (_phase)
             {
-                case Phase.Dialing: UpdateDialing(); break;
-                case Phase.Open: UpdateOpen(); break;
+                case Phase.Idle:
+                    if (active) StartDialing(connected);
+                    else ShowIdleLook(connected);
+                    break;
+                case Phase.Dialing:
+                    if (!active) Shutdown(connected); else UpdateDialing();
+                    break;
+                case Phase.Open:
+                    if (!active) Shutdown(connected); else UpdateOpen();
+                    break;
             }
 
+            UpdateMorph();
             UpdateWater();
-            UpdateHum(connected);
+            UpdateHum();
         }
 
-        // ---------------------------------------------------------------- dialing
-
-        private void StartDialing()
-        {
-            _phase = Phase.Dialing;
-            _locked = 0;
-            _phaseTime = 0f;
-            _spinDirection = 1f;
-            for (int i = 0; i < _chevrunes.Length; i++) SetChevrune(i, false);
-            StartSpinSound();
-        }
-
-        private void UpdateDialing()
-        {
-            _phaseTime += Time.deltaTime;
-            float seconds = Mathf.Max(0.1f, PortalHeimSG1Plugin.LockSeconds.Value);
-            float spinSeconds = seconds * SpinShareOfStep;
-
-            // The ring spins for the first part of each step, then stops while the chevrune locks.
-            if (_phaseTime < spinSeconds)
-                _inner.Rotate(0f, 0f, _spinDirection * (DegreesPerStep / spinSeconds) * Time.deltaTime);
-
-            if (_phaseTime >= spinSeconds && _spinSource.isPlaying) _spinSource.Stop();
-
-            if (_phaseTime >= seconds)
-            {
-                SetChevrune(_locked, true);
-                GateSounds.PlayAt(GateSounds.Chevrune, transform.position, _template);
-                _locked++;
-                _phaseTime = 0f;
-                _spinDirection = -_spinDirection;
-
-                if (_locked >= _chevrunes.Length)
-                {
-                    _spinSource.Stop();
-                    _phase = Phase.Open;
-                    if (_previewing) _previewHoldUntil = Time.time + 5f;
-                    GateSounds.PlayAt(GateSounds.Activate, transform.position, _template);
-                }
-                else
-                {
-                    StartSpinSound();
-                }
-            }
-        }
-
-        private void UpdateOpen()
-        {
-            // The ring slowly turns while the gate is open.
-            _inner.Rotate(0f, 0f, 3f * Time.deltaTime);
-
-            // A preview on a gate that isn't really connected ends by closing again.
-            if (_previewing && Time.time >= _previewHoldUntil)
-            {
-                _previewing = false;
-                if (!Connected()) Close(true);
-            }
-        }
-
-        /// <summary>Replays the whole opening sequence (and its sounds), for testing.</summary>
-        public void Preview()
-        {
-            _previewing = true;
-            _previewHoldUntil = float.MaxValue;
-            StartDialing();
-        }
-
-        private void Close(bool near)
-        {
-            if (near && _phase != Phase.Idle) GateSounds.PlayAt(GateSounds.Close, transform.position, _template);
-            _spinSource.Stop();
-            SnapTo(Phase.Idle);
-        }
-
-        private void SnapTo(Phase phase)
-        {
-            _phase = phase;
-            for (int i = 0; i < _chevrunes.Length; i++) SetChevrune(i, phase == Phase.Open);
-        }
-
-        private void SetChevrune(int index, bool lit)
-        {
-            if (index < 0 || index >= _chevrunes.Length) return;
-            // Swap between two shared materials (the game's hover/damage highlighting can clear
-            // per-renderer overrides, but it leaves material assignments alone).
-            _chevrunes[index].sharedMaterial = lit ? GateBuilder.ChevruneOn : GateBuilder.ChevruneOff;
-        }
-
-        // ---------------------------------------------------------------- water
+        // ---------------------------------------------------------------- is anyone there?
 
         /// <summary>
-        /// The pool fills the opening once the gate is open: it swells in with a little overshoot (a
-        /// splash), then settles. It drains away quickly when the gate closes. While the water is
-        /// usable, the game's own swirl is hidden so the two don't fight.
+        /// Twice a second, checks whether someone is standing at either end: the game's own portal glow is on
+        /// (a player near this end who can go through), or a player is near the far portal.
         /// </summary>
-        /// <summary>
-        /// A gate is "live" when someone is standing at either end: the game's own portal glow is on (a player
-        /// near this end who can go through), or a player is near the far end. Checked twice a second.
-        /// </summary>
-        private void UpdateOccupancy()
+        private void UpdateLive(bool connected)
         {
-            if (Time.time < _nextOccupancyCheck) return;
-            _nextOccupancyCheck = Time.time + 0.5f;
-
-            _occupied = _wasConnected && (ThisEndLive() || OtherEndOccupied());
+            if (Time.time < _nextLiveCheck) return;
+            _nextLiveCheck = Time.time + 0.5f;
+            if (connected && (ThisEndLive() || OtherEndOccupied())) _liveUntil = Time.time + LiveGraceSeconds;
         }
 
         private bool ThisEndLive()
@@ -235,10 +173,152 @@ namespace PortalHeimSG1
             return false;
         }
 
+        // ---------------------------------------------------------------- start up and shut down
+
+        private void StartDialing(bool connected)
+        {
+            _phase = Phase.Dialing;
+            _locked = 0;
+            _phaseTime = 0f;
+            _spinDirection = 1f;
+            _idleLook = null;
+            SetAll(connected ? ChevruneState.Dim : ChevruneState.Off);
+            StartSpinSound();
+        }
+
+        private void UpdateDialing()
+        {
+            _phaseTime += Time.deltaTime;
+            float seconds = Mathf.Max(0.1f, PortalHeimSG1Plugin.LockSeconds.Value);
+            float spinSeconds = seconds * SpinShareOfStep;
+
+            // The ring spins for the first part of each step, then stops while the chevrune locks.
+            if (_phaseTime < spinSeconds)
+                _inner.Rotate(0f, 0f, _spinDirection * (DegreesPerStep / spinSeconds) * Time.deltaTime);
+
+            if (_phaseTime >= spinSeconds && _spinSource.isPlaying) _spinSource.Stop();
+
+            if (_phaseTime >= seconds)
+            {
+                // This step's Chevrunes (a left and right pair, or the last one) turn from arrows into runes.
+                foreach (int index in LockOrder[_locked]) SetChevrune(index, ChevruneState.Lit);
+                PlaySound(GateSounds.Chevrune);
+                _locked++;
+                _phaseTime = 0f;
+                _spinDirection = -_spinDirection;
+
+                if (_locked >= LockOrder.Length)
+                {
+                    _spinSource.Stop();
+                    _phase = Phase.Open;
+                    if (_previewing) _previewHoldUntil = Time.time + 5f;
+                    PlaySound(GateSounds.Activate);
+                }
+                else
+                {
+                    StartSpinSound();
+                }
+            }
+        }
+
+        private void UpdateOpen()
+        {
+            // The ring slowly turns while the gate is open.
+            _inner.Rotate(0f, 0f, 3f * Time.deltaTime);
+
+            // A preview ends after a few seconds; the gate then follows who's really nearby.
+            if (_previewing && Time.time >= _previewHoldUntil) _previewing = false;
+        }
+
+        private void Shutdown(bool connected)
+        {
+            if (_phase != Phase.Idle) PlaySound(GateSounds.Close);
+            _spinSource.Stop();
+            _phase = Phase.Idle;
+            ShowIdleLook(connected, force: true);
+        }
+
+        /// <summary>Replays the whole start-up sequence (and its sounds), for testing.</summary>
+        public void Preview()
+        {
+            _previewing = true;
+            _previewHoldUntil = float.MaxValue;
+            if (_phase != Phase.Idle) Shutdown(Connected());
+            StartDialing(Connected());
+        }
+
+        /// <summary>A connected gate with nobody near glows faintly; an unconnected one is dark.</summary>
+        private void ShowIdleLook(bool connected, bool force = false)
+        {
+            var look = connected ? ChevruneState.Dim : ChevruneState.Off;
+            if (!force && _idleLook == look) return;
+            _idleLook = look;
+            SetAll(look);
+        }
+
+        private void SetAll(ChevruneState state)
+        {
+            for (int i = 0; i < _chevrunes.Length; i++) SetChevrune(i, state);
+        }
+
+        private void SetChevrune(int index, ChevruneState state)
+        {
+            if (index < 0 || index >= _chevrunes.Length) return;
+            _state[index] = state;
+            // Swap between shared materials (the game's hover/damage highlighting can clear
+            // per-renderer overrides, but it leaves material assignments alone).
+            var material = state == ChevruneState.Lit ? GateBuilder.ChevruneOn
+                : state == ChevruneState.Dim ? GateBuilder.ChevruneDim
+                : GateBuilder.ChevruneOff;
+            _chevrunes[index].Arrow.sharedMaterial = material;
+            _chevrunes[index].Rune.sharedMaterial = material;
+        }
+
+        // ---------------------------------------------------------------- arrow <-> rune
+
+        /// <summary>Eases each Chevrune toward arrow or rune, depending on whether it's locked.</summary>
+        private void UpdateMorph()
+        {
+            float step = Time.deltaTime / MorphSeconds;
+            for (int i = 0; i < _chevrunes.Length; i++)
+            {
+                float target = _state[i] == ChevruneState.Lit ? 1f : 0f;
+                if (_morph[i] == target) continue;
+                _morph[i] = Mathf.MoveTowards(_morph[i], target, step);
+                ApplyMorph(i);
+            }
+        }
+
+        /// <summary>The arrow shrinks away as the rune pops in (with a little overshoot).</summary>
+        private void ApplyMorph(int i)
+        {
+            float p = _morph[i];
+            float arrow = Mathf.Clamp01(1f - p * 2.2f);
+            float runeT = Mathf.Clamp01((p - 0.35f) / 0.65f);
+            float rune = 0f;
+            if (runeT > 0f)
+            {
+                float t = runeT - 1f;
+                rune = 1f + 2.70158f * t * t * t + 1.70158f * t * t;
+            }
+
+            var parts = _chevrunes[i];
+            bool showArrow = arrow > 0.001f, showRune = rune > 0.001f;
+            if (parts.Arrow.enabled != showArrow) parts.Arrow.enabled = showArrow;
+            if (parts.Rune.enabled != showRune) parts.Rune.enabled = showRune;
+            if (showArrow) parts.Arrow.transform.localScale = Vector3.one * arrow;
+            if (showRune) parts.Rune.transform.localScale = Vector3.one * rune;
+        }
+
+        // ---------------------------------------------------------------- water
+
+        /// <summary>
+        /// The pool fills the opening once the gate has finished starting up: it swells in with a little
+        /// overshoot (a splash), then settles. It drains away quickly when the gate shuts down. While the water
+        /// is usable, the game's own swirl is hidden so the two don't fight.
+        /// </summary>
         private void UpdateWater()
         {
-            UpdateOccupancy();
-
             bool hideSwirl = PortalHeimSG1Plugin.Interior.Value == InteriorMode.Water && WaterSurface.Usable;
             if (hideSwirl != _swirlHidden)
             {
@@ -249,8 +329,7 @@ namespace PortalHeimSG1
 
             if (_water == null) return;
 
-            // Water only while the gate is live (someone at either end), like the game's own portal glow.
-            bool wantWater = _phase == Phase.Open && WaterSurface.Ready && (_occupied || _previewing);
+            bool wantWater = _phase == Phase.Open && WaterSurface.Ready;
             _waterProgress = Mathf.Clamp01(_waterProgress + (wantWater ? 1f / WaterFillSeconds : -1f / WaterDrainSeconds) * Time.deltaTime);
 
             bool show = _waterProgress > 0.001f;
@@ -275,21 +354,26 @@ namespace PortalHeimSG1
 
         // ---------------------------------------------------------------- sound
 
+        private void PlaySound(string name)
+        {
+            if (Near) GateSounds.PlayAt(name, transform.position, _template);
+        }
+
         private void StartSpinSound()
         {
             var clip = GateSounds.Get(GateSounds.Spin);
-            if (clip == null) return;
+            if (clip == null || !Near) return;
             _spinSource.clip = clip;
             _spinSource.Play();
         }
 
-        /// <summary>The open gate's hum plays while the game's own portal glow is on (you're near and can go through).</summary>
-        private void UpdateHum(bool connected)
+        /// <summary>The hum plays while the gate is open (after the start-up sequence, until it shuts down).</summary>
+        private void UpdateHum()
         {
             var hum = GateSounds.Get(GateSounds.Idle);
             if (hum == null) return;
 
-            bool humming = connected && _portal.m_target_found != null && _portal.m_target_found.m_active;
+            bool humming = _phase == Phase.Open;
             if (humming != _wasHumming)
             {
                 _wasHumming = humming;
@@ -304,7 +388,7 @@ namespace PortalHeimSG1
         /// <summary>Called when someone steps through.</summary>
         public void OnTeleport()
         {
-            GateSounds.PlayAt(GateSounds.Teleport, transform.position, _template);
+            PlaySound(GateSounds.Teleport);
         }
     }
 }

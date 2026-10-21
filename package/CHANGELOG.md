@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0
+- **The start-up sequence now plays whenever a gate goes live**, not just when a portal first connects. Walk up to a connected portal (at either end) and the ring spins while the Chevrunes lock on **in pairs, climbing the ring**: the bottom two first, then the next pair up on the left and right, and so on, with the top one last. Then the gate opens, the water swells in and the hum starts. When everyone has gone it shuts down again (Chevrunes dim, water drains, power-down sound). `SecondsPerChevrune` is now the time between steps.
+- **Chevrunes are runes.** Each one sits as an arrow while idle and **turns into a glowing rune** as it locks. Around the ring the runes spell V-A-L-H-E-I-M in Elder Futhark (ᚹ ᚨ ᛚ ᚺ ᛖ ᛁ ᛗ), with ᛟ (Othala, "home") at the top and ᛞ to finish.
+- A connected gate with nobody near glows faintly (`Look / DormantGlow`), so you can still tell which portals are connected; an unconnected one stays dark.
+- **Ramps**: a gentle ramp up to the portal's base on both sides, so anyone can walk in, even when overencumbered (`Look / Ramps`).
+- **The ring sits low** so the bottom of the opening is level with the ground, with no stone lip to step over (`Look / SinkRing`).
+- The hum now starts once the gate is fully open. F8 replays the whole sequence.
+
 ## 0.1.9
 - **The water now only shows while a gate is live**: when someone is standing at either end (the game's own portal glow is on, or a player is near the far portal). Walk away and it drains out; walk up and it swells in. Before, it stayed on whenever the portal was connected.
 

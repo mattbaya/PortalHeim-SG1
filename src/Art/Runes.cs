@@ -41,6 +41,9 @@ namespace PortalHeimSG1.Art
 
         public static int GlyphCount => Glyphs.Length;
 
+        /// <summary>The strokes of one rune: each is a polyline of x,y pairs in a box 1 wide by 2 tall (y up).</summary>
+        public static float[][] Lines(int glyph) => Glyphs[glyph];
+
         /// <summary>Lays all runes out in a row (for checking each shape while developing).</summary>
         public static void PaintSheet(Pixels canvas)
         {
