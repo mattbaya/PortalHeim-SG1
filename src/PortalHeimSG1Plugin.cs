@@ -37,7 +37,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.2.0";
+        public const string Version = "0.2.1";
 
         internal static ManualLogSource Log;
 
@@ -52,6 +52,8 @@ namespace PortalHeimSG1
         internal static ConfigEntry<TravelMode> Travel;
         internal static ConfigEntry<float> Volume;
         internal static ConfigEntry<bool> UseBundledSounds;
+        internal static ConfigEntry<bool> TravelBass;
+        internal static ConfigEntry<float> TravelVolume;
         internal static ConfigEntry<bool> ShowStatus;
         internal static ConfigEntry<KeyboardShortcut> PreviewKey;
         internal static PortalHeimSG1Plugin Instance;
@@ -94,6 +96,10 @@ namespace PortalHeimSG1
             ShowStatus = Config.Bind("Diagnostics", "ShowStatusOnSpawn", true,
                 "Show a one-line status message a few seconds after you spawn (how many portals are gates, whether the water and sounds loaded, any error). " +
                 "Handy while testing; turn off once everything works.");
+            TravelBass = Config.Bind("Sound", "TravelBassLine", true,
+                "Play a looping bass line while you're travelling through a portal (on the loading screen).");
+            TravelVolume = Config.Bind("Sound", "TravelBassVolume", 0.7f,
+                new ConfigDescription("Volume of the travel bass line.", new AcceptableValueRange<float>(0f, 1f)));
             UseBundledSounds = Config.Bind("Sound", "UseBundledSounds", true,
                 "Play the sounds that come with the mod. Turn off for silence (or to use only your own clips). Takes effect on next game start.");
             Volume = Config.Bind("Sound", "Volume", 1.0f,
@@ -194,6 +200,7 @@ namespace PortalHeimSG1
         {
             try
             {
+                TravelSound.Attach(__instance);
                 TravelScreen.Build(__instance);
             }
             catch (System.Exception e)

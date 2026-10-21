@@ -20,6 +20,7 @@ Gate sounds are **included**: a heavy lock thud for each Chevrune, a stone scrap
 | `idle` | the open gate hums (loops; replaces the game's own hum) |
 | `teleport` | someone steps through |
 | `close` | the gate shuts down |
+| `travel` | loops while you're in the portal tunnel (the loading screen for a long trip) |
 
 ### More free sounds
 
@@ -33,7 +34,7 @@ All **CC0** (public domain), none from any show:
 
 ### Credits for the included sounds
 
-Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian MacIntosh** (Metal Impact Sounds) and **ezwa** (6 Short Water Splashes, cut by qubodup from public-domain recordings), plus sounds synthesized for this mod. Details in `sounds/CREDITS.txt`.
+Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian MacIntosh** (Metal Impact Sounds) and **ezwa** (6 Short Water Splashes, cut by qubodup from public-domain recordings), plus sounds synthesized for this mod (including the travel bass line). Details in `sounds/CREDITS.txt`.
 
 ## Configuration
 
@@ -52,6 +53,8 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 | Look / TravelScreen | Tunnel | `Tunnel` = endless swirling tunnel, `Gate` = a miniature gate, `Vanilla` = the game's own spinner (reload a world to apply) |
 | Look / Interior | Water | `Water` = rippling pool, `Vanilla` = the portal's own swirl |
 | Look / Shading | PortalShader | If the ring looks wrong or is missing, try `Standard` (restart the game) |
+| Sound / TravelBassLine | true | The looping bass line while you travel through a portal |
+| Sound / TravelBassVolume | 0.7 | Its volume |
 | Sound / UseBundledSounds | true | Turn off the included sounds (restart the game) |
 | Sound / Volume | 1.0 | Also follows the game's sound-effects volume |
 

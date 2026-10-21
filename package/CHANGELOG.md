@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.1
+- **Travel bass line.** While you're on the loading screen for a long portal trip, a driving synth bass loops: four notes on the IV chord (A), then four on the I chord (E), alternating, in the spirit of the classic British sci-fi theme basslines. It's an original piece, synthesized for this mod. It fades in as you enter the tunnel and out as you arrive. Turn it off with `Sound / TravelBassLine`, change the level with `Sound / TravelBassVolume`, or replace it with your own `travel` clip.
+
 ## 0.2.0
 - **The start-up sequence now plays whenever a gate goes live**, not just when a portal first connects. Walk up to a connected portal (at either end) and the ring spins while the Chevrunes lock on **in pairs, climbing the ring**: the bottom two first, then the next pair up on the left and right, and so on, with the top one last. Then the gate opens, the water swells in and the hum starts. When everyone has gone it shuts down again (Chevrunes dim, water drains, power-down sound). `SecondsPerChevrune` is now the time between steps.
 - **Chevrunes are runes.** Each one sits as an arrow while idle and **turns into a glowing rune** as it locks. Around the ring the runes spell V-A-L-H-E-I-M in Elder Futhark (ᚹ ᚨ ᛚ ᚺ ᛖ ᛁ ᛗ), with ᛟ (Othala, "home") at the top and ᛞ to finish.

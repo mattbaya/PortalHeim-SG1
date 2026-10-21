@@ -20,6 +20,7 @@ namespace PortalHeimSG1
         public const string Idle = "idle";           // the open gate's hum (loops)
         public const string Teleport = "teleport";   // someone steps through
         public const string Close = "close";         // the gate shuts down
+        public const string Travel = "travel";       // the bass line while you're in the portal tunnel (loops)
 
         private static readonly Dictionary<string, AudioClip> Clips = new Dictionary<string, AudioClip>();
 
@@ -27,7 +28,7 @@ namespace PortalHeimSG1
 
         public static int Count => Clips.Count;
 
-        private static readonly string[] Expected = { Chevrune, Spin, Activate, Idle, Teleport, Close };
+        private static readonly string[] Expected = { Chevrune, Spin, Activate, Idle, Teleport, Close, Travel };
 
         /// <summary>"6/6 sounds", or which are missing.</summary>
         public static string Summary
@@ -73,7 +74,8 @@ namespace PortalHeimSG1
                         "activate  - the gate opens\n" +
                         "idle      - the open gate's hum (loops; replaces the game's own portal hum)\n" +
                         "teleport  - someone steps through\n" +
-                        "close     - the gate shuts down\n\n" +
+                        "close     - the gate shuts down\n" +
+                        "travel    - the bass line while you're in the portal tunnel (loops)\n\n" +
                         "Name each file exactly as above, e.g. activate.ogg. Changes are picked up the next time the game starts.\n");
                 ready = true;
             }
