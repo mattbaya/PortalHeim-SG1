@@ -6,13 +6,13 @@ namespace PortalHeimSG1.Art
     /// A tiny RGBA drawing surface with no Unity dependency, so the artwork can be generated and
     /// previewed outside the game. Origin is the bottom-left (like Unity textures).
     /// </summary>
-    public sealed class Canvas
+    public sealed class Pixels
     {
         public readonly int Width;
         public readonly int Height;
         public readonly byte[] Rgba;
 
-        public Canvas(int width, int height)
+        public Pixels(int width, int height)
         {
             Width = width;
             Height = height;
@@ -33,10 +33,14 @@ namespace PortalHeimSG1.Art
             if (x < 0 || y < 0 || x >= Width || y >= Height || coverage <= 0f) return;
             if (coverage > 1f) coverage = 1f;
             int i = (y * Width + x) * 4;
-            Rgba[i] = (byte)(Rgba[i] + (r - Rgba[i]) * coverage);
-            Rgba[i + 1] = (byte)(Rgba[i + 1] + (g - Rgba[i + 1]) * coverage);
-            Rgba[i + 2] = (byte)(Rgba[i + 2] + (b - Rgba[i + 2]) * coverage);
-            Rgba[i + 3] = 255;
+            // Standard "over": draws on top of whatever is there, keeping transparency where nothing was painted.
+            float dstA = Rgba[i + 3] / 255f;
+            float outA = coverage + dstA * (1f - coverage);
+            if (outA <= 0f) return;
+            Rgba[i] = (byte)((r * coverage + Rgba[i] * dstA * (1f - coverage)) / outA);
+            Rgba[i + 1] = (byte)((g * coverage + Rgba[i + 1] * dstA * (1f - coverage)) / outA);
+            Rgba[i + 2] = (byte)((b * coverage + Rgba[i + 2] * dstA * (1f - coverage)) / outA);
+            Rgba[i + 3] = (byte)Math.Round(outA * 255f);
         }
 
         /// <summary>A line with rounded ends, anti-aliased by distance to the segment.</summary>
@@ -62,6 +66,43 @@ namespace PortalHeimSG1.Art
                 }
             }
         }
+
+        /// <summary>Fills a convex polygon (corners in order) with 4x4 supersampled edges.</summary>
+        public void FillConvex(float[] xs, float[] ys, byte r, byte g, byte b)
+        {
+            int n = xs.Length;
+            int minX = (int)Math.Floor(Min(xs)), maxX = (int)Math.Ceiling(Max(xs));
+            int minY = (int)Math.Floor(Min(ys)), maxY = (int)Math.Ceiling(Max(ys));
+            // Orientation of the polygon, so "inside" works for either winding.
+            float area = 0f;
+            for (int i = 0; i < n; i++) { int j = (i + 1) % n; area += xs[i] * ys[j] - xs[j] * ys[i]; }
+            float sign = area >= 0f ? 1f : -1f;
+
+            for (int y = minY; y <= maxY; y++)
+            {
+                for (int x = minX; x <= maxX; x++)
+                {
+                    int inside = 0;
+                    for (int sy = 0; sy < 4; sy++)
+                    for (int sx = 0; sx < 4; sx++)
+                    {
+                        float px = x + (sx + 0.5f) / 4f, py = y + (sy + 0.5f) / 4f;
+                        bool all = true;
+                        for (int i = 0; i < n && all; i++)
+                        {
+                            int j = (i + 1) % n;
+                            float cross = (xs[j] - xs[i]) * (py - ys[i]) - (ys[j] - ys[i]) * (px - xs[i]);
+                            if (cross * sign < 0f) all = false;
+                        }
+                        if (all) inside++;
+                    }
+                    if (inside > 0) Blend(x, y, r, g, b, inside / 16f);
+                }
+            }
+        }
+
+        private static float Min(float[] v) { float m = v[0]; foreach (var f in v) if (f < m) m = f; return m; }
+        private static float Max(float[] v) { float m = v[0]; foreach (var f in v) if (f > m) m = f; return m; }
 
         /// <summary>Gentle mottled noise, to take the flatness off stone.</summary>
         public void Speckle(int seed, float amount)

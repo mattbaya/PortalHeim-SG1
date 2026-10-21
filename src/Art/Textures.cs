@@ -8,7 +8,7 @@ namespace PortalHeimSG1.Art
         public const int Size = 1024;
 
         /// <summary>The rotating inner ring, covered in runes.</summary>
-        public static Canvas InnerRing(float outerRadius, float ringIn, float ringOut, int runeCount)
+        public static Pixels InnerRing(float outerRadius, float ringIn, float ringOut, int runeCount)
         {
             var c = StoneBase(outerRadius, ringIn, ringOut, 18, 112, 104, 92);
             float k = Size / (2f * outerRadius);
@@ -17,7 +17,7 @@ namespace PortalHeimSG1.Art
         }
 
         /// <summary>The fixed outer ring: plain carved stone with a thin rim line.</summary>
-        public static Canvas OuterRing(float outerRadius, float ringIn, float ringOut)
+        public static Pixels OuterRing(float outerRadius, float ringIn, float ringOut)
         {
             var c = StoneBase(outerRadius, ringIn, ringOut, 14, 96, 90, 80);
             float k = Size / (2f * outerRadius);
@@ -28,15 +28,15 @@ namespace PortalHeimSG1.Art
             return c;
         }
 
-        private static Canvas StoneBase(float outerRadius, float ringIn, float ringOut, float speckle, byte r, byte g, byte b)
+        private static Pixels StoneBase(float outerRadius, float ringIn, float ringOut, float speckle, byte r, byte g, byte b)
         {
-            var c = new Canvas(Size, Size);
+            var c = new Pixels(Size, Size);
             c.Fill(r, g, b, 255);
             c.Speckle(7, speckle);
             return c;
         }
 
-        private static void Circle(Canvas c, float radiusPx, float width, byte r, byte g, byte b)
+        private static void Circle(Pixels c, float radiusPx, float width, byte r, byte g, byte b)
         {
             const int steps = 720;
             float cx = c.Width / 2f, cy = c.Height / 2f;

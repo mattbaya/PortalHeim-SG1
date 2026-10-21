@@ -1,9 +1,9 @@
 {
   "name": "PortalHeim_SG1",
   "author": "Svaha",
-  "version_number": "0.1.6",
+  "version_number": "0.1.7",
   "website_url": "https://github.com/mattbaya/PortalHeim-SG1",
-  "description": "Turns portals into stone ring gates with Norse runes, glowing Chevrunes and a rippling pool of water, with matching sounds included.",
+  "description": "Turns portals into stone ring gates with Norse runes, glowing Chevrunes and a rippling pool of water, with matching sounds and a gate-themed travel loading screen.",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2351"
   ]

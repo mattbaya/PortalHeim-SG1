@@ -42,7 +42,7 @@ namespace PortalHeimSG1.Art
         public static int GlyphCount => Glyphs.Length;
 
         /// <summary>Lays all runes out in a row (for checking each shape while developing).</summary>
-        public static void PaintSheet(Canvas canvas)
+        public static void PaintSheet(Pixels canvas)
         {
             float cell = canvas.Width / (float)Glyphs.Length;
             float scale = cell * 0.3f;
@@ -63,7 +63,7 @@ namespace PortalHeimSG1.Art
         /// Paints <paramref name="count"/> runes around a ring on <paramref name="canvas"/>, each standing
         /// radially (bottom toward the centre), as engraved grooves with a faint highlight.
         /// </summary>
-        public static void PaintRing(Canvas canvas, float cx, float cy, float radiusIn, float radiusOut, int count, int seed)
+        public static void PaintRing(Pixels canvas, float cx, float cy, float radiusIn, float radiusOut, int count, int seed)
         {
             float mid = (radiusIn + radiusOut) * 0.5f;
             float height = (radiusOut - radiusIn) * 0.72f;   // rune height along the radius

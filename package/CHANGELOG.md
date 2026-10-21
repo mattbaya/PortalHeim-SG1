@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.7
+- **New travel screen.** The spinning graphic shown on the loading screen during a long portal trip is replaced with a miniature gate: the rune ring slowly turning inside a frame of lit Chevrunes, with rippling water in the middle. Set `Look / TravelScreen` to `Vanilla` to keep the game's own spinner.
+
 ## 0.1.6
 - **Fixed: the stone ring, rune ring and Chevrunes were being hidden along with the wooden frame**, so only the water showed.
 - New **preview key (F8)**: stand near a gate and press it to replay the opening sequence with all its sounds, without disconnecting the portal. Change it with `Diagnostics / PreviewKey`.

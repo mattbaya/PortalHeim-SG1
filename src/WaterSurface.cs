@@ -22,6 +22,10 @@ namespace PortalHeimSG1
 
         public static bool Failed { get; private set; }
 
+        public static int FrameCount => Frames.Count;
+
+        public static Texture2D FrameAt(int index) => Frames[index];
+
         public static bool Ready => !Failed && Frames.Count == Art.Water.Frames && _material != null;
 
         /// <summary>True if the water can be used at all (so the vanilla swirl can be hidden).</summary>

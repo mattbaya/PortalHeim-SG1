@@ -14,6 +14,14 @@ namespace PortalHeimSG1
         Vanilla
     }
 
+    public enum TravelMode
+    {
+        /// <summary>A miniature gate (turning rune ring, Chevrunes, rippling water) on the teleport loading screen.</summary>
+        Gate,
+        /// <summary>The game's own spinner.</summary>
+        Vanilla
+    }
+
     public enum ShadingMode
     {
         /// <summary>Reuse the portal's own shader for the stone (safest: it's known to render).</summary>
@@ -27,7 +35,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.1.6";
+        public const string Version = "0.1.7";
 
         internal static ManualLogSource Log;
 
@@ -36,6 +44,7 @@ namespace PortalHeimSG1
         internal static ConfigEntry<float> LockSeconds;
         internal static ConfigEntry<ShadingMode> Shading;
         internal static ConfigEntry<InteriorMode> Interior;
+        internal static ConfigEntry<TravelMode> Travel;
         internal static ConfigEntry<float> Volume;
         internal static ConfigEntry<bool> UseBundledSounds;
         internal static ConfigEntry<bool> ShowStatus;
@@ -58,6 +67,9 @@ namespace PortalHeimSG1
                 new ConfigDescription("Seconds between each Chevrune lighting up when a gate connects (nine in all).", new AcceptableValueRange<float>(0.1f, 4f)));
             Interior = Config.Bind("Look", "Interior", InteriorMode.Water,
                 "What fills an open gate: Water (a rippling pool) or Vanilla (the portal's own swirl). Takes effect for portals loaded after this is changed.");
+            Travel = Config.Bind("Look", "TravelScreen", TravelMode.Gate,
+                "The graphic shown on the loading screen during a long portal trip: Gate (a miniature gate with a turning rune ring and rippling water) " +
+                "or Vanilla (the game's own spinner). Takes effect next time you load a world.");
             Shading = Config.Bind("Look", "Shading", ShadingMode.PortalShader,
                 "How the stone is shaded. PortalShader reuses the portal's own shader. If the ring looks wrong or is missing, try Standard. " +
                 "Takes effect on next game start.");
@@ -155,6 +167,23 @@ namespace PortalHeimSG1
         {
             if (PortalHeimSG1Plugin.Instance != null)
                 PortalHeimSG1Plugin.Instance.StartCoroutine(Diagnostics.ReportSoon());
+        }
+    }
+
+    [HarmonyPatch(typeof(Hud), nameof(Hud.Awake))]
+    internal static class HudPatches
+    {
+        private static void Postfix(Hud __instance)
+        {
+            try
+            {
+                TravelScreen.Build(__instance);
+            }
+            catch (System.Exception e)
+            {
+                Diagnostics.RecordFailure("travel screen", e);
+                PortalHeimSG1Plugin.Log.LogError($"Couldn't change the teleport loading screen; leaving it as it is. {e}");
+            }
         }
     }
 }

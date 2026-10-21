@@ -2,7 +2,7 @@
 
 Turns every portal into a **stone ring gate**: an outer ring with nine glowing **Chevrunes** (chevrons set with runes), and an inner ring of **Elder Futhark runes** that spins when a portal connects while the Chevrunes **lock one by one** and glow. It's *inspired by* a certain famous gate, but built from Norse runes and a design of its own.
 
-When a gate opens, the opening **fills with a rippling pool of water**. (Prefer the game's own swirl? Set `Interior` to `Vanilla`.)
+When a gate opens, the opening **fills with a rippling pool of water**. On a long portal trip the loading screen shows a **miniature gate** (turning rune ring, lit Chevrunes, rippling water) instead of the game's spinner. (Prefer the game's own swirl? Set `Interior` to `Vanilla`.)
 
 It only changes how portals **look and sound**. Portals work exactly as before, and it's **client-side only**: nobody else needs the mod, and other players see normal portals.
 
@@ -46,6 +46,7 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 | Look / SecondsPerChevrune | 0.5 | Seconds between each Chevrune lighting up (nine in all) |
 | Diagnostics / PreviewKey | F8 | Stand near a gate and press it to replay the opening sequence and sounds |
 | Diagnostics / ShowStatusOnSpawn | true | Shows a status line a few seconds after you spawn (turn off once it all works) |
+| Look / TravelScreen | Gate | `Gate` = the miniature gate on the loading screen, `Vanilla` = the game's own spinner |
 | Look / Interior | Water | `Water` = rippling pool, `Vanilla` = the portal's own swirl |
 | Look / Shading | PortalShader | If the ring looks wrong or is missing, try `Standard` (restart the game) |
 | Sound / UseBundledSounds | true | Turn off the included sounds (restart the game) |

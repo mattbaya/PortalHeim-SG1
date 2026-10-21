@@ -21,9 +21,9 @@ namespace PortalHeimSG1.Art
             new[] { 0.42f, -0.36f, 4.2f, 1f, 0.24f },
         };
 
-        public static Canvas Frame(int frame)
+        public static Pixels Frame(int frame)
         {
-            var c = new Canvas(Size, Size);
+            var c = new Pixels(Size, Size);
             double phase = 2.0 * Math.PI * frame / Frames;
             const double eps = 0.01;
 

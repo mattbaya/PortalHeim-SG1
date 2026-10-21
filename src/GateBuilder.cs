@@ -208,7 +208,7 @@ namespace PortalHeimSG1
             if (material.HasProperty("_EmissionColor")) material.SetColor("_EmissionColor", color);
         }
 
-        private static Material StoneMaterial(Material template, Canvas canvas, string name)
+        private static Material StoneMaterial(Material template, Pixels canvas, string name)
         {
             var texture = new Texture2D(canvas.Width, canvas.Height, TextureFormat.RGBA32, true) { name = name + "Tex" };
             // SetPixelData takes just the base level; Apply then builds the mip chain.
