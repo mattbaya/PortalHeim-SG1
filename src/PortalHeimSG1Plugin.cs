@@ -58,6 +58,7 @@ namespace PortalHeimSG1
         internal static ConfigEntry<bool> DialingEnabled;
         internal static ConfigEntry<bool> OnlyVisited;
         internal static ConfigEntry<bool> GatePins;
+        internal static ConfigEntry<bool> GateIconOnMap;
         internal static ConfigEntry<Minimap.PinType> PinIcon;
         internal static ConfigEntry<float> DialIdleSeconds;
         internal static ConfigEntry<float> DialMaxSeconds;
@@ -107,8 +108,10 @@ namespace PortalHeimSG1
                 "Only list (and put on the map) gates you have been near, or built yourself. Set to false to see every gate in the world.");
             GatePins = Config.Bind("Dialing", "ShowGatePins", true,
                 "Show gates on the map. Shift+click a gate's pin while standing at an idle gate to dial it.");
+            GateIconOnMap = Config.Bind("Dialing", "GateIconOnMap", true,
+                "Mark gates on the map with this mod's own little gate (stone ring, light-blue Chevrunes, water). Set to false to use a built-in map icon instead.");
             PinIcon = Config.Bind("Dialing", "PinIcon", Minimap.PinType.Icon4,
-                "Which of the map's built-in pin icons marks a gate.");
+                "Which of the map's built-in pin icons marks a gate when GateIconOnMap is off (it also decides which map icon filter hides the gate pins).");
             DialIdleSeconds = Config.Bind("Dialing", "CloseAfterIdleSeconds", 15f,
                 new ConfigDescription("A dialed gate closes this many seconds after the last player leaves both gates. (Server setting.)", new AcceptableValueRange<float>(3f, 300f)));
             DialMaxSeconds = Config.Bind("Dialing", "MaxOpenSeconds", 300f,

@@ -83,6 +83,23 @@ namespace PortalHeimSG1
         private static Minimap _forMap;
         private static bool _dirty = true;
         private static bool _subscribed;
+        private static Sprite _icon;
+
+        /// <summary>The gate-shaped map icon, painted in code the first time it's needed.</summary>
+        private static Sprite GateIcon()
+        {
+            if (_icon != null) return _icon;
+            var canvas = Art.MapIcon.Draw();
+            var texture = new Texture2D(canvas.Width, canvas.Height, TextureFormat.RGBA32, false) { name = "SG1MapIcon" };
+            texture.SetPixelData(canvas.Rgba, 0);
+            texture.filterMode = FilterMode.Bilinear;
+            texture.wrapMode = TextureWrapMode.Clamp;
+            texture.Apply(false, false);
+            texture.hideFlags |= HideFlags.DontUnloadUnusedAsset;
+            _icon = Sprite.Create(texture, new Rect(0, 0, canvas.Width, canvas.Height), new Vector2(0.5f, 0.5f), 100f);
+            _icon.hideFlags |= HideFlags.DontUnloadUnusedAsset;
+            return _icon;
+        }
 
         public static void Tick()
         {
@@ -130,11 +147,14 @@ namespace PortalHeimSG1
                 {
                     pin.m_name = label;
                     pin.m_pos = pair.Value.Position;
+                    if (PortalHeimSG1Plugin.GateIconOnMap.Value) pin.m_icon = GateIcon();
                 }
                 else
                 {
                     // Not saved with the map: the list comes from the server every time, so nothing goes stale in the save.
-                    Pins[pair.Key] = map.AddPin(pair.Value.Position, PortalHeimSG1Plugin.PinIcon.Value, label, false, false);
+                    var added = map.AddPin(pair.Value.Position, PortalHeimSG1Plugin.PinIcon.Value, label, false, false);
+                    if (PortalHeimSG1Plugin.GateIconOnMap.Value) added.m_icon = GateIcon();
+                    Pins[pair.Key] = added;
                 }
             }
 

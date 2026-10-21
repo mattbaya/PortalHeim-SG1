@@ -43,7 +43,7 @@ With PortalHeim_SG1 on the **server** as well as on each player's game, gates ca
 
 - **Use an unconnected gate** to open the dial window: a list of the gates you know, nearest first. Pick one and press **Dial** (or Enter). Both gates run the usual start-up sequence and open.
 - **Home gate:** press **Set home** next to a gate. It is highlighted first in the window, and **Shift+use** on any free gate dials home immediately.
-- **On the map:** known gates get a pin. **Shift+click** a gate's pin while standing at a free gate to dial it.
+- **On the map:** known gates get a small gate icon. **Shift+click** a gate's pin while standing at a free gate to dial it.
 - A dialed gate closes by itself 15 seconds after the last player leaves both gates (never later than 5 minutes). **Hang up** in the window closes it sooner.
 - **Which gates you see:** by default only gates you have been near, or built yourself, so exploring still matters. Each character keeps its own list. Set `Dialing / OnlyShowVisitedGates` to false to see every gate.
 - Gates that share a name still pair exactly as in vanilla (and use goes straight to the game's naming window for those). Dialing only connects free gates, and puts each gate's name back afterwards.
@@ -70,7 +70,8 @@ With PortalHeim_SG1 on the **server** as well as on each player's game, gates ca
 | Dialing / Enabled | true | Dialing on or off (set it on the server to switch it off for everyone) |
 | Dialing / OnlyShowVisitedGates | true | `false` lists and pins every gate in the world |
 | Dialing / ShowGatePins | true | Gate pins on the map |
-| Dialing / PinIcon | Icon4 | Which built-in map icon marks a gate |
+| Dialing / GateIconOnMap | true | Mark gates with the mod's own gate icon (light-blue Chevrunes) |
+| Dialing / PinIcon | Icon4 | Built-in map icon used when GateIconOnMap is off |
 | Dialing / CloseAfterIdleSeconds | 15 | Server: a dialed gate closes this long after the last player leaves |
 | Dialing / MaxOpenSeconds | 300 | Server: a dialed gate always closes after this long |
 | Dialing / DialRange | 15 | Server: how close you must be to a gate to dial from it |
