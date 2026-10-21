@@ -27,7 +27,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.1.5";
+        public const string Version = "0.1.6";
 
         internal static ManualLogSource Log;
 
@@ -39,6 +39,7 @@ namespace PortalHeimSG1
         internal static ConfigEntry<float> Volume;
         internal static ConfigEntry<bool> UseBundledSounds;
         internal static ConfigEntry<bool> ShowStatus;
+        internal static ConfigEntry<KeyboardShortcut> PreviewKey;
         internal static PortalHeimSG1Plugin Instance;
 
         private Harmony _harmony;
@@ -60,6 +61,9 @@ namespace PortalHeimSG1
             Shading = Config.Bind("Look", "Shading", ShadingMode.PortalShader,
                 "How the stone is shaded. PortalShader reuses the portal's own shader. If the ring looks wrong or is missing, try Standard. " +
                 "Takes effect on next game start.");
+            PreviewKey = Config.Bind("Diagnostics", "PreviewKey", new KeyboardShortcut(KeyCode.F8),
+                "Stand near a gate and press this to replay the opening sequence (Chevrunes locking, the water, and all the sounds) " +
+                "without having to disconnect and reconnect the portal.");
             ShowStatus = Config.Bind("Diagnostics", "ShowStatusOnSpawn", true,
                 "Show a one-line status message a few seconds after you spawn (how many portals are gates, whether the water and sounds loaded, any error). " +
                 "Handy while testing; turn off once everything works.");
@@ -79,6 +83,28 @@ namespace PortalHeimSG1
         private void Update()
         {
             WaterSurface.Tick();
+
+            if (PreviewKey.Value.IsDown() && Player.m_localPlayer != null
+                && !(Chat.instance != null && Chat.instance.HasFocus()) && !global::Console.IsVisible() && !TextInput.IsVisible())
+            {
+                GateRing nearest = null;
+                float best = 30f;
+                foreach (var ring in FindObjectsByType<GateRing>(FindObjectsSortMode.None))
+                {
+                    float d = Vector3.Distance(ring.transform.position, Player.m_localPlayer.transform.position);
+                    if (d < best) { best = d; nearest = ring; }
+                }
+
+                if (nearest != null)
+                {
+                    nearest.Preview();
+                    Log.LogInfo($"Previewing the gate {best:0} m away. {GateSounds.Summary}");
+                }
+                else
+                {
+                    Player.m_localPlayer.Message(MessageHud.MessageType.Center, "No gate within 30 m to preview.");
+                }
+            }
         }
 
         private void OnDestroy()

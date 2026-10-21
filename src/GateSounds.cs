@@ -27,6 +27,18 @@ namespace PortalHeimSG1
 
         public static int Count => Clips.Count;
 
+        private static readonly string[] Expected = { Chevrune, Spin, Activate, Idle, Teleport, Close };
+
+        /// <summary>"6/6 sounds", or which are missing.</summary>
+        public static string Summary
+        {
+            get
+            {
+                var missing = System.Array.FindAll(Expected, n => !Clips.ContainsKey(n));
+                return missing.Length == 0 ? $"{Expected.Length}/{Expected.Length} sounds" : $"{Expected.Length - missing.Length}/{Expected.Length} sounds (missing: {string.Join(", ", missing)})";
+            }
+        }
+
         public static bool Has(string name) => Clips.ContainsKey(name);
 
         public static AudioClip Get(string name) => Clips.TryGetValue(name, out var clip) ? clip : null;
@@ -39,8 +51,11 @@ namespace PortalHeimSG1
         {
             Clips.Clear();
 
-            if (PortalHeimSG1Plugin.UseBundledSounds.Value && Directory.Exists(bundledFolder))
-                yield return LoadFolder(bundledFolder);
+            if (PortalHeimSG1Plugin.UseBundledSounds.Value)
+            {
+                if (Directory.Exists(bundledFolder)) yield return Safely(LoadFolder(bundledFolder), "bundled sounds");
+                else PortalHeimSG1Plugin.Log.LogWarning($"The bundled sounds folder isn't there: {bundledFolder}");
+            }
 
             string folder = Folder;
             bool ready = false;
@@ -67,8 +82,29 @@ namespace PortalHeimSG1
                 PortalHeimSG1Plugin.Log.LogWarning($"Couldn't prepare the sounds folder: {e.Message}");
             }
 
-            if (ready) yield return LoadFolder(folder);
+            if (ready) yield return Safely(LoadFolder(folder), "your sounds");
             PortalHeimSG1Plugin.Log.LogInfo($"{Clips.Count} gate sound(s) ready ({string.Join(", ", Clips.Keys)}).");
+        }
+
+        /// <summary>Runs a loading routine, logging (and recording) any exception instead of letting the coroutine die silently.</summary>
+        private static IEnumerator Safely(IEnumerator routine, string what)
+        {
+            while (true)
+            {
+                object current;
+                try
+                {
+                    if (!routine.MoveNext()) yield break;
+                    current = routine.Current;
+                }
+                catch (System.Exception e)
+                {
+                    Diagnostics.RecordFailure(what, e);
+                    PortalHeimSG1Plugin.Log.LogError($"Couldn't load the {what}: {e}");
+                    yield break;
+                }
+                yield return current;
+            }
         }
 
         private static IEnumerator LoadFolder(string folder)
@@ -104,6 +140,7 @@ namespace PortalHeimSG1
                     clip.name = name;
                     clip.hideFlags |= HideFlags.DontUnloadUnusedAsset;
                     Clips[name] = clip;
+                    PortalHeimSG1Plugin.Log.LogInfo($"Loaded sound '{name}' ({clip.length:0.0}s) from {Path.GetFileName(folder)}");
                 }
             }
         }

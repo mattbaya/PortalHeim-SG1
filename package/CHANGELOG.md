@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.6
+- **Fixed: the stone ring, rune ring and Chevrunes were being hidden along with the wooden frame**, so only the water showed.
+- New **preview key (F8)**: stand near a gate and press it to replay the opening sequence with all its sounds, without disconnecting the portal. Change it with `Diagnostics / PreviewKey`.
+- The spawn status line now counts the gates that exist right now (it counted every gate ever loaded, giving "4 of 2"), and says which sounds, if any, are missing.
+- Sound loading now reports its own errors instead of failing silently.
+
 ## 0.1.5
 - A one-line status message now appears a few seconds after you spawn: how many portals are gates, whether the water and sounds loaded, and any error. It makes it obvious whether the mod is working. Turn it off with `Diagnostics / ShowStatusOnSpawn`.
 

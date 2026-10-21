@@ -40,6 +40,8 @@ namespace PortalHeimSG1
         private bool _swirlHidden;
         private bool _wasConnected;
         private bool _wasHumming;
+        private bool _previewing;
+        private float _previewHoldUntil;
 
         public void Setup(TeleportWorld portal, Transform inner, Renderer[] chevrunes, MeshRenderer water, ParticleSystemRenderer[] swirl)
         {
@@ -126,6 +128,7 @@ namespace PortalHeimSG1
                 {
                     _spinSource.Stop();
                     _phase = Phase.Open;
+                    if (_previewing) _previewHoldUntil = Time.time + 5f;
                     GateSounds.PlayAt(GateSounds.Activate, transform.position, _template);
                 }
                 else
@@ -139,6 +142,21 @@ namespace PortalHeimSG1
         {
             // The ring slowly turns while the gate is open.
             _inner.Rotate(0f, 0f, 3f * Time.deltaTime);
+
+            // A preview on a gate that isn't really connected ends by closing again.
+            if (_previewing && Time.time >= _previewHoldUntil)
+            {
+                _previewing = false;
+                if (!Connected()) Close(true);
+            }
+        }
+
+        /// <summary>Replays the whole opening sequence (and its sounds), for testing.</summary>
+        public void Preview()
+        {
+            _previewing = true;
+            _previewHoldUntil = float.MaxValue;
+            StartDialing();
         }
 
         private void Close(bool near)

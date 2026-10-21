@@ -104,7 +104,7 @@ def main():
     hum = f"0.5*sin(2*PI*{f1:.6f}*t)+0.28*sin(2*PI*{f2:.6f}*t)+0.14*sin(2*PI*{f3:.6f}*t)"
     run(ffm + ["-i", drone] + lavfi(hum, f"{dur:.6f}") + ["-filter_complex",
                "[0]aresample=44100,pan=mono|c0=c0,volume=0.9[d];[1]volume=0.6[h];[d][h]amix=inputs=2:normalize=0", wav("idle")])
-    finish(wav("idle"), os.path.join(a.out, "idle.wav"), -14)
+    finish(wav("idle"), os.path.join(a.out, "idle.wav"), -9)
 
     # teleport: a whoosh (shaped noise) with a splash and a low thump as you pass through.
     run(ffm + noise("pink", 1.3, 0.9) + ["-i", splash(2)] + lavfi("0.9*sin(2*PI*t*(120-90*t))*exp(-6*t)", 0.4) + [

@@ -52,7 +52,7 @@ namespace PortalHeimSG1
                 chevrunes.Add(chevruneRenderer);
             }
 
-            int hidden = HideWoodenFrame(portal);
+            int hidden = HideWoodenFrame(portal, root);
 
             // The water that fills the gate when it opens (hidden until then).
             MeshRenderer water = null;
@@ -99,7 +99,7 @@ namespace PortalHeimSG1
         /// forceRenderingOff, which stays off whatever the portal's LODGroup does, and also disables the
         /// LODGroup so it can't switch anything back on.
         /// </summary>
-        private static int HideWoodenFrame(TeleportWorld portal)
+        private static int HideWoodenFrame(TeleportWorld portal, Transform ourGate)
         {
             int hidden = 0;
             foreach (var lod in portal.GetComponentsInChildren<LODGroup>(true))
@@ -108,7 +108,7 @@ namespace PortalHeimSG1
             foreach (var renderer in portal.GetComponentsInChildren<Renderer>(true))
             {
                 if (renderer is ParticleSystemRenderer || renderer is TrailRenderer || renderer is LineRenderer) continue;
-                if (renderer.GetComponentInParent<GateRing>() != null) continue;
+                if (renderer.transform.IsChildOf(ourGate)) continue; // our own ring, chevrunes and water
                 if (IsEffectOrDebris(renderer.transform, portal.transform) && renderer != portal.m_model) continue;
 
                 renderer.forceRenderingOff = true;
