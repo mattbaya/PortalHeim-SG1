@@ -126,8 +126,16 @@ namespace PortalHeimSG1
                     cart.m_body.angularVelocity = Vector3.zero;
                 }
 
-                // The cart's own code hooks it onto this player on its next update, just as if they'd pressed use on it.
-                cart.m_useRequester = player;
+                // The cart's record may still say it's attached from before the trip, which would make the cart's own code
+                // let go instead of hooking on. Clear that, line its handle up with the player, and hook it on directly.
+                var zdo = cart.m_nview.GetZDO();
+                if (zdo.GetBool(ZDOVars.s_attachJointHash)) zdo.Set(ZDOVars.s_attachJointHash, false);
+
+                Vector3 shift = (player.transform.position + cart.m_attachOffset) - cart.m_attachPoint.position;
+                cart.transform.position += shift;
+                if (cart.m_body != null) cart.m_body.position = cart.transform.position;
+
+                cart.AttachTo(player.gameObject);
                 yield break;
             }
         }

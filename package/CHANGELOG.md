@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.1
+- Carts now hook back on to you after going through a portal (before, they arrived but weren't attached, so you had to press use on them).
+
 ## 0.5.0
 - **Carry anything through a portal.** The game's limit on ore, metal and similar items is switched off (`Portals / AllowAllItems`, on by default).
 - **Take your cart with you.** Pull a cart into a gate and it comes through with you and hooks back on, ready to keep pulling (`Portals / CartsFollow`). You step out a little further from the gate so the cart behind you clears it (`Portals / CartExitDistance`). Carts need the mod on the server too.
