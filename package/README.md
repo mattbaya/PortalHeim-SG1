@@ -28,7 +28,7 @@ And it isn't only cosmetic. With the mod on your server too, you can **dial any 
 - **Start-up sequence:** when someone walks up to a connected gate (at either end), the inner ring turns and the Chevrunes lock on in pairs, bottom to top, the top one last. They start as arrows and turn into glowing runes as they lock.
 - **A pool of water** fills the opening once the gate is open, and drains away when everyone has gone. (Prefer the game's own swirl? Set `Interior` to `Vanilla`.)
 - **Dormant glow:** a connected gate that nobody is near glows faintly, so you can tell it's live from across the base.
-- **Ramps and a sunk ring:** the bottom of the ring sits at ground level and gentle ramps on both sides let anyone walk in, even when overencumbered.
+- **Ramps and a sunk ring:** the bottom of the ring sits at ground level and a gentle ramp on the front lets anyone walk in, even when overencumbered. (Want one on the back too? Set `Look / BackRamp` to true.)
 
 <!-- IMAGE: gate-sequence.png (three frames: dormant, Chevrunes locking, open with water) -->
 
@@ -139,7 +139,8 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 | --- | --- | --- |
 | Look / Reskin | true | Set to false to keep ordinary portals |
 | Look / ChevruneColor | orange | Glow colour of a locked Chevrune |
-| Look / Ramps | true | A gentle ramp up to the portal's base on both sides |
+| Look / Ramps | true | A gentle ramp up to the portal's base on the front |
+| Look / BackRamp | false | Also add a ramp on the back |
 | Look / SinkRing | true | The ring sits low so the opening is level with the ground |
 | Look / DormantGlow | 0.3 | How brightly a connected but idle gate's Chevrunes glow (0 = dark) |
 | Look / SecondsPerChevrune | 0.5 | Seconds between start-up steps (five steps: bottom pair, then up the sides, top last) |

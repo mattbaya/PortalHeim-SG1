@@ -109,7 +109,7 @@ namespace PortalHeimSG1
                     $"portal enabled={portal.enabled}.");
         }
 
-        /// <summary>A gentle ramp up to the base slab on each side, with collision, so anyone can walk in (even overencumbered).</summary>
+        /// <summary>A gentle ramp up to the base slab on the front (and the back, if enabled), with collision, so anyone can walk in (even overencumbered).</summary>
         private static void AddRamps(TeleportWorld portal, Transform gateRoot)
         {
             // Take the layer of the portal's own base collider, so the ramps behave like part of the portal
@@ -118,7 +118,9 @@ namespace PortalHeimSG1
             foreach (var collider in portal.GetComponentsInChildren<Collider>(true))
                 if (!collider.isTrigger && !collider.transform.IsChildOf(gateRoot)) { layer = collider.gameObject.layer; break; }
 
-            foreach (float side in new[] { 1f, -1f })
+            // The front is the side you step out of; the back ramp is optional.
+            var sides = PortalHeimSG1Plugin.BackRamp.Value ? new[] { 1f, -1f } : new[] { 1f };
+            foreach (float side in sides)
             {
                 // Parented under the gate (so the frame-hiding leaves it alone) but placed in portal space.
                 var holder = new GameObject(side > 0 ? "RampFront" : "RampBack");

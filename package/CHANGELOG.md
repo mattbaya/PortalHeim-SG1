@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.3
+- The ramp on the **back** of the gate is gone: only the front ramp (the side you step out of) is built. `Look / BackRamp` brings it back.
+
 ## 0.5.2
 - **Dial from or to any gate, even ones paired by name.** The gate it was paired with is set aside while the dial is open, and when the dial closes the original pair is put back exactly as it was. Switch off with `Dialing / AllowDialingLinkedGates`.
 
