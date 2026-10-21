@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.4.1
+- The map and dial lists now update by themselves whenever a gate is built, removed, renamed, or starts or stops being connected (the server checks every second and tells everyone), instead of only when a gate was dialed.
+
 ## 0.4.0
 - **Dial any gate.** With the mod on the server too, using a free gate opens a window listing the gates you know. Pick one and it dials, with the usual start-up sequence. Mark a **home gate** and Shift+use dials it straight away.
 - **Gates on the map** with a small gate icon (the powered-off gate sunk in the ground with its ramp, flat like the game's own pins), and Shift+click a pin to dial it from the gate you're standing at.

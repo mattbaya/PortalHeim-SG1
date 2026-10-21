@@ -38,6 +38,8 @@ namespace PortalHeimSG1
         private static float _serverUpSince = -1f;
         private static bool _repaired;
         private static int _counter;
+        private static int _lastSignature;
+        private static bool _sentList;
 
         public static bool IsServer => ZNet.instance != null && ZNet.instance.IsServer();
 
@@ -47,6 +49,7 @@ namespace PortalHeimSG1
             {
                 _serverUpSince = -1f;
                 _repaired = false;
+                _sentList = false;
                 Dials.Clear();
                 return;
             }
@@ -62,6 +65,16 @@ namespace PortalHeimSG1
             {
                 _repaired = true;
                 RepairLeftovers();
+            }
+
+            // Tell everyone whenever a gate is built, removed, renamed, or starts or stops being connected, so the
+            // map and the dial lists stay current without anyone having to ask.
+            int signature = Signature(Snapshot());
+            if (!_sentList || signature != _lastSignature)
+            {
+                _sentList = true;
+                _lastSignature = signature;
+                GateNet.BroadcastGates();
             }
 
             if (Dials.Count == 0) return;
@@ -231,6 +244,27 @@ namespace PortalHeimSG1
             }
 
             return list;
+        }
+
+        /// <summary>A number that changes whenever anything a player sees about the gates changes (order doesn't matter).</summary>
+        private static int Signature(List<GateInfo> gates)
+        {
+            unchecked
+            {
+                int sum = gates.Count * 7919;
+                foreach (var gate in gates)
+                {
+                    int h = 17;
+                    h = h * 31 + gate.Id.GetHashCode();
+                    h = h * 31 + (gate.Name ?? "").GetHashCode();
+                    h = h * 31 + (int)gate.State;
+                    h = h * 31 + gate.Partner.GetHashCode();
+                    h = h * 31 + Mathf.RoundToInt(gate.Position.x) * 73 + Mathf.RoundToInt(gate.Position.z);
+                    sum += h;
+                }
+
+                return sum;
+            }
         }
 
         // --- Where the players are (the server knows every player's position) ---
