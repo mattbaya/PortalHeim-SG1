@@ -26,11 +26,17 @@ namespace PortalHeimSG1
     internal static class GateServer
     {
         private static readonly int KeyOriginalName = "sg1_orig".GetStableHashCode();
+        // Who a gate was paired with (the vanilla way) before a dial took it over, so the pair can be put back exactly.
+        private static readonly int KeyOldPartner = "sg1_partner".GetStableHashCode();
 
         private class Dial
         {
             public ZDOID A, B;
+            /// <summary>Gates that were paired with A or B. They are set aside (given a private tag) so the game doesn't pair them with each other.</summary>
+            public List<ZDOID> Parked = new List<ZDOID>();
             public float Start, LastNear;
+
+            public bool Has(ZDOID id) => A == id || B == id || Parked.Contains(id);
         }
 
         private static readonly List<Dial> Dials = new List<Dial>();
@@ -93,7 +99,7 @@ namespace PortalHeimSG1
                 bool tooLong = Time.time - dial.Start > PortalHeimSG1Plugin.DialMaxSeconds.Value;
                 if (gone || idle || tooLong)
                 {
-                    Close(a, b);
+                    Close(dial);
                     Dials.RemoveAt(i);
                     changed = true;
                 }
@@ -109,15 +115,11 @@ namespace PortalHeimSG1
         /// <summary>Gates left over from a previous run that stopped mid-dial: give them their names back.</summary>
         private static void RepairLeftovers()
         {
-            int fixedCount = 0;
+            var leftovers = new List<ZDO>();
             foreach (var zdo in ZDOMan.instance.GetPortalList())
-            {
-                if (HasStoredName(zdo) && !IsInDial(zdo.m_uid))
-                {
-                    Restore(zdo);
-                    fixedCount++;
-                }
-            }
+                if (HasStoredName(zdo) && !IsInDial(zdo.m_uid)) leftovers.Add(zdo);
+            int fixedCount = leftovers.Count;
+            RestoreAll(leftovers);
 
             if (fixedCount > 0)
             {
@@ -126,7 +128,7 @@ namespace PortalHeimSG1
             }
         }
 
-        private static bool IsInDial(ZDOID id) => Dials.Exists(d => d.A == id || d.B == id);
+        private static bool IsInDial(ZDOID id) => Dials.Exists(d => d.Has(id));
 
         private static bool HasStoredName(ZDO zdo) => zdo.GetString(KeyOriginalName, "").Length > 0;
 
@@ -162,18 +164,33 @@ namespace PortalHeimSG1
                 if (Vector3.Distance(where, src.GetPosition()) > range) return "You are too far from the gate.";
             }
 
-            if (StateOf(src) != GateState.Idle) return "This gate is already connected.";
-            if (StateOf(dst) != GateState.Idle) return "That gate is busy.";
+            var srcState = StateOf(src);
+            var dstState = StateOf(dst);
+            bool allowLinked = PortalHeimSG1Plugin.AllowDialingLinkedGates.Value;
+            if (srcState == GateState.Dialing) return "This gate is already connected.";
+            if (dstState == GateState.Dialing) return "That gate is busy.";
+            if (!allowLinked && srcState == GateState.Linked) return "This gate is already connected.";
+            if (!allowLinked && dstState == GateState.Linked) return "That gate is busy.";
 
+            var srcPartner = srcState == GateState.Linked ? PartnerOf(src) : ZDOID.None;
+            var dstPartner = dstState == GateState.Linked ? PartnerOf(dst) : ZDOID.None;
+            if (srcPartner == dstId || dstPartner == srcId) return "These two gates are already connected.";
+
+            var dial = new Dial { A = srcId, B = dstId, Start = Time.time, LastNear = Time.time };
             string session = "~sg1:" + (++_counter) + ":" + Random.Range(1000, 9999);
-            Begin(src, session);
-            Begin(dst, session);
+            Begin(src, session, srcPartner);
+            Begin(dst, session, dstPartner);
+
+            // The gates they were paired with are set aside until this dial ends.
+            Park(dial, srcPartner, srcId);
+            Park(dial, dstPartner, dstId);
+
             src.SetConnection(ZDOExtraData.ConnectionType.Portal, dst.m_uid);
             dst.SetConnection(ZDOExtraData.ConnectionType.Portal, src.m_uid);
             ZDOMan.instance.ForceSendZDO(src.m_uid);
             ZDOMan.instance.ForceSendZDO(dst.m_uid);
 
-            Dials.Add(new Dial { A = srcId, B = dstId, Start = Time.time, LastNear = Time.time });
+            Dials.Add(dial);
             PortalHeimSG1Plugin.Log.LogInfo($"Dialed '{NameOf(src)}' -> '{NameOf(dst)}'.");
             GateNet.BroadcastGates();
             return null;
@@ -182,28 +199,67 @@ namespace PortalHeimSG1
         /// <summary>Ends a dial from either gate.</summary>
         public static string TryHangUp(ZDOID gateId)
         {
-            var dial = Dials.Find(d => d.A == gateId || d.B == gateId);
+            var dial = Dials.Find(d => d.Has(gateId));
             if (dial == null) return "This gate isn't dialed.";
 
-            Close(ZDOMan.instance.GetZDO(dial.A), ZDOMan.instance.GetZDO(dial.B));
+            Close(dial);
             Dials.Remove(dial);
             Game.instance.ConnectPortals();
             GateNet.BroadcastGates();
             return null;
         }
 
-        private static void Begin(ZDO zdo, string sessionTag)
+        private static void Begin(ZDO zdo, string sessionTag, ZDOID oldPartner)
         {
             zdo.SetOwner(ZDOMan.GetSessionID());
             // Marked with "o:" so an empty original name can be told apart from "nothing stored".
             zdo.Set(KeyOriginalName, "o:" + zdo.GetString(ZDOVars.s_tag));
+            zdo.Set(KeyOldPartner, oldPartner == ZDOID.None ? "" : GateClient.Key(oldPartner));
             zdo.Set(ZDOVars.s_tag, sessionTag);
         }
 
-        private static void Close(ZDO a, ZDO b)
+        /// <summary>Sets a gate aside while a dial is open: it keeps its place in the old pair, but won't pair with anything else.</summary>
+        private static void Park(Dial dial, ZDOID partnerId, ZDOID pairedWith)
         {
-            if (a != null) Restore(a);
-            if (b != null) Restore(b);
+            if (partnerId == ZDOID.None) return;
+            var partner = ZDOMan.instance.GetZDO(partnerId);
+            if (partner == null || StateOf(partner) == GateState.Dialing) return;
+
+            Begin(partner, "~sg1park:" + (++_counter) + ":" + Random.Range(1000, 9999), pairedWith);
+            partner.SetConnection(ZDOExtraData.ConnectionType.Portal, ZDOID.None);
+            ZDOMan.instance.ForceSendZDO(partner.m_uid);
+            dial.Parked.Add(partnerId);
+        }
+
+        /// <summary>Ends a dial: every gate it touched gets its name back, and the old pairs are put back as they were.</summary>
+        private static void Close(Dial dial)
+        {
+            var gates = new List<ZDO>();
+            var a = ZDOMan.instance.GetZDO(dial.A);
+            var b = ZDOMan.instance.GetZDO(dial.B);
+            if (a != null) gates.Add(a);
+            if (b != null) gates.Add(b);
+            foreach (var id in dial.Parked)
+            {
+                var parked = ZDOMan.instance.GetZDO(id);
+                if (parked != null) gates.Add(parked);
+            }
+
+            RestoreAll(gates);
+        }
+
+        private static void RestoreAll(List<ZDO> gates)
+        {
+            // Note who each gate was paired with before the names change.
+            var pairs = new List<KeyValuePair<ZDO, ZDOID>>();
+            foreach (var zdo in gates)
+            {
+                if (GateClient.TryParse(zdo.GetString(KeyOldPartner, ""), out var old)) pairs.Add(new KeyValuePair<ZDO, ZDOID>(zdo, old));
+            }
+
+            foreach (var zdo in gates) Restore(zdo);
+
+            foreach (var pair in pairs) Reconnect(pair.Key, ZDOMan.instance.GetZDO(pair.Value));
         }
 
         private static void Restore(ZDO zdo)
@@ -214,8 +270,25 @@ namespace PortalHeimSG1
             zdo.SetOwner(ZDOMan.GetSessionID());
             zdo.Set(ZDOVars.s_tag, stored.Substring(2));
             zdo.Set(KeyOriginalName, "");
+            zdo.Set(KeyOldPartner, "");
             zdo.SetConnection(ZDOExtraData.ConnectionType.Portal, ZDOID.None);
             ZDOMan.instance.ForceSendZDO(zdo.m_uid);
+        }
+
+        /// <summary>Pairs two gates again, if they are still free and share a name (otherwise the game sorts them out as usual).</summary>
+        private static void Reconnect(ZDO a, ZDO b)
+        {
+            if (a == null || b == null) return;
+            if (a.GetString(ZDOVars.s_tag) != b.GetString(ZDOVars.s_tag)) return;
+            if (a.GetConnectionZDOID(ZDOExtraData.ConnectionType.Portal) != ZDOID.None) return;
+            if (b.GetConnectionZDOID(ZDOExtraData.ConnectionType.Portal) != ZDOID.None) return;
+
+            a.SetOwner(ZDOMan.GetSessionID());
+            b.SetOwner(ZDOMan.GetSessionID());
+            a.SetConnection(ZDOExtraData.ConnectionType.Portal, b.m_uid);
+            b.SetConnection(ZDOExtraData.ConnectionType.Portal, a.m_uid);
+            ZDOMan.instance.ForceSendZDO(a.m_uid);
+            ZDOMan.instance.ForceSendZDO(b.m_uid);
         }
 
         private static bool IsPortal(ZDO zdo)

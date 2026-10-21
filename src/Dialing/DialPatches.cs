@@ -37,11 +37,11 @@ namespace PortalHeimSG1
             // Let the game deal with gates in someone else's protected area (it shows its own message).
             if (!PrivateArea.CheckAccess(__instance.transform.position)) return true;
             // Gates linked the old way (two sharing a name) behave exactly as before, including the naming window.
-            if (!TryGetInfo(__instance, out var info) || info.State == GateState.Linked) return true;
+            if (!TryGetInfo(__instance, out var info) || (info.State == GateState.Linked && !GateClient.Dialable(info.State))) return true;
 
             // Alt+use dials the home gate straight away.
-            if (alt && info.State == GateState.Idle && GateClient.TryGetHome(out var home)
-                && home.State == GateState.Idle && home.Id != info.Id)
+            if (alt && GateClient.Dialable(info.State) && GateClient.TryGetHome(out var home)
+                && GateClient.Dialable(home.State) && home.Id != info.Id)
             {
                 DialMenu.DialFrom(__instance, home);
                 __result = true;
@@ -57,7 +57,7 @@ namespace PortalHeimSG1
         [HarmonyPatch(nameof(TeleportWorld.GetHoverText))]
         private static void HoverText_Postfix(TeleportWorld __instance, ref string __result)
         {
-            if (!Active || !TryGetInfo(__instance, out var info) || info.State == GateState.Linked) return;
+            if (!Active || !TryGetInfo(__instance, out var info) || (info.State == GateState.Linked && !GateClient.Dialable(info.State))) return;
 
             int lastLine = __result.LastIndexOf('\n');
             if (lastLine < 0) return;
@@ -70,7 +70,7 @@ namespace PortalHeimSG1
             text += info.State == GateState.Dialing
                 ? $"\n[<color=yellow><b>{use}</b></color>] Gate options"
                 : $"\n[<color=yellow><b>{use}</b></color>] Dial a gate";
-            if (info.State == GateState.Idle && GateClient.TryGetHome(out var home) && home.State == GateState.Idle && home.Id != info.Id)
+            if (GateClient.Dialable(info.State) && GateClient.TryGetHome(out var home) && GateClient.Dialable(home.State) && home.Id != info.Id)
                 text += $"\n[<color=yellow><b>Shift+{use}</b></color>] Dial home ({DialMenu.DisplayName(home)})";
             __result = text;
         }

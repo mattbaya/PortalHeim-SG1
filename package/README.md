@@ -51,7 +51,7 @@ With PortalHeim_SG1 on the **server** as well as on each player's game, gates ca
 - **On the map:** known gates get a small gate icon. **Shift+click** a gate's pin while standing at a free gate to dial it.
 - A dialed gate closes by itself 15 seconds after the last player leaves both gates (never later than 5 minutes). **Hang up** in the window closes it sooner.
 - **Which gates you see:** by default only gates you have been near, or built yourself, so exploring still matters. Each character keeps its own list. Set `Dialing / OnlyShowVisitedGates` to false to see every gate.
-- Gates that share a name still pair exactly as in vanilla (and use goes straight to the game's naming window for those). Dialing only connects free gates, and puts each gate's name back afterwards.
+- Gates that share a name still pair as in vanilla, and walking through them works as usual. You can also dial from or to a paired gate: its old partner is set aside while the dial is open, and when the dial closes the original pair is put back exactly as it was (`Dialing / AllowDialingLinkedGates`). Each gate's name is put back afterwards.
 
 **Where to install it:** a dedicated server needs BepInEx and this mod, and so does every player. If you host from your own game, you and your friends all need it. Playing alone, it just works. On a server without the mod, everything looks and sounds the same but gates behave as in vanilla (no dialing, no gate pins).
 
@@ -76,6 +76,7 @@ With PortalHeim_SG1 on the **server** as well as on each player's game, gates ca
 | Portals / CartsFollow | true | A cart you are pulling comes through with you (needs the mod on the server) |
 | Portals / CartExitDistance | 5.5 | Extra metres from the gate you come out when pulling a cart |
 | Dialing / Enabled | true | Dialing on or off (set it on the server to switch it off for everyone) |
+| Dialing / AllowDialingLinkedGates | true | Paired gates can be dialed from or to; the old partner is set aside until the dial closes |
 | Dialing / OnlyShowVisitedGates | true | `false` lists and pins every gate in the world |
 | Dialing / ShowGatePins | true | Gate pins on the map |
 | Dialing / GateIconOnMap | true | Mark gates with the mod's own gate icon (the powered-off gate, sunk in the ground with its ramp) |

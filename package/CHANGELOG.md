@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.2
+- **Dial from or to any gate, even ones paired by name.** The gate it was paired with is set aside while the dial is open, and when the dial closes the original pair is put back exactly as it was. Switch off with `Dialing / AllowDialingLinkedGates`.
+
 ## 0.5.1
 - Carts now hook back on to you after going through a portal (before, they arrived but weren't attached, so you had to press use on them).
 

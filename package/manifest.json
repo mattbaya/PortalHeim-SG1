@@ -1,7 +1,7 @@
 {
   "name": "PortalHeim_SG1",
   "author": "Svaha",
-  "version_number": "0.5.1",
+  "version_number": "0.5.2",
   "website_url": "https://github.com/mattbaya/PortalHeim-SG1",
   "description": "Turns portals into stone ring gates with Norse runes, Chevrunes and rippling water, plus sounds, an endless swirling-tunnel loading screen, and (with the mod on the server too) dialing any gate you know from a menu or the map.",
   "dependencies": [

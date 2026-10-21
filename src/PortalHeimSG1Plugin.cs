@@ -37,7 +37,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.5.1";
+        public const string Version = "0.5.2";
 
         internal static ManualLogSource Log;
 
@@ -59,6 +59,7 @@ namespace PortalHeimSG1
         internal static ConfigEntry<bool> CartsFollow;
         internal static ConfigEntry<float> CartExitDistance;
         internal static ConfigEntry<bool> DialingEnabled;
+        internal static ConfigEntry<bool> AllowDialingLinkedGates;
         internal static ConfigEntry<bool> OnlyVisited;
         internal static ConfigEntry<bool> GatePins;
         internal static ConfigEntry<bool> GateIconOnMap;
@@ -114,6 +115,9 @@ namespace PortalHeimSG1
             DialingEnabled = Config.Bind("Dialing", "Enabled", true,
                 "Let players dial any gate they know, instead of only gates that share a name. Needs this mod on the server too " +
                 "(a dedicated server, or the host's own game); without it, gates behave as in vanilla. Switch off on the server to turn dialing off for everyone.");
+            AllowDialingLinkedGates = Config.Bind("Dialing", "AllowDialingLinkedGates", true,
+                "Gates paired the old way (two sharing a name) can be dialed from, or dialed to, too. The gate they were paired with is set aside " +
+                "until the dial closes, and then the original pair is put back. Set to false to leave paired gates alone. (Server setting for what's allowed.)");
             OnlyVisited = Config.Bind("Dialing", "OnlyShowVisitedGates", true,
                 "Only list (and put on the map) gates you have been near, or built yourself. Set to false to see every gate in the world.");
             GatePins = Config.Bind("Dialing", "ShowGatePins", true,

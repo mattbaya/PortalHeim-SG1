@@ -116,10 +116,12 @@ namespace PortalHeimSG1
 
             if (self.Value.State == GateState.Dialing)
             {
-                string partner = "another gate";
+                string partner = "";
                 foreach (var gate in GateClient.Gates)
                     if (gate.Id == self.Value.Partner) partner = DisplayName(gate);
-                GUILayout.Label("Connected to " + partner + ". It closes by itself once everyone has gone.", _label);
+                GUILayout.Label(partner.Length > 0
+                    ? "Connected to " + partner + ". It closes by itself once everyone has gone."
+                    : "This gate is set aside while another dial is open. It goes back to normal when that dial closes.", _label);
                 GUILayout.Space(8f * scale);
                 if (GUILayout.Button("Hang up", GUILayout.Height(34f * scale)))
                 {
@@ -159,7 +161,7 @@ namespace PortalHeimSG1
             {
                 _hadDefault = true;
                 foreach (var gate in candidates)
-                    if (GateClient.IsHome(gate.Id) && gate.State == GateState.Idle) _selected = GateClient.Key(gate.Id);
+                    if (GateClient.IsHome(gate.Id) && GateClient.Dialable(gate.State)) _selected = GateClient.Key(gate.Id);
                 if (_selected.Length == 0)
                     foreach (var gate in candidates)
                         if (gate.State == GateState.Idle)
@@ -167,6 +169,14 @@ namespace PortalHeimSG1
                             _selected = GateClient.Key(gate.Id);
                             break;
                         }
+            }
+
+            if (self.State == GateState.Linked)
+            {
+                string pairedWith = "another gate";
+                foreach (var gate in GateClient.Gates)
+                    if (gate.Id == self.Partner) pairedWith = DisplayName(gate);
+                GUILayout.Label("Paired with " + pairedWith + ". Dialing another gate sets that pair aside until the dial closes.", _small);
             }
 
             string note = candidates.Count == 0
@@ -178,13 +188,13 @@ namespace PortalHeimSG1
             foreach (var gate in candidates)
             {
                 string key = GateClient.Key(gate.Id);
-                bool free = gate.State == GateState.Idle;
+                bool free = GateClient.Dialable(gate.State);
                 bool selected = key == _selected;
                 int meters = Mathf.RoundToInt(Vector3.Distance(gate.Position, self.Position));
 
                 GUILayout.BeginHorizontal(selected ? _rowSelected : _row);
                 string star = GateClient.IsHome(gate.Id) ? "* " : "";
-                string state = free ? "" : (gate.State == GateState.Dialing ? "  (in use)" : "  (linked)");
+                string state = gate.State == GateState.Dialing ? "  (in use)" : (gate.State == GateState.Linked ? "  (paired)" : "");
                 if (GUILayout.Button(star + DisplayName(gate) + "  -  " + meters + " m" + state, _label, GUILayout.ExpandWidth(true)) && free)
                     _selected = key;
 
@@ -213,7 +223,7 @@ namespace PortalHeimSG1
             if (_source == null || _selected.Length == 0) return false;
             foreach (var gate in GateClient.Gates)
             {
-                if (GateClient.Key(gate.Id) != _selected || gate.State != GateState.Idle) continue;
+                if (GateClient.Key(gate.Id) != _selected || !GateClient.Dialable(gate.State)) continue;
                 var portal = _source;
                 Close();
                 return DialFrom(portal, gate);

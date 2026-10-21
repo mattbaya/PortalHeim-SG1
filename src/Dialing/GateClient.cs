@@ -128,6 +128,10 @@ namespace PortalHeimSG1
         /// <summary>Whether the player may see this gate in the list and on the map.</summary>
         public static bool IsVisible(ZDOID id) => !PortalHeimSG1Plugin.OnlyVisited.Value || IsVisited(id);
 
+        /// <summary>Whether a gate in this state can be dialed from or to.</summary>
+        public static bool Dialable(GateState state) =>
+            state == GateState.Idle || (state == GateState.Linked && PortalHeimSG1Plugin.AllowDialingLinkedGates.Value);
+
         public static bool IsHome(ZDOID id) => _home.Length > 0 && _home == Key(id);
 
         public static bool TryGetHome(out GateInfo home)
