@@ -62,7 +62,7 @@ namespace PortalHeimSG1
             }
 
             if (_forPlayer != player) LoadFor(player);
-            if (!PortalHeimSG1Plugin.DialingEnabled.Value) return;
+            if (!PortalHeimSG1Plugin.DialingEnabled.Value && !PortalHeimSG1Plugin.CartsFollow.Value) return;
 
             // Keep saying hello until the server answers (it can take a moment after spawning).
             if (!ServerHasMod && Time.time >= _nextHello)

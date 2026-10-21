@@ -37,7 +37,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.4.1";
+        public const string Version = "0.5.0";
 
         internal static ManualLogSource Log;
 
@@ -55,6 +55,9 @@ namespace PortalHeimSG1
         internal static ConfigEntry<bool> TravelSounds;
         internal static ConfigEntry<float> TravelMusicVolume;
         internal static ConfigEntry<float> TravelEffectVolume;
+        internal static ConfigEntry<bool> AllowAllItems;
+        internal static ConfigEntry<bool> CartsFollow;
+        internal static ConfigEntry<float> CartExitDistance;
         internal static ConfigEntry<bool> DialingEnabled;
         internal static ConfigEntry<bool> OnlyVisited;
         internal static ConfigEntry<bool> GatePins;
@@ -101,6 +104,13 @@ namespace PortalHeimSG1
             Shading = Config.Bind("Look", "Shading", ShadingMode.PortalShader,
                 "How the stone is shaded. PortalShader reuses the portal's own shader. If the ring looks wrong or is missing, try Standard. " +
                 "Takes effect on next game start.");
+            AllowAllItems = Config.Bind("Portals", "AllowAllItems", true,
+                "Let players carry anything through a portal, including ore, metal and other items the game normally keeps out. " +
+                "Takes effect for portals loaded after this is changed. Each player's own setting applies to them.");
+            CartsFollow = Config.Bind("Portals", "CartsFollow", true,
+                "Someone pulling a cart can walk through a portal and the cart comes with them, ready to keep pulling. Needs the mod on the server too.");
+            CartExitDistance = Config.Bind("Portals", "CartExitDistance", 5.5f,
+                new ConfigDescription("How much further from the gate, in metres, you come out when you're pulling a cart, so the cart behind you isn't inside the gate.", new AcceptableValueRange<float>(0f, 15f)));
             DialingEnabled = Config.Bind("Dialing", "Enabled", true,
                 "Let players dial any gate they know, instead of only gates that share a name. Needs this mod on the server too " +
                 "(a dedicated server, or the host's own game); without it, gates behave as in vanilla. Switch off on the server to turn dialing off for everyone.");
@@ -162,6 +172,7 @@ namespace PortalHeimSG1
             if (Headless) return;
 
             GateClient.Tick();
+            CartFollow.Tick();
             DialMap.Tick();
             WaterSurface.Tick();
             TunnelSurface.Pump();
@@ -203,6 +214,7 @@ namespace PortalHeimSG1
         private static void Awake_Postfix(TeleportWorld __instance)
         {
             GateRegistry.Add(__instance);
+            if (PortalHeimSG1Plugin.AllowAllItems.Value) __instance.m_allowAllItems = true;
             if (!PortalHeimSG1Plugin.Reskin.Value || PortalHeimSG1Plugin.Headless) return;
             try
             {

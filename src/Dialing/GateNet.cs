@@ -21,6 +21,7 @@ namespace PortalHeimSG1
         private const string DialRpc = "SG1_Dial";
         private const string HangUpRpc = "SG1_HangUp";
         private const string Result = "SG1_Result";
+        private const string MoveCart = "SG1_MoveCart";
 
         private static ZRoutedRpc _registeredOn;
 
@@ -38,6 +39,7 @@ namespace PortalHeimSG1
             rpc.Register<ZDOID, ZDOID>(DialRpc, RpcDial);
             rpc.Register<ZDOID>(HangUpRpc, RpcHangUp);
             rpc.Register<string>(Result, RpcResult);
+            rpc.Register<ZDOID, Vector3, Quaternion>(MoveCart, RpcMoveCart);
         }
 
         // --- Player to server ---
@@ -64,7 +66,17 @@ namespace PortalHeimSG1
             if (ZRoutedRpc.instance != null) ZRoutedRpc.instance.InvokeRoutedRPC(HangUpRpc, gate);
         }
 
+        public static void RequestMoveCart(ZDOID cart, Vector3 position, Quaternion rotation)
+        {
+            if (ZRoutedRpc.instance != null) ZRoutedRpc.instance.InvokeRoutedRPC(MoveCart, cart, position, rotation);
+        }
+
         // --- Server side ---
+
+        private static void RpcMoveCart(long sender, ZDOID cart, Vector3 position, Quaternion rotation)
+        {
+            if (GateServer.IsServer) CartFollow.ServerMove(sender, cart, position, rotation);
+        }
 
         private static void RpcHello(long sender, string version)
         {

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0
+- **Carry anything through a portal.** The game's limit on ore, metal and similar items is switched off (`Portals / AllowAllItems`, on by default).
+- **Take your cart with you.** Pull a cart into a gate and it comes through with you and hooks back on, ready to keep pulling (`Portals / CartsFollow`). You step out a little further from the gate so the cart behind you clears it (`Portals / CartExitDistance`). Carts need the mod on the server too.
+
 ## 0.4.1
 - The map and dial lists now update by themselves whenever a gate is built, removed, renamed, or starts or stops being connected (the server checks every second and tells everyone), instead of only when a gate was dialed.
 

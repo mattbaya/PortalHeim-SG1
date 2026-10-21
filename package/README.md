@@ -37,6 +37,11 @@ All **CC0** (public domain), none from any show:
 
 Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian MacIntosh** (Metal Impact Sounds) and **ezwa** (6 Short Water Splashes, cut by qubodup from public-domain recordings), plus sounds synthesized for this mod. The travel sound is **"Deepbassloop80bpm"** by **deep into perspectives**, CC0. Details in `sounds/CREDITS.txt`.
 
+## Carry anything, take your cart
+
+- **No item limits:** you can walk through a portal carrying ore, metal and anything else the game normally refuses. Turn it off with `Portals / AllowAllItems`.
+- **Carts follow you:** if you are pulling a cart when you step through, the cart is moved to your side of the portal and hooks back on to you. You come out a few metres further from the gate so the cart doesn't end up inside it. This needs the mod on the server as well (see below); without it the cart stays behind as in vanilla.
+
 ## Dialing any gate (needs the mod on the server too)
 
 With PortalHeim_SG1 on the **server** as well as on each player's game, gates can be dialed instead of only pairing by name.
@@ -67,6 +72,9 @@ With PortalHeim_SG1 on the **server** as well as on each player's game, gates ca
 | Look / TravelScreen | Tunnel | `Tunnel` = endless swirling tunnel, `Gate` = a miniature gate, `Vanilla` = the game's own spinner (reload a world to apply) |
 | Look / Interior | Water | `Water` = rippling pool, `Vanilla` = the portal's own swirl |
 | Look / Shading | PortalShader | If the ring looks wrong or is missing, try `Standard` (restart the game) |
+| Portals / AllowAllItems | true | Carry ore, metal and other normally blocked items through portals |
+| Portals / CartsFollow | true | A cart you are pulling comes through with you (needs the mod on the server) |
+| Portals / CartExitDistance | 5.5 | Extra metres from the gate you come out when pulling a cart |
 | Dialing / Enabled | true | Dialing on or off (set it on the server to switch it off for everyone) |
 | Dialing / OnlyShowVisitedGates | true | `false` lists and pins every gate in the world |
 | Dialing / ShowGatePins | true | Gate pins on the map |

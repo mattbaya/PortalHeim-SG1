@@ -277,7 +277,7 @@ namespace PortalHeimSG1
             return list;
         }
 
-        private static bool TryGetPlayerPosition(long sender, out Vector3 position)
+        internal static bool TryGetPlayerPosition(long sender, out Vector3 position)
         {
             var peer = ZNet.instance.GetPeer(sender);
             if (peer != null)
