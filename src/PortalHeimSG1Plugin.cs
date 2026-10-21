@@ -37,7 +37,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.3.0";
+        public const string Version = "0.4.0";
 
         internal static ManualLogSource Log;
 
@@ -55,9 +55,18 @@ namespace PortalHeimSG1
         internal static ConfigEntry<bool> TravelSounds;
         internal static ConfigEntry<float> TravelMusicVolume;
         internal static ConfigEntry<float> TravelEffectVolume;
+        internal static ConfigEntry<bool> DialingEnabled;
+        internal static ConfigEntry<bool> OnlyVisited;
+        internal static ConfigEntry<bool> GatePins;
+        internal static ConfigEntry<Minimap.PinType> PinIcon;
+        internal static ConfigEntry<float> DialIdleSeconds;
+        internal static ConfigEntry<float> DialMaxSeconds;
+        internal static ConfigEntry<float> DialRange;
+        internal static ConfigEntry<float> DialKeepOpenRange;
         internal static ConfigEntry<bool> ShowStatus;
         internal static ConfigEntry<KeyboardShortcut> PreviewKey;
         internal static PortalHeimSG1Plugin Instance;
+        internal static bool Headless;
 
         private Harmony _harmony;
 
@@ -91,6 +100,23 @@ namespace PortalHeimSG1
             Shading = Config.Bind("Look", "Shading", ShadingMode.PortalShader,
                 "How the stone is shaded. PortalShader reuses the portal's own shader. If the ring looks wrong or is missing, try Standard. " +
                 "Takes effect on next game start.");
+            DialingEnabled = Config.Bind("Dialing", "Enabled", true,
+                "Let players dial any gate they know, instead of only gates that share a name. Needs this mod on the server too " +
+                "(a dedicated server, or the host's own game); without it, gates behave as in vanilla. Switch off on the server to turn dialing off for everyone.");
+            OnlyVisited = Config.Bind("Dialing", "OnlyShowVisitedGates", true,
+                "Only list (and put on the map) gates you have been near, or built yourself. Set to false to see every gate in the world.");
+            GatePins = Config.Bind("Dialing", "ShowGatePins", true,
+                "Show gates on the map. Shift+click a gate's pin while standing at an idle gate to dial it.");
+            PinIcon = Config.Bind("Dialing", "PinIcon", Minimap.PinType.Icon4,
+                "Which of the map's built-in pin icons marks a gate.");
+            DialIdleSeconds = Config.Bind("Dialing", "CloseAfterIdleSeconds", 15f,
+                new ConfigDescription("A dialed gate closes this many seconds after the last player leaves both gates. (Server setting.)", new AcceptableValueRange<float>(3f, 300f)));
+            DialMaxSeconds = Config.Bind("Dialing", "MaxOpenSeconds", 300f,
+                new ConfigDescription("A dialed gate always closes after this long, even if someone is standing by it. (Server setting.)", new AcceptableValueRange<float>(10f, 3600f)));
+            DialRange = Config.Bind("Dialing", "DialRange", 15f,
+                new ConfigDescription("How close you must be to a gate to dial from it. (Server setting.)", new AcceptableValueRange<float>(3f, 100f)));
+            DialKeepOpenRange = Config.Bind("Dialing", "KeepOpenRange", 15f,
+                new ConfigDescription("A dialed gate stays open while a player is this close to either gate. (Server setting.)", new AcceptableValueRange<float>(3f, 100f)));
             PreviewKey = Config.Bind("Diagnostics", "PreviewKey", new KeyboardShortcut(KeyCode.F8),
                 "Stand near a gate and press this to replay the opening sequence (Chevrunes locking, the water, and all the sounds) " +
                 "without having to disconnect and reconnect the portal.");
@@ -108,17 +134,32 @@ namespace PortalHeimSG1
             Volume = Config.Bind("Sound", "Volume", 1.0f,
                 new ConfigDescription("Volume of the gate sounds you provide (also follows the game's sound-effects volume).", new AcceptableValueRange<float>(0f, 1f)));
 
-            StartCoroutine(GateSounds.LoadAll(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Info.Location), "sounds")));
-            if (Interior.Value == InteriorMode.Water || Travel.Value == TravelMode.Gate) StartCoroutine(WaterSurface.Build());
-            if (Travel.Value == TravelMode.Tunnel) TunnelSurface.Start();
+            // A dedicated server has no screen or speakers: it only needs the dialing logic.
+            Headless = Application.isBatchMode;
+            if (!Headless)
+            {
+                StartCoroutine(GateSounds.LoadAll(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Info.Location), "sounds")));
+                if (Interior.Value == InteriorMode.Water || Travel.Value == TravelMode.Gate) StartCoroutine(WaterSurface.Build());
+                if (Travel.Value == TravelMode.Tunnel) TunnelSurface.Start();
+            }
 
             _harmony = new Harmony(Guid);
             _harmony.PatchAll(typeof(PortalHeimSG1Plugin).Assembly);
             Log.LogInfo($"{Name} {Version} loaded. Sound files go in {GateSounds.Folder}");
         }
 
+        private void OnGUI()
+        {
+            if (!Headless) DialMenu.Draw();
+        }
+
         private void Update()
         {
+            GateServer.Tick();
+            if (Headless) return;
+
+            GateClient.Tick();
+            DialMap.Tick();
             WaterSurface.Tick();
             TunnelSurface.Pump();
 
@@ -158,7 +199,8 @@ namespace PortalHeimSG1
         [HarmonyPatch(nameof(TeleportWorld.Awake))]
         private static void Awake_Postfix(TeleportWorld __instance)
         {
-            if (!PortalHeimSG1Plugin.Reskin.Value) return;
+            GateRegistry.Add(__instance);
+            if (!PortalHeimSG1Plugin.Reskin.Value || PortalHeimSG1Plugin.Headless) return;
             try
             {
                 GateBuilder.Attach(__instance);

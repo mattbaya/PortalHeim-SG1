@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0
+- **Dial any gate.** With the mod on the server too, using a free gate opens a window listing the gates you know. Pick one and it dials, with the usual start-up sequence. Mark a **home gate** and Shift+use dials it straight away.
+- **Gates on the map**, and Shift+click a pin to dial it from the gate you're standing at.
+- By default you only see gates you've been near or built (`Dialing / OnlyShowVisitedGates`); each character remembers its own.
+- Dialed gates close by themselves once everyone has left. Gates that share a name still pair as in vanilla.
+- Runs on dedicated servers: the server decides every connection, and puts gate names back if it stops mid-dial.
+- Needs the mod installed on the server as well; without it, nothing changes.
+
 ## 0.3.0
 - **New travel sound.** The loading screen for a long portal trip now loops a deep bass line, **"Deepbassloop80bpm"** by deep into perspectives (CC0, credited in `sounds/CREDITS.txt`). The synthesized bass line from 0.2.x is gone.
 - Config: `Sound / TravelSounds` (on/off), `TravelMusicVolume` (0.75) and `TravelEffectVolume` (0.5, for an optional second `travelfx` layer; none ships). Your own `travel` and `travelfx` clips in the config sounds folder replace or add to them. (`TravelBassLine` and `TravelBassVolume` from 0.2.x no longer do anything.)

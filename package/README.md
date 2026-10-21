@@ -37,6 +37,19 @@ All **CC0** (public domain), none from any show:
 
 Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian MacIntosh** (Metal Impact Sounds) and **ezwa** (6 Short Water Splashes, cut by qubodup from public-domain recordings), plus sounds synthesized for this mod. The travel sound is **"Deepbassloop80bpm"** by **deep into perspectives**, CC0. Details in `sounds/CREDITS.txt`.
 
+## Dialing any gate (needs the mod on the server too)
+
+With PortalHeim_SG1 on the **server** as well as on each player's game, gates can be dialed instead of only pairing by name.
+
+- **Use an unconnected gate** to open the dial window: a list of the gates you know, nearest first. Pick one and press **Dial** (or Enter). Both gates run the usual start-up sequence and open.
+- **Home gate:** press **Set home** next to a gate. It is highlighted first in the window, and **Shift+use** on any free gate dials home immediately.
+- **On the map:** known gates get a pin. **Shift+click** a gate's pin while standing at a free gate to dial it.
+- A dialed gate closes by itself 15 seconds after the last player leaves both gates (never later than 5 minutes). **Hang up** in the window closes it sooner.
+- **Which gates you see:** by default only gates you have been near, or built yourself, so exploring still matters. Each character keeps its own list. Set `Dialing / OnlyShowVisitedGates` to false to see every gate.
+- Gates that share a name still pair exactly as in vanilla (and use goes straight to the game's naming window for those). Dialing only connects free gates, and puts each gate's name back afterwards.
+
+**Where to install it:** a dedicated server needs BepInEx and this mod, and so does every player. If you host from your own game, you and your friends all need it. Playing alone, it just works. On a server without the mod, everything looks and sounds the same but gates behave as in vanilla (no dialing, no gate pins).
+
 ## Configuration
 
 `BepInEx/config/mbaya.PortalHeimSG1.cfg`, or Gale's config editor:
@@ -54,6 +67,14 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 | Look / TravelScreen | Tunnel | `Tunnel` = endless swirling tunnel, `Gate` = a miniature gate, `Vanilla` = the game's own spinner (reload a world to apply) |
 | Look / Interior | Water | `Water` = rippling pool, `Vanilla` = the portal's own swirl |
 | Look / Shading | PortalShader | If the ring looks wrong or is missing, try `Standard` (restart the game) |
+| Dialing / Enabled | true | Dialing on or off (set it on the server to switch it off for everyone) |
+| Dialing / OnlyShowVisitedGates | true | `false` lists and pins every gate in the world |
+| Dialing / ShowGatePins | true | Gate pins on the map |
+| Dialing / PinIcon | Icon4 | Which built-in map icon marks a gate |
+| Dialing / CloseAfterIdleSeconds | 15 | Server: a dialed gate closes this long after the last player leaves |
+| Dialing / MaxOpenSeconds | 300 | Server: a dialed gate always closes after this long |
+| Dialing / DialRange | 15 | Server: how close you must be to a gate to dial from it |
+| Dialing / KeepOpenRange | 15 | Server: a dialed gate stays open while a player is this close to either gate |
 | Sound / TravelSounds | true | The bass loop on the portal-travel loading screen |
 | Sound / TravelMusicVolume | 0.75 | Volume of the travel music |
 | Sound / TravelEffectVolume | 0.5 | Volume of an optional second `travelfx` layer (none ships) |
@@ -62,4 +83,4 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 
 ## Roadmap
 
-A list of every gate you can dial, and gates shown on every player's map, are planned for a later version. Those will need the mod on the server too.
+Sharing your visited-gate list between players, and naming gates with a nicer window, are possible later additions.
