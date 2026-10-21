@@ -2,7 +2,7 @@
 
 Turns every portal into a **stone ring gate**: an outer ring with nine glowing **Chevrunes** (chevrons set with runes), and an inner ring of **Elder Futhark runes** that spins when a portal connects while the Chevrunes **lock one by one** and glow. It's *inspired by* a certain famous gate, but built from Norse runes and a design of its own.
 
-When a gate opens, the opening **fills with a rippling pool of water**. On a long portal trip the loading screen becomes an **endless swirling tunnel** (a blue time-vortex flying toward a bright light) instead of the game's spinner. (Prefer the game's own swirl? Set `Interior` to `Vanilla`.)
+When a gate is live (someone is standing at either end), the opening **fills with a rippling pool of water**; it drains away when everyone has gone. On a long portal trip the loading screen becomes an **endless swirling tunnel** (a blue time-vortex flying toward a bright light) instead of the game's spinner. (Prefer the game's own swirl? Set `Interior` to `Vanilla`.)
 
 It only changes how portals **look and sound**. Portals work exactly as before, and it's **client-side only**: nobody else needs the mod, and other players see normal portals.
 

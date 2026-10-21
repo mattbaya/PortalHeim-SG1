@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.9
+- **The water now only shows while a gate is live**: when someone is standing at either end (the game's own portal glow is on, or a player is near the far portal). Walk away and it drains out; walk up and it swells in. Before, it stayed on whenever the portal was connected.
+
 ## 0.1.8
 - **Endless tunnel.** The loading screen for a long portal trip is now a swirling blue time-vortex tunnel that fills the screen, flying toward a bright light, in the spirit of the classic 1970s-80s British "time tunnel" title sequences. It's an original, procedurally painted effect (not taken from any show). `Look / TravelScreen` now has three choices: `Tunnel` (default), `Gate` (the miniature gate from 0.1.7) and `Vanilla` (the game's own spinner).
 

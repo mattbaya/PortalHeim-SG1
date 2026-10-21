@@ -37,7 +37,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.1.8";
+        public const string Version = "0.1.9";
 
         internal static ManualLogSource Log;
 

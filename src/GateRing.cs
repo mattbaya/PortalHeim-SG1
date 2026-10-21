@@ -42,6 +42,8 @@ namespace PortalHeimSG1
         private bool _wasHumming;
         private bool _previewing;
         private float _previewHoldUntil;
+        private bool _occupied;            // someone is standing at one end of this gate
+        private float _nextOccupancyCheck;
 
         public void Setup(TeleportWorld portal, Transform inner, Renderer[] chevrunes, MeshRenderer water, ParticleSystemRenderer[] swirl)
         {
@@ -187,8 +189,56 @@ namespace PortalHeimSG1
         /// splash), then settles. It drains away quickly when the gate closes. While the water is
         /// usable, the game's own swirl is hidden so the two don't fight.
         /// </summary>
+        /// <summary>
+        /// A gate is "live" when someone is standing at either end: the game's own portal glow is on (a player
+        /// near this end who can go through), or a player is near the far end. Checked twice a second.
+        /// </summary>
+        private void UpdateOccupancy()
+        {
+            if (Time.time < _nextOccupancyCheck) return;
+            _nextOccupancyCheck = Time.time + 0.5f;
+
+            _occupied = _wasConnected && (ThisEndLive() || OtherEndOccupied());
+        }
+
+        private bool ThisEndLive()
+        {
+            if (_portal.m_target_found != null) return _portal.m_target_found.m_active;
+
+            // No glow object to follow (an unusual portal): fall back to a plain distance check.
+            var root = _portal.m_proximityRoot != null ? _portal.m_proximityRoot : _portal.transform;
+            return Player.GetClosestPlayer(root.position, _portal.m_activationRange) != null;
+        }
+
+        /// <summary>Whether any player is standing near the portal at the other end of this connection.</summary>
+        private bool OtherEndOccupied()
+        {
+            if (_portal.m_nview == null || !_portal.m_nview.IsValid() || ZDOMan.instance == null) return false;
+
+            var id = _portal.m_nview.GetZDO().GetConnectionZDOID(ZDOExtraData.ConnectionType.Portal);
+            if (id == ZDOID.None) return false;
+            var far = ZDOMan.instance.GetZDO(id); // only if we already know about it; never asks the server for it
+            if (far == null) return false;
+
+            var position = far.GetPosition();
+            float range = _portal.m_activationRange;
+
+            // Players loaded on this machine (including others close by).
+            foreach (var player in Player.GetAllPlayers())
+                if (player != null && Vector3.Distance(player.transform.position, position) <= range) return true;
+
+            // Players the server tells us about, if they share their position.
+            if (ZNet.instance != null)
+                foreach (var info in ZNet.instance.GetPlayerList())
+                    if (info.m_publicPosition && Vector3.Distance(info.m_position, position) <= range) return true;
+
+            return false;
+        }
+
         private void UpdateWater()
         {
+            UpdateOccupancy();
+
             bool hideSwirl = PortalHeimSG1Plugin.Interior.Value == InteriorMode.Water && WaterSurface.Usable;
             if (hideSwirl != _swirlHidden)
             {
@@ -199,7 +249,8 @@ namespace PortalHeimSG1
 
             if (_water == null) return;
 
-            bool wantWater = _phase == Phase.Open && WaterSurface.Ready;
+            // Water only while the gate is live (someone at either end), like the game's own portal glow.
+            bool wantWater = _phase == Phase.Open && WaterSurface.Ready && (_occupied || _previewing);
             _waterProgress = Mathf.Clamp01(_waterProgress + (wantWater ? 1f / WaterFillSeconds : -1f / WaterDrainSeconds) * Time.deltaTime);
 
             bool show = _waterProgress > 0.001f;
