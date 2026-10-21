@@ -2,7 +2,7 @@
 
 ## 0.4.0
 - **Dial any gate.** With the mod on the server too, using a free gate opens a window listing the gates you know. Pick one and it dials, with the usual start-up sequence. Mark a **home gate** and Shift+use dials it straight away.
-- **Gates on the map** with a small gate icon (stone ring, orange Chevrunes, light-blue water), and Shift+click a pin to dial it from the gate you're standing at.
+- **Gates on the map** with a small gate icon (a flat ring with nine Chevrune arrows, like the game's own pins), and Shift+click a pin to dial it from the gate you're standing at.
 - By default you only see gates you've been near or built (`Dialing / OnlyShowVisitedGates`); each character remembers its own.
 - Dialed gates close by themselves once everyone has left. Gates that share a name still pair as in vanilla.
 - Runs on dedicated servers: the server decides every connection, and puts gate names back if it stops mid-dial.
