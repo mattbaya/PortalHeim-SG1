@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+- **Water inside the gate.** When a gate opens, a pool of rippling water swells in with a little splash, in place of the portal's own swirl. Set `Interior` to `Vanilla` to keep the old swirl.
+- Package page now lists free (CC0) places to find matching sounds.
+
 ## 0.1.2
 - Chevrunes now light one at a time, half a second apart by default (`SecondsPerChevrune`). The inner ring turns one step between each.
 - Hides every part of the wooden frame much more thoroughly (previously just its main model).

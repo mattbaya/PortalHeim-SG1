@@ -48,6 +48,34 @@ namespace PortalHeimSG1
             return b.ToMesh(name);
         }
 
+        /// <summary>A flat disc facing along Z, with UVs mapped across it (the water fills this).</summary>
+        public static Mesh Disc(float radius, int segments)
+        {
+            var vertices = new List<Vector3> { Vector3.zero };
+            var uvs = new List<Vector2> { new Vector2(0.5f, 0.5f) };
+            var normals = new List<Vector3> { new Vector3(0, 0, 1) };
+            var triangles = new List<int>();
+
+            for (int i = 0; i < segments; i++)
+            {
+                float a = Mathf.PI * 2f * i / segments;
+                float x = Mathf.Cos(a), y = Mathf.Sin(a);
+                vertices.Add(new Vector3(x * radius, y * radius, 0f));
+                uvs.Add(new Vector2(0.5f + x * 0.5f, 0.5f + y * 0.5f));
+                normals.Add(new Vector3(0, 0, 1));
+                int next = 1 + (i + 1) % segments;
+                triangles.Add(0); triangles.Add(1 + i); triangles.Add(next);
+            }
+
+            var mesh = new Mesh { name = "SG1Water" };
+            mesh.SetVertices(vertices);
+            mesh.SetNormals(normals);
+            mesh.SetUVs(0, uvs);
+            mesh.SetTriangles(triangles, 0);
+            mesh.RecalculateBounds();
+            return mesh;
+        }
+
         private static void Wall(Builder b, Vector2 d0, Vector2 d1, float radius, float halfDepth, bool outward, float reference)
         {
             var n0 = new Vector3(d0.x, d0.y, 0) * (outward ? 1f : -1f);

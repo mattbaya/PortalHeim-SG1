@@ -14,7 +14,7 @@ namespace PortalHeimSG1
 
         private const int MaxBuildAttempts = 3;
 
-        private static Mesh _outerRing, _innerRing, _chevrune;
+        private static Mesh _outerRing, _innerRing, _chevrune, _waterDisc;
         private static Material _outerMaterial, _innerMaterial;
         private static bool _built;
         private static int _failures;
@@ -54,8 +54,24 @@ namespace PortalHeimSG1
 
             int hidden = HideWoodenFrame(portal);
 
+            // The water that fills the gate when it opens (hidden until then).
+            MeshRenderer water = null;
+            if (PortalHeimSG1Plugin.Interior.Value == InteriorMode.Water && WaterSurface.Material != null)
+            {
+                var disc = Add(root, "Water", _waterDisc, WaterSurface.Material);
+                disc.transform.localPosition = new Vector3(0f, 0f, 0f);
+                water = disc.GetComponent<MeshRenderer>();
+                water.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                water.receiveShadows = false;
+                water.enabled = false;
+            }
+
+            var swirl = portal.m_target_found != null
+                ? portal.m_target_found.GetComponentsInChildren<ParticleSystemRenderer>(true)
+                : new ParticleSystemRenderer[0];
+
             var ring = root.gameObject.AddComponent<GateRing>();
-            ring.Setup(portal, inner.transform, chevrunes.ToArray());
+            ring.Setup(portal, inner.transform, chevrunes.ToArray(), water, swirl);
 
             // Say what happened for the first few gates, so problems are easy to diagnose from the log.
             _attached++;
@@ -132,6 +148,8 @@ namespace PortalHeimSG1
                 _outerRing = GateMeshes.Annulus("SG1OuterRing", GateMeshes.OuterRingIn, GateMeshes.OuterRadius, GateMeshes.OuterHalfDepth);
                 _innerRing = GateMeshes.Annulus("SG1InnerRing", GateMeshes.InnerRingIn, GateMeshes.InnerRingOut, GateMeshes.InnerHalfDepth);
                 _chevrune = GateMeshes.Chevrune();
+                // Slightly wider than the opening so its edge tucks under the inner ring.
+                _waterDisc = GateMeshes.Disc(GateMeshes.InnerRingIn + 0.03f, 64);
 
                 step = "stone textures";
                 var outerCanvas = Textures.OuterRing(GateMeshes.OuterRadius, GateMeshes.OuterRingIn, GateMeshes.OuterRadius);
@@ -151,7 +169,7 @@ namespace PortalHeimSG1
                 PortalHeimSG1Plugin.ChevruneColor.SettingChanged += (_, __) => Tint(ChevruneOn, PortalHeimSG1Plugin.ChevruneColor.Value);
 
                 // Valheim unloads unused assets when you leave a world; keep ours so the next world still has them.
-                foreach (var obj in new UnityEngine.Object[] { _outerRing, _innerRing, _chevrune, _outerMaterial, _innerMaterial, ChevruneOff, ChevruneOn })
+                foreach (var obj in new UnityEngine.Object[] { _outerRing, _innerRing, _chevrune, _waterDisc, _outerMaterial, _innerMaterial, ChevruneOff, ChevruneOn })
                     if (obj != null) obj.hideFlags |= HideFlags.DontUnloadUnusedAsset;
 
                 _built = true;

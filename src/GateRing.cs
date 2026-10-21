@@ -3,9 +3,9 @@ using UnityEngine;
 namespace PortalHeimSG1
 {
     /// <summary>
-    /// Brings a gate to life: when the portal connects, the rune ring spins and the chevrunes lock one by
-    /// one before the gate opens; when it disconnects they go dark again. It only watches the portal's own
-    /// state and never changes what the portal does.
+    /// Brings a gate to life: when the portal connects, the rune ring spins and the chevrunes lock one
+    /// by one before the gate opens and fills with water; when it disconnects they go dark again. It only
+    /// watches the portal's own state and never changes what the portal does.
     /// </summary>
     internal class GateRing : MonoBehaviour
     {
@@ -18,10 +18,15 @@ namespace PortalHeimSG1
         private const float DegreesPerStep = 40f;
         // Beyond this distance there's no point animating; the gate just snaps to its state.
         private const float AnimateRange = 70f;
+        // The water splashes open, then settles; it drains away faster than it fills.
+        private const float WaterFillSeconds = 0.9f;
+        private const float WaterDrainSeconds = 0.25f;
 
         private TeleportWorld _portal;
         private Transform _inner;
         private Renderer[] _chevrunes;
+        private MeshRenderer _water;
+        private ParticleSystemRenderer[] _swirl;
         private AudioSource _template;
         private AudioSource _idleSource;
         private AudioSource _spinSource;
@@ -30,23 +35,32 @@ namespace PortalHeimSG1
         private int _locked;
         private float _phaseTime;
         private float _spinDirection = 1f;
+        private float _waterProgress;       // 0 = empty, 1 = full
+        private bool _waterCounted;
+        private bool _swirlHidden;
         private bool _wasConnected;
         private bool _wasHumming;
 
-        public void Setup(TeleportWorld portal, Transform inner, Renderer[] chevrunes)
+        public void Setup(TeleportWorld portal, Transform inner, Renderer[] chevrunes, MeshRenderer water, ParticleSystemRenderer[] swirl)
         {
             _portal = portal;
             _inner = inner;
             _chevrunes = chevrunes;
+            _water = water;
+            _swirl = swirl ?? new ParticleSystemRenderer[0];
             _template = portal.m_target_found != null ? portal.m_target_found.GetComponentInChildren<AudioSource>() : null;
 
             _idleSource = GateSounds.Configure(gameObject.AddComponent<AudioSource>(), _template, loop: true);
             _spinSource = GateSounds.Configure(gameObject.AddComponent<AudioSource>(), _template, loop: true);
 
             _wasConnected = Connected();
-            if (_wasConnected) SnapTo(Phase.Open);
-            else SnapTo(Phase.Idle);
+            SnapTo(_wasConnected ? Phase.Open : Phase.Idle);
+            if (_wasConnected) _waterProgress = 1f; // already open when the world loads: no splash
         }
+
+        private void OnDisable() => CountWater(false);
+
+        private void OnDestroy() => CountWater(false);
 
         private bool Connected() => _portal != null && _portal.enabled && _portal.m_nview != null && _portal.m_nview.IsValid() && _portal.HaveTarget();
 
@@ -72,6 +86,7 @@ namespace PortalHeimSG1
                 case Phase.Open: UpdateOpen(); break;
             }
 
+            UpdateWater();
             UpdateHum(connected);
         }
 
@@ -145,6 +160,48 @@ namespace PortalHeimSG1
             // Swap between two shared materials (the game's hover/damage highlighting can clear
             // per-renderer overrides, but it leaves material assignments alone).
             _chevrunes[index].sharedMaterial = lit ? GateBuilder.ChevruneOn : GateBuilder.ChevruneOff;
+        }
+
+        // ---------------------------------------------------------------- water
+
+        /// <summary>
+        /// The pool fills the opening once the gate is open: it swells in with a little overshoot (a
+        /// splash), then settles. It drains away quickly when the gate closes. While the water is
+        /// usable, the game's own swirl is hidden so the two don't fight.
+        /// </summary>
+        private void UpdateWater()
+        {
+            bool hideSwirl = PortalHeimSG1Plugin.Interior.Value == InteriorMode.Water && WaterSurface.Usable;
+            if (hideSwirl != _swirlHidden)
+            {
+                _swirlHidden = hideSwirl;
+                foreach (var renderer in _swirl)
+                    if (renderer != null) renderer.forceRenderingOff = hideSwirl;
+            }
+
+            if (_water == null) return;
+
+            bool wantWater = _phase == Phase.Open && WaterSurface.Ready;
+            _waterProgress = Mathf.Clamp01(_waterProgress + (wantWater ? 1f / WaterFillSeconds : -1f / WaterDrainSeconds) * Time.deltaTime);
+
+            bool show = _waterProgress > 0.001f;
+            if (_water.enabled != show) _water.enabled = show;
+            CountWater(show);
+
+            if (show)
+            {
+                // Ease out with overshoot: the surface pops slightly past full size, then settles.
+                float t = _waterProgress - 1f;
+                float eased = 1f + 2.70158f * t * t * t + 1.70158f * t * t;
+                _water.transform.localScale = new Vector3(eased, eased, 1f);
+            }
+        }
+
+        private void CountWater(bool showing)
+        {
+            if (showing == _waterCounted) return;
+            _waterCounted = showing;
+            WaterSurface.Showing += showing ? 1 : -1;
         }
 
         // ---------------------------------------------------------------- sound

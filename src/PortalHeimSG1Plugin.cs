@@ -6,6 +6,14 @@ using UnityEngine;
 
 namespace PortalHeimSG1
 {
+    public enum InteriorMode
+    {
+        /// <summary>A pool of rippling water fills the open gate.</summary>
+        Water,
+        /// <summary>The portal's own blue swirl.</summary>
+        Vanilla
+    }
+
     public enum ShadingMode
     {
         /// <summary>Reuse the portal's own shader for the stone (safest: it's known to render).</summary>
@@ -19,7 +27,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.1.2";
+        public const string Version = "0.1.3";
 
         internal static ManualLogSource Log;
 
@@ -27,6 +35,7 @@ namespace PortalHeimSG1
         internal static ConfigEntry<Color> ChevruneColor;
         internal static ConfigEntry<float> LockSeconds;
         internal static ConfigEntry<ShadingMode> Shading;
+        internal static ConfigEntry<InteriorMode> Interior;
         internal static ConfigEntry<float> Volume;
 
         private Harmony _harmony;
@@ -42,6 +51,8 @@ namespace PortalHeimSG1
                 "The glow colour of a locked chevrune.");
             LockSeconds = Config.Bind("Look", "SecondsPerChevrune", 0.5f,
                 new ConfigDescription("Seconds between each Chevrune lighting up when a gate connects (nine in all).", new AcceptableValueRange<float>(0.1f, 4f)));
+            Interior = Config.Bind("Look", "Interior", InteriorMode.Water,
+                "What fills an open gate: Water (a rippling pool) or Vanilla (the portal's own swirl). Takes effect for portals loaded after this is changed.");
             Shading = Config.Bind("Look", "Shading", ShadingMode.PortalShader,
                 "How the stone is shaded. PortalShader reuses the portal's own shader. If the ring looks wrong or is missing, try Standard. " +
                 "Takes effect on next game start.");
@@ -49,10 +60,16 @@ namespace PortalHeimSG1
                 new ConfigDescription("Volume of the gate sounds you provide (also follows the game's sound-effects volume).", new AcceptableValueRange<float>(0f, 1f)));
 
             StartCoroutine(GateSounds.LoadAll());
+            if (Interior.Value == InteriorMode.Water) StartCoroutine(WaterSurface.Build());
 
             _harmony = new Harmony(Guid);
             _harmony.PatchAll(typeof(PortalHeimSG1Plugin).Assembly);
             Log.LogInfo($"{Name} {Version} loaded. Sound files go in {GateSounds.Folder}");
+        }
+
+        private void Update()
+        {
+            WaterSurface.Tick();
         }
 
         private void OnDestroy()
