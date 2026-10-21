@@ -13,6 +13,6 @@ Recordings used (all CC0 / public domain, from OpenGameArt):
 
 Synthesized for this mod (MIT, with the mod): the low "whoomph" under the gate opening, the hum under the
 idle loop, the whoosh and thump in "teleport", the falling sweep in "close", and the whole "travel" bass line
-(an original IV-I eighth-note ostinato made with tools/make_travel.py: eight notes on each chord, 116 bpm).
+(an original IV-I eighth-note ostinato made with tools/make_travel.py: eight notes on each chord, 116 bpm, with a low drone that follows the chords).
 
 None of these are from any film or TV show.

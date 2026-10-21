@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.3
+- The travel bass line now has a **low drone underneath** that follows the chord: a sustained A (for the IV chord) that glides down to a sustained E (for the I chord) and back again, in step with the notes above it.
+
 ## 0.2.2
 - The travel bass line is **slower** (116 bpm instead of 138) and now plays **eight notes on each chord** (eight on the IV chord, A, then eight on the I chord, E) instead of four.
 
