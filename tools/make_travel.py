@@ -2,11 +2,11 @@
 """
 Synthesizes the looping bass line played while travelling through a portal (package/sounds/travel.wav).
 
-An original two-bar ostinato in the key of E: four bass notes on the IV chord (A), then four on the I chord (E),
-alternating, in a driving eighth-note pulse. Plain synthesis (saw + square + sub, plucked filter): no samples,
+An original two-bar ostinato in the key of E: eight bass notes on the IV chord (A), then eight on the I chord (E),
+alternating, in a steady eighth-note pulse. Plain synthesis (saw + square + sub, plucked filter): no samples,
 nothing taken from any recording.
 
-Usage:  python3 -I tools/make_travel.py package/sounds/travel.wav [--bpm 138]
+Usage:  python3 -I tools/make_travel.py package/sounds/travel.wav [--bpm 116]
 """
 import argparse
 import math
@@ -15,13 +15,15 @@ import wave
 
 RATE = 44100
 
-# Root notes (Hz): the IV chord (A2) then the I chord (E2), each played four times (the pattern is the octave
-# multiplier for each of the four notes: root, root, octave up, root).
+# Root notes (Hz): the IV chord (A2) then the I chord (E2), each getting eight notes (the pattern is the octave
+# multiplier for each note: root, root, octave up, root, twice over).
 CHORDS = [110.00, 82.41]
-PATTERN = [1, 1, 2, 1]
+PATTERN = [1, 1, 2, 1, 1, 1, 2, 1]
+# A little extra weight on the first note of each half-bar (beats 1 and 3).
+ACCENTS = {0: 1.15, 4: 1.07}
 
 
-def synth_note(buf, start, freq, duration, accent):
+def synth_note(buf, start, freq, duration, accent=1.0):
     """Adds one plucked bass note to buf, wrapping past the end so the loop is seamless."""
     n = len(buf)
     samples = int(duration * RATE)
@@ -44,14 +46,14 @@ def synth_note(buf, start, freq, duration, accent):
         # Quick attack, short release, a little extra weight on the first note of each chord.
         attack = min(1.0, t / 0.004)
         release = min(1.0, (duration - t) / 0.035)
-        amp = attack * release * (1.15 if accent else 1.0)
+        amp = attack * release * accent
         buf[(start + i) % n] += low * amp
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
-    ap.add_argument("--bpm", type=float, default=138.0)
+    ap.add_argument("--bpm", type=float, default=116.0)
     args = ap.parse_args()
 
     note = 60.0 / args.bpm / 2.0                 # one eighth note
@@ -61,7 +63,7 @@ def main():
 
     for n in range(notes_per_loop):
         chord, step = divmod(n, len(PATTERN))
-        synth_note(buf, int(round(n * note * RATE)), CHORDS[chord] * PATTERN[step], note * 0.93, accent=(step == 0))
+        synth_note(buf, int(round(n * note * RATE)), CHORDS[chord] * PATTERN[step], note * 0.93, ACCENTS.get(step, 1.0))
 
     peak = max(abs(x) for x in buf)
     gain = 0.70 / peak                            # about -3 dB

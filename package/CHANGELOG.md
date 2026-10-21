@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.2
+- The travel bass line is **slower** (116 bpm instead of 138) and now plays **eight notes on each chord** (eight on the IV chord, A, then eight on the I chord, E) instead of four.
+
 ## 0.2.1
 - **Travel bass line.** While you're on the loading screen for a long portal trip, a driving synth bass loops: four notes on the IV chord (A), then four on the I chord (E), alternating, in the spirit of the classic British sci-fi theme basslines. It's an original piece, synthesized for this mod. It fades in as you enter the tunnel and out as you arrive. Turn it off with `Sound / TravelBassLine`, change the level with `Sound / TravelBassVolume`, or replace it with your own `travel` clip.
 
