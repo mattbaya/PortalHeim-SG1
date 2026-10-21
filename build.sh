@@ -15,6 +15,8 @@ trap 'rm -rf "$STAGE"' EXIT
 cp package/manifest.json package/README.md package/CHANGELOG.md package/icon.png "$STAGE/"
 mkdir -p "$STAGE/plugins"
 cp src/bin/Release/netstandard2.1/PortalHeimSG1.dll "$STAGE/plugins/"
+# Bundled gate sounds (and their credits) go beside the DLL.
+if [ -d package/sounds ]; then cp -R package/sounds "$STAGE/plugins/sounds"; fi
 
 mkdir -p dist
 OUT="$PWD/dist/PortalHeim_SG1-$VERSION.zip"

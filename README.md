@@ -11,6 +11,7 @@ Player-facing docs: [package/README.md](package/README.md).
 | Path | Purpose |
 | --- | --- |
 | `src/` | Mod source (`PortalHeimSG1.csproj`, targets `netstandard2.1`) |
+| `tools/make_sounds.py` | Rebuilds the bundled sounds from CC0 recordings plus synthesis |
 | `src/Art/` | Plain C# (no Unity types) that paints the stone and rune textures, so the artwork can be previewed outside the game |
 | `package/` | Thunderstore files |
 | `build.sh` | Builds and zips a Thunderstore package into `dist/` |
@@ -18,7 +19,7 @@ Player-facing docs: [package/README.md](package/README.md).
 
 ## How it works
 
-A Harmony postfix on `TeleportWorld.Awake` hides the wooden frame (`forceRenderingOff` on `m_model`) and adds a procedurally built ring, rune ring and nine Chevrunes. `GateRing` watches the portal's connection state and animates the connect sequence. Sounds are loaded from the user's own files and never bundled.
+A Harmony postfix on `TeleportWorld.Awake` hides the wooden frame (`forceRenderingOff` on `m_model`) and adds a procedurally built ring, rune ring and nine Chevrunes. `GateRing` watches the portal's connection state and animates the connect sequence. Gate sounds are bundled as WAV files in `package/sounds/` (CC0 recordings mixed with synthesized sounds; see `package/sounds/CREDITS.txt`) and can be overridden by files in the config folder. Rebuild them with `tools/make_sounds.py` (needs ffmpeg and the three CC0 packs listed in that script).
 
 ## Building
 

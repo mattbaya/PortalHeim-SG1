@@ -6,32 +6,34 @@ When a gate opens, the opening **fills with a rippling pool of water**. (Prefer 
 
 It only changes how portals **look and sound**. Portals work exactly as before, and it's **client-side only**: nobody else needs the mod, and other players see normal portals.
 
-## Sounds: bring your own
+## Sounds
 
-No sounds are included. On first run the mod creates `BepInEx/config/PortalHeim_SG1/sounds/` with a README. Put your own clips there (`.ogg`, `.wav` or `.mp3`), named for the moment they play:
+Gate sounds are **included**: a heavy lock thud for each Chevrune, a stone scrape as the ring turns, a deep rumble and splash as the gate opens, a low hum while it's open, a whoosh when you step through, and a power-down when it shuts. They're mixes of free public-domain (CC0) recordings and sounds made for this mod (credits below).
+
+**Want your own?** Put clips (`.ogg`, `.wav` or `.mp3`) in `BepInEx/config/PortalHeim_SG1/sounds/`, named for the moment they play. A file there replaces the included one. Restart the game after adding files.
 
 | File | Plays when |
 | --- | --- |
 | `chevrune` | each Chevrune locks |
-| `spin` | the inner ring turns (loops while it spins) |
+| `spin` | the inner ring turns |
 | `activate` | the gate opens |
 | `idle` | the open gate hums (loops; replaces the game's own hum) |
 | `teleport` | someone steps through |
 | `close` | the gate shuts down |
 
-A missing file stays silent (or keeps the game's own sound). Restart the game after adding files.
+### More free sounds
 
-### Where to find free sounds
+All **CC0** (public domain), none from any show:
 
-These are all **CC0** (public domain), so you can use them freely. None are from the show; they just suit the feel (stone, heavy locks, water). I haven't tied any particular file to a slot, so audition and pick:
+- [100 CC0 SFX #2](https://opengameart.org/content/100-cc0-sfx-2) by rubberduck: stones, metal hits, doors, switches, air flowing, and loops including flowing water.
+- [Metal Impact Sounds](https://opengameart.org/content/metal-impact-sounds) by BMacZero: thuds and clinks.
+- [6 Short Water Splashes](https://opengameart.org/content/6-short-water-splashes) by ezwa: splashes.
+- [Various Sound Effects](https://aleksicluka.itch.io/various-sound-effects) by Luka Aleksic: includes `grind_stone`, `lock` and door sounds.
+- [Sci-Fi Sounds](https://kenney.nl/assets/sci-fi-sounds) by Kenney: 70 sci-fi and engine sounds.
 
-- [100 CC0 SFX #2](https://opengameart.org/content/100-cc0-sfx-2) by rubberduck: stones, metal hits, doors, switches, air flowing, and loops including flowing water (good for `idle`).
-- [Metal Impact Sounds](https://opengameart.org/content/metal-impact-sounds) by BMacZero: thuds and clinks (good for `chevrune` and `close`).
-- [6 Short Water Splashes](https://opengameart.org/content/6-short-water-splashes) by ezwa: splashes (good for `activate` and `teleport`).
-- [Various Sound Effects](https://aleksicluka.itch.io/various-sound-effects) by Luka Aleksic: includes `grind_stone`, `lock` and door sounds (good for `spin` and `chevrune`).
-- [Sci-Fi Sounds](https://kenney.nl/assets/sci-fi-sounds) by Kenney: 70 sci-fi and engine sounds (look here for a hum or whoosh).
+### Credits for the included sounds
 
-Rename the files you pick to the slot names above (e.g. `activate.ogg`).
+Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian MacIntosh** (Metal Impact Sounds) and **ezwa** (6 Short Water Splashes, cut by qubodup from public-domain recordings), plus sounds synthesized for this mod. Details in `sounds/CREDITS.txt`.
 
 ## Configuration
 
@@ -44,6 +46,7 @@ Rename the files you pick to the slot names above (e.g. `activate.ogg`).
 | Look / SecondsPerChevrune | 0.5 | Seconds between each Chevrune lighting up (nine in all) |
 | Look / Interior | Water | `Water` = rippling pool, `Vanilla` = the portal's own swirl |
 | Look / Shading | PortalShader | If the ring looks wrong or is missing, try `Standard` (restart the game) |
+| Sound / UseBundledSounds | true | Turn off the included sounds (restart the game) |
 | Sound / Volume | 1.0 | Also follows the game's sound-effects volume |
 
 ## Roadmap

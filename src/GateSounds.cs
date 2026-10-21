@@ -8,8 +8,8 @@ using UnityEngine.Networking;
 namespace PortalHeimSG1
 {
     /// <summary>
-    /// Sounds come from files you provide in BepInEx/config/PortalHeim_SG1/sounds/ (nothing is bundled).
-    /// A missing file just means that moment stays silent (or keeps the game's own sound).
+    /// Sounds ship with the mod (see CREDITS.txt) and can be replaced by files in BepInEx/config/PortalHeim_SG1/sounds/.
+    /// A moment with no sound at all just stays silent (or keeps the game's own sound).
     /// </summary>
     internal static class GateSounds
     {
@@ -29,33 +29,48 @@ namespace PortalHeimSG1
 
         public static AudioClip Get(string name) => Clips.TryGetValue(name, out var clip) ? clip : null;
 
-        /// <summary>Creates the sounds folder (with a note about what goes in it) and starts loading whatever is there.</summary>
-        public static IEnumerator LoadAll()
+        /// <summary>
+        /// Loads the sounds that ship with the mod, then anything in the user's own sounds folder, which
+        /// replaces a bundled sound of the same name. Also creates that folder with a note about what goes in it.
+        /// </summary>
+        public static IEnumerator LoadAll(string bundledFolder)
         {
             Clips.Clear();
+
+            if (PortalHeimSG1Plugin.UseBundledSounds.Value && Directory.Exists(bundledFolder))
+                yield return LoadFolder(bundledFolder);
+
             string folder = Folder;
+            bool ready = false;
             try
             {
                 Directory.CreateDirectory(folder);
                 string note = Path.Combine(folder, "README.txt");
                 if (!File.Exists(note))
                     File.WriteAllText(note,
-                        "Put your own sound clips here (.ogg, .wav or .mp3). PortalHeim_SG1 doesn't ship any.\n\n" +
-                        "chevrune   - plays as each chevrune locks\n" +
-                        "spin      - the inner ring turning (loops while it spins)\n" +
+                        "PortalHeim_SG1 comes with its own gate sounds. To use your own instead, put clips here\n" +
+                        "(.ogg, .wav or .mp3), named for the moment they play. A file here replaces the bundled\n" +
+                        "sound with the same name.\n\n" +
+                        "chevrune  - plays as each chevrune locks\n" +
+                        "spin      - the inner ring turning\n" +
                         "activate  - the gate opens\n" +
                         "idle      - the open gate's hum (loops; replaces the game's own portal hum)\n" +
                         "teleport  - someone steps through\n" +
                         "close     - the gate shuts down\n\n" +
-                        "Name each file exactly as above, e.g. activate.ogg. Missing files are simply silent.\n" +
-                        "Changes are picked up the next time the game starts.\n");
+                        "Name each file exactly as above, e.g. activate.ogg. Changes are picked up the next time the game starts.\n");
+                ready = true;
             }
             catch (System.Exception e)
             {
                 PortalHeimSG1Plugin.Log.LogWarning($"Couldn't prepare the sounds folder: {e.Message}");
-                yield break;
             }
 
+            if (ready) yield return LoadFolder(folder);
+            PortalHeimSG1Plugin.Log.LogInfo($"{Clips.Count} gate sound(s) ready ({string.Join(", ", Clips.Keys)}).");
+        }
+
+        private static IEnumerator LoadFolder(string folder)
+        {
             foreach (var path in Directory.GetFiles(folder))
             {
                 string ext = Path.GetExtension(path).ToLowerInvariant();
@@ -89,8 +104,6 @@ namespace PortalHeimSG1
                     Clips[name] = clip;
                 }
             }
-
-            PortalHeimSG1Plugin.Log.LogInfo($"Loaded {Clips.Count} gate sound(s) from {folder}");
         }
 
         /// <summary>Plays a one-off clip at a position (so it comes from the gate), if that sound was provided.</summary>

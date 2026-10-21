@@ -27,7 +27,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.1.3";
+        public const string Version = "0.1.4";
 
         internal static ManualLogSource Log;
 
@@ -37,6 +37,7 @@ namespace PortalHeimSG1
         internal static ConfigEntry<ShadingMode> Shading;
         internal static ConfigEntry<InteriorMode> Interior;
         internal static ConfigEntry<float> Volume;
+        internal static ConfigEntry<bool> UseBundledSounds;
 
         private Harmony _harmony;
 
@@ -56,10 +57,12 @@ namespace PortalHeimSG1
             Shading = Config.Bind("Look", "Shading", ShadingMode.PortalShader,
                 "How the stone is shaded. PortalShader reuses the portal's own shader. If the ring looks wrong or is missing, try Standard. " +
                 "Takes effect on next game start.");
+            UseBundledSounds = Config.Bind("Sound", "UseBundledSounds", true,
+                "Play the sounds that come with the mod. Turn off for silence (or to use only your own clips). Takes effect on next game start.");
             Volume = Config.Bind("Sound", "Volume", 1.0f,
                 new ConfigDescription("Volume of the gate sounds you provide (also follows the game's sound-effects volume).", new AcceptableValueRange<float>(0f, 1f)));
 
-            StartCoroutine(GateSounds.LoadAll());
+            StartCoroutine(GateSounds.LoadAll(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Info.Location), "sounds")));
             if (Interior.Value == InteriorMode.Water) StartCoroutine(WaterSurface.Build());
 
             _harmony = new Harmony(Guid);
