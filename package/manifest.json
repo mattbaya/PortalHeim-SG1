@@ -3,7 +3,7 @@
   "author": "Svaha",
   "version_number": "0.5.2",
   "website_url": "https://github.com/mattbaya/PortalHeim-SG1",
-  "description": "Turns portals into stone ring gates with Norse runes, Chevrunes and rippling water, plus sounds, an endless swirling-tunnel loading screen, and (with the mod on the server too) dialing any gate you know from a menu or the map.",
+  "description": "Portals become stone ring gates with Norse runes, orange Chevrunes and rippling water. With the mod on your server too: dial any gate you know from a menu or the map, carry ore through, and pull your cart through with you.",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2351"
   ]
