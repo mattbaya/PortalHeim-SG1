@@ -20,7 +20,8 @@ Gate sounds are **included**: a heavy lock thud for each Chevrune, a stone scrap
 | `idle` | the open gate hums (loops; replaces the game's own hum) |
 | `teleport` | someone steps through |
 | `close` | the gate shuts down |
-| `travel` | loops while you're in the portal tunnel (the loading screen for a long trip): a bass line on the I and IV chords with a drone underneath |
+| `travel` | the music that loops while you're in the portal tunnel (the loading screen for a long trip) |
+| `travelfx` | a second bass line layered faintly under it (loops) |
 
 ### More free sounds
 
@@ -34,7 +35,7 @@ All **CC0** (public domain), none from any show:
 
 ### Credits for the included sounds
 
-Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian MacIntosh** (Metal Impact Sounds) and **ezwa** (6 Short Water Splashes, cut by qubodup from public-domain recordings), plus sounds synthesized for this mod (including the travel bass line). Details in `sounds/CREDITS.txt`.
+Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian MacIntosh** (Metal Impact Sounds) and **ezwa** (6 Short Water Splashes, cut by qubodup from public-domain recordings), plus sounds synthesized for this mod. The travel sound is **"Deepbassloop80bpm"** by **deep into perspectives** (CC0) with **"bass 1 122bpm"** by **freesound_community** (Pixabay Content License) faintly layered under it. Details in `sounds/CREDITS.txt`.
 
 ## Configuration
 
@@ -53,8 +54,9 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 | Look / TravelScreen | Tunnel | `Tunnel` = endless swirling tunnel, `Gate` = a miniature gate, `Vanilla` = the game's own spinner (reload a world to apply) |
 | Look / Interior | Water | `Water` = rippling pool, `Vanilla` = the portal's own swirl |
 | Look / Shading | PortalShader | If the ring looks wrong or is missing, try `Standard` (restart the game) |
-| Sound / TravelBassLine | true | The looping bass line while you travel through a portal |
-| Sound / TravelBassVolume | 0.7 | Its volume |
+| Sound / TravelSounds | true | The bass loops on the portal-travel loading screen |
+| Sound / TravelMusicVolume | 0.75 | Volume of the travel music |
+| Sound / TravelEffectVolume | 0.45 | Volume of the second bass line |
 | Sound / UseBundledSounds | true | Turn off the included sounds (restart the game) |
 | Sound / Volume | 1.0 | Also follows the game's sound-effects volume |
 

@@ -11,7 +11,7 @@ Player-facing docs: [package/README.md](package/README.md).
 | Path | Purpose |
 | --- | --- |
 | `src/` | Mod source (`PortalHeimSG1.csproj`, targets `netstandard2.1`) |
-| `tools/make_sounds.py`, `tools/make_travel.py` | Rebuild the bundled sounds (CC0 recordings plus synthesis) and the synthesized travel bass line |
+| `tools/make_sounds.py` | Rebuilds the bundled gate sounds (CC0 recordings plus synthesis). The travel loops are cut from CC0 tracks, see `package/sounds/CREDITS.txt` |
 | `src/Art/` | Plain C# (no Unity types) that paints the stone and rune textures, so the artwork can be previewed outside the game |
 | `package/` | Thunderstore files |
 | `build.sh` | Builds and zips a Thunderstore package into `dist/` |

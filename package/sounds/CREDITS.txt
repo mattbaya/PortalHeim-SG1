@@ -1,6 +1,6 @@
 PortalHeim_SG1 gate sounds: credits
 
-The six sounds in this folder are mixes of a few public-domain (CC0) recordings plus sounds
+The gate sounds in this folder are mixes of a few public-domain (CC0) recordings plus sounds
 synthesized for this mod. tools/make_sounds.py in the source repository rebuilds them.
 
 Recordings used (all CC0 / public domain, from OpenGameArt):
@@ -10,9 +10,13 @@ Recordings used (all CC0 / public domain, from OpenGameArt):
   (thud2, thud3)
 - "6 Short Water Splashes" by ezwa, cut by qubodup from public-domain recordings on pdsounds.org:
   https://opengameart.org/content/6-short-water-splashes  (splashes 2 and 4)
+- "Deepbassloop80bpm" by deep into perspectives (CC0): https://freesound.org/people/deep%20into%20perspectives/sounds/406809/
+  Four bars (12 seconds) cut at the bar attacks and levelled so it loops cleanly: this is "travel".
+- "bass 1 122bpm" by freesound_community, from Pixabay (Pixabay Content License, which allows free use and
+  modification; this is a modified, mixed use, not a standalone copy): https://pixabay.com/sound-effects/musical-bass-1-122bpm-38871/
+  Four bars slowed to 80 BPM to lock with the loop above, low-passed and levelled: this is "travelfx".
 
 Synthesized for this mod (MIT, with the mod): the low "whoomph" under the gate opening, the hum under the
-idle loop, the whoosh and thump in "teleport", the falling sweep in "close", and the whole "travel" bass line
-(an original IV-I eighth-note ostinato made with tools/make_travel.py: eight notes on each chord, 116 bpm, with a low drone that follows the chords).
+idle loop, the whoosh and thump in "teleport", and the falling sweep in "close".
 
 None of these are from any film or TV show.

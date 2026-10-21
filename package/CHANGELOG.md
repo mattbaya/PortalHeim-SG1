@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.0
+- **New travel sound.** The loading screen for a long portal trip now loops a deep bass line, **"Deepbassloop80bpm"** by deep into perspectives (CC0), with a second, fainter bass line ("bass 1 122bpm" by freesound_community from Pixabay, slowed to 80 BPM to lock with it) layered under. Both are credited in `sounds/CREDITS.txt`. The synthesized bass line from 0.2.x is gone.
+- Config: `Sound / TravelSounds` (on/off), `TravelMusicVolume` (0.75) and `TravelEffectVolume` (0.45, the second bass line). Your own `travel` and `travelfx` clips in the config sounds folder replace them. (`TravelBassLine` and `TravelBassVolume` from 0.2.x no longer do anything.)
+
 ## 0.2.4
 - The travel bass line is now a plain bass line: every note sits on the chord's root, with **no octave jumps**. The drone underneath is unchanged.
 
