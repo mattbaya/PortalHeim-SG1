@@ -75,6 +75,7 @@ namespace PortalHeimSG1
 
             // Say what happened for the first few gates, so problems are easy to diagnose from the log.
             _attached++;
+            Diagnostics.Attached++;
             if (_attached <= 3)
                 PortalHeimSG1Plugin.Log.LogInfo(
                     $"Gate #{_attached} attached to '{portal.name}': hid {hidden} frame renderer(s), " +
@@ -181,6 +182,7 @@ namespace PortalHeimSG1
             {
                 _failures++;
                 _built = false;
+                Diagnostics.RecordFailure(step, e);
                 PortalHeimSG1Plugin.Log.LogError(
                     $"Couldn't build the gate art (failed at: {step}, attempt {_failures} of {MaxBuildAttempts}); " +
                     $"portals stay as they are for now. {e}");

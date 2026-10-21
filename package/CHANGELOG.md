@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.5
+- A one-line status message now appears a few seconds after you spawn: how many portals are gates, whether the water and sounds loaded, and any error. It makes it obvious whether the mod is working. Turn it off with `Diagnostics / ShowStatusOnSpawn`.
+
 ## 0.1.4
 - **Gate sounds are now included**: a lock thud for each Chevrune, stone scrape, a deep rumble and splash as the gate opens, a low hum while it's open, a whoosh when you go through, and a power-down when it closes. They're mixes of free public-domain (CC0) recordings plus sounds made for the mod; none are from any show. Credits in `sounds/CREDITS.txt`.
 - Your own clips in `BepInEx/config/PortalHeim_SG1/sounds/` still replace any of them. `UseBundledSounds` turns the included ones off.

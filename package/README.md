@@ -44,6 +44,7 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 | Look / Reskin | true | Set to false to keep ordinary portals |
 | Look / ChevruneColor | orange | Glow colour of a locked Chevrune |
 | Look / SecondsPerChevrune | 0.5 | Seconds between each Chevrune lighting up (nine in all) |
+| Diagnostics / ShowStatusOnSpawn | true | Shows a status line a few seconds after you spawn (turn off once it all works) |
 | Look / Interior | Water | `Water` = rippling pool, `Vanilla` = the portal's own swirl |
 | Look / Shading | PortalShader | If the ring looks wrong or is missing, try `Standard` (restart the game) |
 | Sound / UseBundledSounds | true | Turn off the included sounds (restart the game) |

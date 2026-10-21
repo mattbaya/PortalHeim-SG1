@@ -25,6 +25,8 @@ namespace PortalHeimSG1
 
         public static string Folder => Path.Combine(Paths.ConfigPath, "PortalHeim_SG1", "sounds");
 
+        public static int Count => Clips.Count;
+
         public static bool Has(string name) => Clips.ContainsKey(name);
 
         public static AudioClip Get(string name) => Clips.TryGetValue(name, out var clip) ? clip : null;

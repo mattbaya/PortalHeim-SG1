@@ -27,7 +27,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.1.4";
+        public const string Version = "0.1.5";
 
         internal static ManualLogSource Log;
 
@@ -38,12 +38,15 @@ namespace PortalHeimSG1
         internal static ConfigEntry<InteriorMode> Interior;
         internal static ConfigEntry<float> Volume;
         internal static ConfigEntry<bool> UseBundledSounds;
+        internal static ConfigEntry<bool> ShowStatus;
+        internal static PortalHeimSG1Plugin Instance;
 
         private Harmony _harmony;
 
         private void Awake()
         {
             Log = Logger;
+            Instance = this;
 
             Reskin = Config.Bind("Look", "Reskin", true,
                 "Turn every portal into a ring gate with runes and chevrunes. Takes effect for portals loaded after this is changed " +
@@ -57,6 +60,9 @@ namespace PortalHeimSG1
             Shading = Config.Bind("Look", "Shading", ShadingMode.PortalShader,
                 "How the stone is shaded. PortalShader reuses the portal's own shader. If the ring looks wrong or is missing, try Standard. " +
                 "Takes effect on next game start.");
+            ShowStatus = Config.Bind("Diagnostics", "ShowStatusOnSpawn", true,
+                "Show a one-line status message a few seconds after you spawn (how many portals are gates, whether the water and sounds loaded, any error). " +
+                "Handy while testing; turn off once everything works.");
             UseBundledSounds = Config.Bind("Sound", "UseBundledSounds", true,
                 "Play the sounds that come with the mod. Turn off for silence (or to use only your own clips). Takes effect on next game start.");
             Volume = Config.Bind("Sound", "Volume", 1.0f,
@@ -95,6 +101,7 @@ namespace PortalHeimSG1
             }
             catch (System.Exception e)
             {
+                Diagnostics.RecordFailure("portal", e);
                 PortalHeimSG1Plugin.Log.LogError($"Couldn't turn a portal into a gate; leaving it as it is. {e}");
             }
         }
@@ -112,6 +119,16 @@ namespace PortalHeimSG1
             if (__state || player == null || !player.IsTeleporting()) return;
             var ring = __instance.GetComponentInChildren<GateRing>();
             if (ring != null) ring.OnTeleport();
+        }
+    }
+
+    [HarmonyPatch(typeof(Player), nameof(Player.OnSpawned))]
+    internal static class SpawnPatch
+    {
+        private static void Postfix()
+        {
+            if (PortalHeimSG1Plugin.Instance != null)
+                PortalHeimSG1Plugin.Instance.StartCoroutine(Diagnostics.ReportSoon());
         }
     }
 }
