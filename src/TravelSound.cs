@@ -3,7 +3,7 @@ using UnityEngine;
 namespace PortalHeimSG1
 {
     /// <summary>
-    /// Plays the travel music and a faint second bass layer on a loop while the teleport loading screen is up, fading in
+    /// Plays the travel music (and an optional second layer) on a loop while the teleport loading screen is up, fading in
     /// as you enter the tunnel and out as you arrive. It watches the same panel the game shows for a long portal trip.
     /// </summary>
     internal class TravelSound : MonoBehaviour

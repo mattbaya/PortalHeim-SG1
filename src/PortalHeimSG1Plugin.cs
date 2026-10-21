@@ -101,8 +101,8 @@ namespace PortalHeimSG1
                 "Play bass music while you're travelling through a portal (on the loading screen).");
             TravelMusicVolume = Config.Bind("Sound", "TravelMusicVolume", 0.75f,
                 new ConfigDescription("Volume of the travel music.", new AcceptableValueRange<float>(0f, 1f)));
-            TravelEffectVolume = Config.Bind("Sound", "TravelEffectVolume", 0.45f,
-                new ConfigDescription("Volume of the second bass line layered faintly under the travel music.", new AcceptableValueRange<float>(0f, 1f)));
+            TravelEffectVolume = Config.Bind("Sound", "TravelEffectVolume", 0.5f,
+                new ConfigDescription("Volume of the optional second sound (a 'travelfx' clip you add) layered under the travel music. Nothing ships for it.", new AcceptableValueRange<float>(0f, 1f)));
             UseBundledSounds = Config.Bind("Sound", "UseBundledSounds", true,
                 "Play the sounds that come with the mod. Turn off for silence (or to use only your own clips). Takes effect on next game start.");
             Volume = Config.Bind("Sound", "Volume", 1.0f,
