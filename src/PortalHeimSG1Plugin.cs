@@ -109,7 +109,7 @@ namespace PortalHeimSG1
             GatePins = Config.Bind("Dialing", "ShowGatePins", true,
                 "Show gates on the map. Shift+click a gate's pin while standing at an idle gate to dial it.");
             GateIconOnMap = Config.Bind("Dialing", "GateIconOnMap", true,
-                "Mark gates on the map with this mod's own little gate (a flat ring with nine Chevrune arrows, in the style of the game's own pins). Set to false to use a built-in map icon instead.");
+                "Mark gates on the map with this mod's own little gate (the powered-off gate sunk in the ground with its ramp, flat like the game's own pins). Set to false to use a built-in map icon instead.");
             PinIcon = Config.Bind("Dialing", "PinIcon", Minimap.PinType.Icon4,
                 "Which of the map's built-in pin icons marks a gate when GateIconOnMap is off (it also decides which map icon filter hides the gate pins).");
             DialIdleSeconds = Config.Bind("Dialing", "CloseAfterIdleSeconds", 15f,

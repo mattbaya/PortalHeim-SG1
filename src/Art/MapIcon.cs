@@ -4,8 +4,8 @@ namespace PortalHeimSG1.Art
 {
     /// <summary>
     /// The little gate that marks a gate on the map. Like the game's own map icons it is a flat, single-colour shape:
-    /// a ring with the nine Chevrunes cut into it as arrows pointing in, and a dot of "water" in the middle.
-    /// Drawn in code like the rest of the artwork.
+    /// the gate as it looks when powered off (an empty ring with the nine Chevrunes as arrows cut into it), sunk into the
+    /// ground, with a small ramp in front. Drawn in code like the rest of the artwork.
     /// </summary>
     public static class MapIcon
     {
@@ -17,8 +17,10 @@ namespace PortalHeimSG1.Art
         public static Pixels Draw()
         {
             var px = new Pixels(Size, Size);
-            float c = (Size - 1) * 0.5f;
-            const float outer = 60f, inner = 37f, dot = 15f;
+            float cx = (Size - 1) * 0.5f, cy = 71f;
+            const float outer = 56f, inner = 35f;
+            // The ring is buried below this line; the ramp sits under it. (Origin is the bottom-left.)
+            const float ground = 27f;
 
             // Nine arrows, the top one first, each pointing at the centre.
             var tris = new float[9][];
@@ -27,12 +29,12 @@ namespace PortalHeimSG1.Art
                 float angle = (90f - k * 40f) * (float)Math.PI / 180f;
                 float ux = (float)Math.Cos(angle), uy = (float)Math.Sin(angle);
                 float tx = -uy, ty = ux;
-                float tip = 41f, baseR = 55f, half = 7f;
+                float tip = 38.5f, baseR = 52f, half = 6.6f;
                 tris[k] = new[]
                 {
-                    c + ux * tip, c + uy * tip,
-                    c + ux * baseR + tx * half, c + uy * baseR + ty * half,
-                    c + ux * baseR - tx * half, c + uy * baseR - ty * half,
+                    cx + ux * tip, cy + uy * tip,
+                    cx + ux * baseR + tx * half, cy + uy * baseR + ty * half,
+                    cx + ux * baseR - tx * half, cy + uy * baseR - ty * half,
                 };
             }
 
@@ -40,17 +42,18 @@ namespace PortalHeimSG1.Art
             {
                 for (int x = 0; x < Size; x++)
                 {
-                    float dx = x - c, dy = y - c;
+                    float dx = x - cx, dy = y - cy;
                     float d = (float)Math.Sqrt(dx * dx + dy * dy);
 
-                    float ring = Cover(outer - d) * Cover(d - inner);
+                    float ring = Cover(outer - d) * Cover(d - inner) * Cover(y - ground);
                     float cut = 0f;
                     foreach (var t in tris) cut = Math.Max(cut, InsideTriangle(x, y, t));
-                    float shape = Math.Max(ring * (1f - cut), Cover(dot - d));
-
-                    px.Blend(x, y, R, G, B, shape);
+                    px.Blend(x, y, R, G, B, ring * (1f - cut));
                 }
             }
+
+            // The ramp: a low wedge in front of the buried base, wider at the bottom.
+            px.FillConvex(new[] { 32f, 96f, 118f, 10f }, new[] { 20f, 20f, 5f, 5f }, R, G, B);
 
             return px;
         }
