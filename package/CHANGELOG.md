@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.8
+- **Endless tunnel.** The loading screen for a long portal trip is now a swirling blue time-vortex tunnel that fills the screen, flying toward a bright light, in the spirit of the classic 1970s-80s British "time tunnel" title sequences. It's an original, procedurally painted effect (not taken from any show). `Look / TravelScreen` now has three choices: `Tunnel` (default), `Gate` (the miniature gate from 0.1.7) and `Vanilla` (the game's own spinner).
+
 ## 0.1.7
 - **New travel screen.** The spinning graphic shown on the loading screen during a long portal trip is replaced with a miniature gate: the rune ring slowly turning inside a frame of lit Chevrunes, with rippling water in the middle. Set `Look / TravelScreen` to `Vanilla` to keep the game's own spinner.
 

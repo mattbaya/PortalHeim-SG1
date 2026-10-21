@@ -16,6 +16,8 @@ namespace PortalHeimSG1
 
     public enum TravelMode
     {
+        /// <summary>An endless tunnel of swirling cloud fills the loading screen during a long portal trip.</summary>
+        Tunnel,
         /// <summary>A miniature gate (turning rune ring, Chevrunes, rippling water) on the teleport loading screen.</summary>
         Gate,
         /// <summary>The game's own spinner.</summary>
@@ -35,7 +37,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.1.7";
+        public const string Version = "0.1.8";
 
         internal static ManualLogSource Log;
 
@@ -67,9 +69,10 @@ namespace PortalHeimSG1
                 new ConfigDescription("Seconds between each Chevrune lighting up when a gate connects (nine in all).", new AcceptableValueRange<float>(0.1f, 4f)));
             Interior = Config.Bind("Look", "Interior", InteriorMode.Water,
                 "What fills an open gate: Water (a rippling pool) or Vanilla (the portal's own swirl). Takes effect for portals loaded after this is changed.");
-            Travel = Config.Bind("Look", "TravelScreen", TravelMode.Gate,
-                "The graphic shown on the loading screen during a long portal trip: Gate (a miniature gate with a turning rune ring and rippling water) " +
-                "or Vanilla (the game's own spinner). Takes effect next time you load a world.");
+            Travel = Config.Bind("Look", "TravelScreen", TravelMode.Tunnel,
+                "The graphic shown on the loading screen during a long portal trip: Tunnel (an endless swirling tunnel filling the screen), " +
+                "Gate (a miniature gate with a turning rune ring and rippling water) or Vanilla (the game's own spinner). " +
+                "Takes effect next time you load a world.");
             Shading = Config.Bind("Look", "Shading", ShadingMode.PortalShader,
                 "How the stone is shaded. PortalShader reuses the portal's own shader. If the ring looks wrong or is missing, try Standard. " +
                 "Takes effect on next game start.");
@@ -85,7 +88,8 @@ namespace PortalHeimSG1
                 new ConfigDescription("Volume of the gate sounds you provide (also follows the game's sound-effects volume).", new AcceptableValueRange<float>(0f, 1f)));
 
             StartCoroutine(GateSounds.LoadAll(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Info.Location), "sounds")));
-            if (Interior.Value == InteriorMode.Water) StartCoroutine(WaterSurface.Build());
+            if (Interior.Value == InteriorMode.Water || Travel.Value == TravelMode.Gate) StartCoroutine(WaterSurface.Build());
+            if (Travel.Value == TravelMode.Tunnel) TunnelSurface.Start();
 
             _harmony = new Harmony(Guid);
             _harmony.PatchAll(typeof(PortalHeimSG1Plugin).Assembly);
@@ -95,6 +99,7 @@ namespace PortalHeimSG1
         private void Update()
         {
             WaterSurface.Tick();
+            TunnelSurface.Pump();
 
             if (PreviewKey.Value.IsDown() && Player.m_localPlayer != null
                 && !(Chat.instance != null && Chat.instance.HasFocus()) && !global::Console.IsVisible() && !TextInput.IsVisible())

@@ -35,7 +35,8 @@ namespace PortalHeimSG1
             int gates = Object.FindObjectsByType<GateRing>(FindObjectsSortMode.None).Length;
             string water = PortalHeimSG1Plugin.Interior.Value != InteriorMode.Water ? "water off"
                 : WaterSurface.Failed ? "water FAILED" : WaterSurface.Ready ? "water ready" : "water loading";
-            string text = $"PortalHeim SG1 {PortalHeimSG1Plugin.Version}: {gates} of {portals} portals are gates, {water}, {GateSounds.Summary}";
+            string travel = PortalHeimSG1Plugin.Travel.Value == TravelMode.Tunnel ? $", tunnel {TunnelSurface.Status}" : "";
+            string text = $"PortalHeim SG1 {PortalHeimSG1Plugin.Version}: {gates} of {portals} portals are gates, {water}, {GateSounds.Summary}{travel}";
             if (Failures > 0) text += $" | ERROR: {LastError}";
             else if (portals > 0 && gates == 0) text += " | no gates attached, see BepInEx log";
 

@@ -21,17 +21,56 @@ namespace PortalHeimSG1
 
         public static void Build(Hud hud)
         {
-            if (PortalHeimSG1Plugin.Travel.Value != TravelMode.Gate) return;
+            var mode = PortalHeimSG1Plugin.Travel.Value;
+            if (mode == TravelMode.Vanilla) return;
             var panel = hud != null ? hud.m_teleportingProgress : null;
             if (panel == null)
             {
                 PortalHeimSG1Plugin.Log.LogWarning("Couldn't find the teleport loading panel; leaving the loading screen as it is.");
                 return;
             }
+
+            LogVanillaOnce(panel.transform);
+            if (mode == TravelMode.Tunnel) BuildTunnel(hud, panel);
+            else BuildGate(panel);
+        }
+
+        /// <summary>An endless cloud tunnel filling the whole loading screen, sitting just behind the panel's own text.</summary>
+        private static void BuildTunnel(Hud hud, GameObject panel)
+        {
+            var loading = hud.m_loadingScreen != null ? hud.m_loadingScreen.transform : panel.transform.parent;
+            if (loading == null || loading.Find("SG1Tunnel") != null) return;
+
+            var go = new GameObject("SG1Tunnel", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage), typeof(AspectRatioFitter));
+            go.transform.SetParent(loading, false);
+
+            // Cover the whole screen without stretching the picture.
+            var fitter = go.GetComponent<AspectRatioFitter>();
+            fitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+            fitter.aspectRatio = (float)Art.Tunnel.Width / Art.Tunnel.Height;
+
+            var raw = go.GetComponent<RawImage>();
+            raw.raycastTarget = false;
+            raw.enabled = false; // shown only while the teleport panel is up and the frames are ready
+
+            // Draw it just behind the teleport panel (above the black background, below the panel's text).
+            Transform panelRoot = panel.transform;
+            while (panelRoot.parent != null && panelRoot.parent != loading) panelRoot = panelRoot.parent;
+            if (panelRoot.parent == loading) go.transform.SetSiblingIndex(panelRoot.GetSiblingIndex());
+
+            var vanilla = panel.GetComponentsInChildren<Graphic>(true)
+                .Where(g => !(g is TMP_Text) && !g.transform.IsChildOf(go.transform))
+                .ToList();
+            go.AddComponent<TunnelAnimator>().Setup(raw, panel, vanilla);
+            PortalHeimSG1Plugin.Log.LogInfo($"Tunnel travel screen built under '{loading.name}'; will hide {vanilla.Count} of the game's own graphics on the teleport panel while it plays.");
+        }
+
+        /// <summary>A miniature gate on the teleport panel.</summary>
+        private static void BuildGate(GameObject panel)
+        {
             if (panel.transform.Find("SG1Travel") != null) return;
 
             EnsureSprites();
-            LogVanillaOnce(panel.transform);
 
             var root = new GameObject("SG1Travel", typeof(RectTransform));
             root.transform.SetParent(panel.transform, false);
@@ -163,6 +202,48 @@ namespace PortalHeimSG1
                 sprites[i].hideFlags |= HideFlags.DontUnloadUnusedAsset;
             }
             _waterSprites = sprites;
+        }
+    }
+}
+
+namespace PortalHeimSG1
+{
+    /// <summary>Plays the tunnel while the teleport panel is showing, and keeps the game's own spinner hidden then.</summary>
+    internal class TunnelAnimator : MonoBehaviour
+    {
+        private const float FramesPerSecond = 24f;
+
+        private RawImage _image;
+        private GameObject _panel;
+        private System.Collections.Generic.List<Graphic> _vanilla;
+        private float _clock;
+
+        public void Setup(RawImage image, GameObject panel, System.Collections.Generic.List<Graphic> vanilla)
+        {
+            _image = image;
+            _panel = panel;
+            _vanilla = vanilla;
+        }
+
+        private bool Showing => _panel != null && _panel.activeInHierarchy && TunnelSurface.Ready;
+
+        private void Update()
+        {
+            bool show = Showing;
+            if (_image.enabled != show) _image.enabled = show;
+            if (!show) return;
+
+            // Real time: the clock can be stopped while a world loads.
+            _clock += Time.unscaledDeltaTime;
+            _image.texture = TunnelSurface.FrameAt((int)(_clock * FramesPerSecond) % TunnelSurface.FrameCount);
+        }
+
+        private void LateUpdate()
+        {
+            // Only hide the game's own spinner once the tunnel can actually take its place.
+            if (!Showing) return;
+            foreach (var graphic in _vanilla)
+                if (graphic != null && graphic.enabled) graphic.enabled = false;
         }
     }
 }
