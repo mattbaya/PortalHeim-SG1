@@ -20,7 +20,7 @@ Gate sounds are **included**: a heavy lock thud for each Chevrune, a stone scrap
 | `idle` | the open gate hums (loops; replaces the game's own hum) |
 | `teleport` | someone steps through |
 | `close` | the gate shuts down |
-| `travel` | loops while you're in the portal tunnel (the loading screen for a long trip) |
+| `travel` | loops while you're in the portal tunnel (the loading screen for a long trip): a bass line on the I and IV chords with a drone underneath |
 
 ### More free sounds
 

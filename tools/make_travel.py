@@ -15,7 +15,7 @@ import wave
 
 RATE = 44100
 
-# Root notes (Hz): the IV chord (A2) then the I chord (E2). Each chord gets eight notes over one bar of 4/4.
+# Root notes (Hz): the IV chord (A2) then the I chord (E2). Each chord gets eight notes over one bar of 4/4, all on its root.
 CHORDS = [110.00, 82.41]
 
 # The drone under the bass: a sustained low note on each chord's root (A1 for the IV chord, E1 for the I chord) that
@@ -29,14 +29,14 @@ DRONE_GLIDE = 0.30     # seconds taken to slide from one chord's drone to the ne
 # A style lists each note of one chord as (length in beats, octave multiplier, accent). Beats are quarter notes.
 T = 1.0 / 3.0   # a triplet: three of them fill one beat
 STYLES = {
-    # Even eighth notes: root, root, octave, root, twice over.
-    "straight": [(0.5, m, 1.15 if i == 0 else 1.07 if i == 4 else 1.0) for i, m in enumerate([1, 1, 2, 1, 1, 1, 2, 1])],
+    # Even eighth notes, all on the chord's root (it's a bass line).
+    "straight": [(0.5, 1, 1.15 if i == 0 else 1.07 if i == 4 else 1.0) for i in range(8)],
 
     # A triplet feel, in the spirit of the half-bar rhythm blocks described for the 1963 theme:
     # "diddly-dum" (three quick notes then a quarter note) followed by "dum-dum-diddy" (two longer notes, then two quick).
     "triplet": [
-        (T, 1, 1.15), (T, 1, 1.0), (T, 1, 1.0), (1.0, 2, 1.1),          # da-da-da DUM
-        (2 * T, 1, 1.07), (2 * T, 1, 1.0), (T, 1, 1.0), (T, 2, 1.0),    # DUM-DUM-da-da
+        (T, 1, 1.15), (T, 1, 1.0), (T, 1, 1.0), (1.0, 1, 1.1),          # da-da-da DUM
+        (2 * T, 1, 1.07), (2 * T, 1, 1.0), (T, 1, 1.0), (T, 1, 1.0),    # DUM-DUM-da-da
     ],
 }
 

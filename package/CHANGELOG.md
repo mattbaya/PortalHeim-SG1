@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.4
+- The travel bass line is now a plain bass line: every note sits on the chord's root, with **no octave jumps**. The drone underneath is unchanged.
+
 ## 0.2.3
 - The travel bass line now has a **low drone underneath** that follows the chord: a sustained A (for the IV chord) that glides down to a sustained E (for the I chord) and back again, in step with the notes above it.
 
