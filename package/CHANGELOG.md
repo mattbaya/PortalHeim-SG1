@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.8
+- **The transit sound is half as loud.** The music on the portal-travel loading screen now plays at 50% of its old volume. `Sound / TravelMusicVolume` still scales it (its 1.0 is now the old 0.5).
+
 ## 0.5.7
 - New icon and screenshots in the description. No changes to how the mod works.
 

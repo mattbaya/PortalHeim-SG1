@@ -45,6 +45,9 @@ namespace PortalHeimSG1
             return source;
         }
 
+        // The transit sound is played at half the volume it used to be, whatever the volume settings say.
+        private const float OverallLevel = 0.5f;
+
         private void Update()
         {
             bool wanted = PortalHeimSG1Plugin.TravelSounds.Value && _panel != null && _panel.activeInHierarchy;
@@ -67,7 +70,7 @@ namespace PortalHeimSG1
                     source.clip = clip;
                     source.Play();
                 }
-                source.volume = _fade * Mathf.Clamp01(volume);
+                source.volume = _fade * Mathf.Clamp01(volume) * OverallLevel;
             }
             else if (source.isPlaying)
             {

@@ -164,7 +164,7 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 | Dialing / DialRange | 15 | Server: how close you must be to a gate to dial from it |
 | Dialing / KeepOpenRange | 15 | Server: a dialed gate stays open while a player is this close to either gate |
 | Sound / TravelSounds | true | The bass loop on the portal-travel loading screen |
-| Sound / TravelMusicVolume | 0.75 | Volume of the travel music |
+| Sound / TravelMusicVolume | 0.75 | Volume of the travel music (already played at half its earlier level) |
 | Sound / TravelEffectVolume | 0.5 | Volume of an optional second `travelfx` layer (none ships) |
 | Sound / MuteIncomingChevrunes | true | No chevrune lock sounds on an incoming gate (one that's opening but isn't the gate you're standing at) |
 | Sound / MuteIncomingOpening | true | No gate-opening sound on an incoming gate |
