@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.13
+- **Hang up from either end, faster.** On a gate that's part of a dial (the one you dialed from, the one you dialed, or one that was set aside to make room for it), **Shift+E** now hangs up straight away, and the gate's prompt says so. (Pressing E and clicking **Hang up** still works too.)
+
 ## 0.5.12
 - **Pick the gate on the map.** The dial window has a new **Pick on map** button. It opens the map with a banner ("Click a gate to dial it from ..."), and a plain click on a gate's icon dials it. Esc or closing the map cancels. (Shift+click on a gate icon while standing at a free gate still works too.)
 

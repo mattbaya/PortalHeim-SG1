@@ -57,7 +57,7 @@ With the mod on the server too, you aren't limited to portals that share a name.
 
 1. Walk up to a gate and press **E** (the normal use key). A window opens listing the gates you know, **nearest first**, with their distance.
 2. Pick a gate and press **Dial** (or highlight it and press **Enter**). Both gates run their start-up sequence and open. Walk in.
-3. The gate closes by itself about 15 seconds after the last player has left both gates. **Hang up** in the same window closes it sooner.
+3. The gate closes by itself about 15 seconds after the last player has left both gates. To close it sooner, use either gate (the one you dialed from, the one you dialed, or one that was set aside for the dial) and press **Shift+E**, or press **E** and click **Hang up**. Either end can hang up.
 
 <!-- IMAGE: dial-menu.png (the dial window with a few gates listed) -->
 
