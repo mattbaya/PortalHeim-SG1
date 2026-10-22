@@ -168,8 +168,7 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 | Sound / TravelEffectVolume | 0.5 | Volume of an optional second `travelfx` layer (none ships) |
 | Sound / ChevruneThuds | true | Play a thud as each chevrune locks (set false to switch it off on every gate) |
 | Sound / OpeningSound | true | Play the gate-opening rumble and splash (set false to switch it off on every gate) |
-| Sound / MuteIncomingChevrunes | true | No chevrune lock sounds on an incoming gate (one that's opening but isn't the gate you're standing at) |
-| Sound / MuteIncomingOpening | true | No gate-opening sound on an incoming gate |
+| Sound / IncomingGate | Burst | What an incoming gate sounds like: `Burst` = one chevrune thud together with the opening sound as it opens, `Silent` = nothing, `Normal` = the whole sequence |
 | Sound / UseBundledSounds | true | Turn off the included sounds (restart the game) |
 | Sound / Volume | 1.0 | Also follows the game's sound-effects volume |
 | Diagnostics / PreviewKey | F8 | Stand near a gate and press it to replay the opening sequence and sounds |

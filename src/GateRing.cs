@@ -221,7 +221,8 @@ namespace PortalHeimSG1
             {
                 // This step's Chevrunes (a left and right pair, or the last one) turn from arrows into runes.
                 foreach (int index in LockOrder[_locked]) SetChevrune(index, ChevruneState.Lit);
-                if (PortalHeimSG1Plugin.ChevruneThuds.Value && (!IsIncoming || !PortalHeimSG1Plugin.MuteIncomingChevrunes.Value)) PlaySound(GateSounds.Chevrune);
+                // On an incoming gate the five spaced thuds are skipped (unless it's set to the full sequence); see the opening below.
+                if (PortalHeimSG1Plugin.ChevruneThuds.Value && (!IsIncoming || PortalHeimSG1Plugin.IncomingGate.Value == IncomingSounds.Normal)) PlaySound(GateSounds.Chevrune);
                 _locked++;
                 _phaseTime = 0f;
                 _spinDirection = -_spinDirection;
@@ -231,13 +232,31 @@ namespace PortalHeimSG1
                     _spinSource.Stop();
                     _phase = Phase.Open;
                     if (_previewing) _previewHoldUntil = Time.time + 5f;
-                    if (PortalHeimSG1Plugin.OpeningSound.Value && (!IsIncoming || !PortalHeimSG1Plugin.MuteIncomingOpening.Value)) PlaySound(GateSounds.Activate);
+                    PlayOpening();
                 }
                 else
                 {
                     StartSpinSound();
                 }
             }
+        }
+
+        /// <summary>
+        /// The sound as the gate finishes opening. The gate you start from plays its opening sound. An incoming gate, by default,
+        /// plays one chevrune thud together with the opening sound, instead of the spaced thuds.
+        /// </summary>
+        private void PlayOpening()
+        {
+            if (!IsIncoming)
+            {
+                if (PortalHeimSG1Plugin.OpeningSound.Value) PlaySound(GateSounds.Activate);
+                return;
+            }
+
+            var mode = PortalHeimSG1Plugin.IncomingGate.Value;
+            if (mode == IncomingSounds.Silent) return;
+            if (mode == IncomingSounds.Burst && PortalHeimSG1Plugin.ChevruneThuds.Value) PlaySound(GateSounds.Chevrune);
+            if (PortalHeimSG1Plugin.OpeningSound.Value) PlaySound(GateSounds.Activate);
         }
 
         private void UpdateOpen()

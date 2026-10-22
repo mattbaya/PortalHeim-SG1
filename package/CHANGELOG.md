@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.10
+- **The incoming gate plays one burst as it opens.** A gate that's opening but isn't the one you're standing at (someone dialed it, or it's where you arrive) no longer plays the five spaced chevrune thuds. Instead it plays one chevrune thud together with the opening sound, at the moment it opens. The gate you start from still plays everything. `Sound / IncomingGate` chooses: `Burst` (default), `Silent` (nothing) or `Normal` (the full sequence). This replaces `MuteIncomingChevrunes` and `MuteIncomingOpening`.
+
 ## 0.5.9
 - **No more "PortalHeim loading" message** a few seconds after you spawn. The status line now goes to the log only (`BepInEx/LogOutput.log`); it shows on screen only if something goes wrong, or if you turn on `Diagnostics / ShowStatusMessage`. (The old `ShowStatusOnSpawn` setting is replaced by it.)
 - **The gate you arrive at is quiet too.** It starts up as you step out of the trip, and its chevrune and opening sounds were still playing. For 15 seconds after you arrive, the gate you're standing at counts as the incoming one (`Sound / MuteIncomingChevrunes` and `MuteIncomingOpening`).

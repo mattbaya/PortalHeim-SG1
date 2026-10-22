@@ -24,6 +24,16 @@ namespace PortalHeimSG1
         Vanilla
     }
 
+    public enum IncomingSounds
+    {
+        /// <summary>One chevrune thud, together with the opening sound, as the gate opens.</summary>
+        Burst,
+        /// <summary>Nothing: no chevrune thuds and no opening sound.</summary>
+        Silent,
+        /// <summary>The full sequence, same as the gate you start from.</summary>
+        Normal
+    }
+
     public enum ShadingMode
     {
         /// <summary>Reuse the portal's own shader for the stone (safest: it's known to render).</summary>
@@ -37,7 +47,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.5.9";
+        public const string Version = "0.5.10";
 
         internal static ManualLogSource Log;
 
@@ -55,8 +65,7 @@ namespace PortalHeimSG1
         internal static ConfigEntry<bool> UseBundledSounds;
         internal static ConfigEntry<bool> ChevruneThuds;
         internal static ConfigEntry<bool> OpeningSound;
-        internal static ConfigEntry<bool> MuteIncomingChevrunes;
-        internal static ConfigEntry<bool> MuteIncomingOpening;
+        internal static ConfigEntry<IncomingSounds> IncomingGate;
         internal static ConfigEntry<bool> TravelSounds;
         internal static ConfigEntry<float> TravelMusicVolume;
         internal static ConfigEntry<float> TravelEffectVolume;
@@ -161,14 +170,13 @@ namespace PortalHeimSG1
             TravelEffectVolume = Config.Bind("Sound", "TravelEffectVolume", 0.5f,
                 new ConfigDescription("Volume of the optional second sound (a 'travelfx' clip you add) layered under the travel music. Nothing ships for it.", new AcceptableValueRange<float>(0f, 1f)));
             ChevruneThuds = Config.Bind("Sound", "ChevruneThuds", true,
-                "Play a heavy thud as each chevrune locks while a gate starts up. (Muted on an incoming gate, see MuteIncomingChevrunes.)");
+                "Play a heavy thud as each chevrune locks while a gate starts up. (What an incoming gate does is set by IncomingGate.)");
             OpeningSound = Config.Bind("Sound", "OpeningSound", true,
-                "Play the gate-opening rumble and splash when the start-up sequence finishes. (Muted on an incoming gate, see MuteIncomingOpening.)");
-            MuteIncomingChevrunes = Config.Bind("Sound", "MuteIncomingChevrunes", true,
-                "Don't play the chevrune lock sounds on an incoming gate: one that's opening but isn't the gate you're standing at " +
-                "(someone else dialed it, or it's the far end of your trip). The gate you're at still plays them.");
-            MuteIncomingOpening = Config.Bind("Sound", "MuteIncomingOpening", true,
-                "Don't play the gate-opening sound (the rumble and splash) on an incoming gate. The gate you're standing at still plays it.");
+                "Play the gate-opening rumble and splash when the start-up sequence finishes. (What an incoming gate does is set by IncomingGate.)");
+            IncomingGate = Config.Bind("Sound", "IncomingGate", IncomingSounds.Burst,
+                "What an incoming gate sounds like (one that's opening but isn't the gate you're standing at, including the gate you arrive at, for 15 seconds). " +
+                "Burst = one chevrune thud together with the opening sound, as it opens. Silent = no chevrune or opening sounds. " +
+                "Normal = the whole sequence, like the gate you start from. The gate you start from always plays everything.");
             UseBundledSounds = Config.Bind("Sound", "UseBundledSounds", true,
                 "Play the sounds that come with the mod. Turn off for silence (or to use only your own clips). Takes effect on next game start.");
             Volume = Config.Bind("Sound", "Volume", 1.0f,
