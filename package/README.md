@@ -102,7 +102,7 @@ On a server without the mod, everything still looks and sounds the same on your 
 
 ## Sounds
 
-Gate sounds are **included**: a heavy lock thud for each Chevrune, a stone scrape as the ring turns, a deep rumble and splash as the gate opens, a low hum while it's open, a whoosh when you step through, and a power-down when it shuts. They're mixes of free public-domain (CC0) recordings and sounds made for this mod (credits below).
+Gate sounds are **included**: a heavy thud for each Chevrune, a stone scrape as the ring turns, a deep rumble and splash as the gate opens, a low hum while it's open, a whoosh when you step through, and a power-down when it shuts. They're mixes of free public-domain (CC0) recordings and sounds made for this mod (credits below).
 
 **Want your own?** Put clips (`.ogg`, `.wav` or `.mp3`) in `BepInEx/config/PortalHeim_SG1/sounds/`, named for the moment they play. A file there replaces the included one. Restart the game after adding files.
 
@@ -147,6 +147,7 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 | Look / TravelScreen | Tunnel | `Tunnel` = endless swirling tunnel, `Gate` = a miniature gate, `Vanilla` = the game's own spinner (reload a world to apply) |
 | Look / Interior | Water | `Water` = rippling pool, `Vanilla` = the portal's own swirl |
 | Look / Shading | PortalShader | If the ring looks wrong or is missing, try `Standard` (restart the game) |
+| Portals / ActivationRange | 3 | How close you must be (metres) before a portal wakes up. The game's own is 5 |
 | Portals / AllowAllItems | true | Carry ore, metal and other normally blocked items through portals |
 | Portals / CartsFollow | true | A cart you are pulling comes through with you (needs the mod on the server) |
 | Portals / CartExitDistance | 5.5 | Extra metres from the gate you come out when pulling a cart |

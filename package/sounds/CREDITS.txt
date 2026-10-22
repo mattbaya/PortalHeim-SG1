@@ -5,7 +5,7 @@ synthesized for this mod. tools/make_sounds.py in the source repository rebuilds
 
 Recordings used (all CC0 / public domain, from OpenGameArt):
 - "100 CC0 SFX #2" by rubberduck: https://opengameart.org/content/100-cc0-sfx-2
-  (stones_02, lock_open_01, thunder_01, loop_ambient_03)
+  (stones_02, thunder_01, loop_ambient_03)
 - "Metal Impact Sounds" by BMacZero (Brian MacIntosh): https://opengameart.org/content/metal-impact-sounds
   (thud2, thud3)
 - "6 Short Water Splashes" by ezwa, cut by qubodup from public-domain recordings on pdsounds.org:

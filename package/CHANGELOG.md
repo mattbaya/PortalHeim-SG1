@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.5
+- **Portals wake up from closer.** You have to be within 3 metres of a portal now (it was 5) before the ring starts up and the portal can be used. Change it with `Portals / ActivationRange`.
+- **No door creak.** The chevrune lock sound is now just the heavy thud: the lock-and-door recording that was mixed in behind it is gone, for every gate. The stone scrape is unchanged.
+
 ## 0.5.4
 - **No chevrune lock sounds and no opening sound on the incoming gate.** A gate that's opening but isn't the one you're standing at (someone else dialed it, or it's the far end of your trip) no longer thuds as each chevrune locks, and no longer plays the opening rumble and splash. The gate you're at still does. Switch them back on with `Sound / MuteIncomingChevrunes` and `Sound / MuteIncomingOpening`.
 

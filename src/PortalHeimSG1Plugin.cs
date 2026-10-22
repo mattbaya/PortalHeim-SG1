@@ -37,7 +37,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.5.4";
+        public const string Version = "0.5.5";
 
         internal static ManualLogSource Log;
 
@@ -59,6 +59,7 @@ namespace PortalHeimSG1
         internal static ConfigEntry<float> TravelMusicVolume;
         internal static ConfigEntry<float> TravelEffectVolume;
         internal static ConfigEntry<bool> AllowAllItems;
+        internal static ConfigEntry<float> ActivationRange;
         internal static ConfigEntry<bool> CartsFollow;
         internal static ConfigEntry<float> CartExitDistance;
         internal static ConfigEntry<bool> DialingEnabled;
@@ -113,6 +114,9 @@ namespace PortalHeimSG1
             AllowAllItems = Config.Bind("Portals", "AllowAllItems", true,
                 "Let players carry anything through a portal, including ore, metal and other items the game normally keeps out. " +
                 "Takes effect for portals loaded after this is changed. Each player's own setting applies to them.");
+            ActivationRange = Config.Bind("Portals", "ActivationRange", 3f,
+                new ConfigDescription("How close (in meters) you have to be before a portal wakes up: the ring starts its start-up sequence, the water fills in and the portal " +
+                    "can be used. The game's own portals use 5. Takes effect for portals loaded after this is changed.", new AcceptableValueRange<float>(1f, 10f)));
             CartsFollow = Config.Bind("Portals", "CartsFollow", true,
                 "Someone pulling a cart can walk through a portal and the cart comes with them, ready to keep pulling. Needs the mod on the server too.");
             CartExitDistance = Config.Bind("Portals", "CartExitDistance", 5.5f,
@@ -229,6 +233,7 @@ namespace PortalHeimSG1
         {
             GateRegistry.Add(__instance);
             if (PortalHeimSG1Plugin.AllowAllItems.Value) __instance.m_allowAllItems = true;
+            __instance.m_activationRange = PortalHeimSG1Plugin.ActivationRange.Value;
             if (!PortalHeimSG1Plugin.Reskin.Value || PortalHeimSG1Plugin.Headless) return;
             try
             {

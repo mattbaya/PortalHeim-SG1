@@ -75,10 +75,10 @@ def main():
     ffm = ["ffmpeg", "-y", "-hide_banner", "-loglevel", "error"]
     print("Building sounds:")
 
-    # chevrune: a heavy thud with a sharp metal click just behind it.
-    run(ffm + ["-i", metal("thud3.wav"), "-i", sfx("lock_open_01"), "-filter_complex",
-               "[0]volume=1.0,aresample=44100,pan=mono|c0=c0[a];[1]volume=0.8,aresample=44100,pan=mono|c0=c0,adelay=25[b];"
-               "[a][b]amix=inputs=2:normalize=0,atrim=0:0.7,afade=t=out:st=0.55:d=0.15", wav("chevrune")])
+    # chevrune: a heavy thud. (An earlier version had a lock-and-door recording, lock_open_01, mixed in behind it;
+    # that creak was dropped.)
+    run(ffm + ["-i", metal("thud3.wav"), "-filter_complex",
+               "[0]volume=1.0,aresample=44100,pan=mono|c0=c0,atrim=0:0.7,afade=t=out:st=0.55:d=0.15", wav("chevrune")])
     finish(wav("chevrune"), os.path.join(a.out, "chevrune.wav"), -3)
 
     # spin: a stone scrape over a low grinding rumble (brown noise).
