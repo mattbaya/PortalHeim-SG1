@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.9
+- **No more "PortalHeim loading" message** a few seconds after you spawn. The status line now goes to the log only (`BepInEx/LogOutput.log`); it shows on screen only if something goes wrong, or if you turn on `Diagnostics / ShowStatusMessage`. (The old `ShowStatusOnSpawn` setting is replaced by it.)
+- **The gate you arrive at is quiet too.** It starts up as you step out of the trip, and its chevrune and opening sounds were still playing. For 15 seconds after you arrive, the gate you're standing at counts as the incoming one (`Sound / MuteIncomingChevrunes` and `MuteIncomingOpening`).
+
 ## 0.5.8
 - **The transit sound is half as loud.** The music on the portal-travel loading screen now plays at 50% of its old volume. `Sound / TravelMusicVolume` still scales it (its 1.0 is now the old 0.5).
 

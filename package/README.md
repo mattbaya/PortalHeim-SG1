@@ -171,11 +171,11 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 | Sound / UseBundledSounds | true | Turn off the included sounds (restart the game) |
 | Sound / Volume | 1.0 | Also follows the game's sound-effects volume |
 | Diagnostics / PreviewKey | F8 | Stand near a gate and press it to replay the opening sequence and sounds |
-| Diagnostics / ShowStatusOnSpawn | true | Shows a status line a few seconds after you spawn (turn off once it all works) |
+| Diagnostics / ShowStatusMessage | false | Show the one-line status on screen a few seconds after you spawn (it's always written to the log; it shows on screen anyway if something goes wrong) |
 
 ## Troubleshooting
 
-- **Portals look the same as before.** Check that the mod is in the profile you launch from. A few seconds after you spawn, a status line says how many portals are gates and whether the water and sounds loaded. If the ring is missing or looks wrong, set `Look / Shading` to `Standard` and restart.
+- **Portals look the same as before.** Check that the mod is in the profile you launch from. A few seconds after you spawn, a status line is written to `BepInEx/LogOutput.log` saying how many portals are gates and whether the water and sounds loaded (set `Diagnostics / ShowStatusMessage` to true to see it on screen). If the ring is missing or looks wrong, set `Look / Shading` to `Standard` and restart.
 - **No water in the gate.** The water only shows while a gate is live: someone standing at either end. Stand next to it, or press **F8** to replay the opening sequence.
 - **Pressing E still opens the old naming box.** The mod isn't on the server (or the server hasn't answered yet; give it a few seconds after spawning). Gates paired by name behave the old way when `Dialing / AllowDialingLinkedGates` is off.
 - **The dial list is empty or missing a gate.** By default you only see gates you've been near or built. Walk past it once, or set `Dialing / OnlyShowVisitedGates` to false.

@@ -37,7 +37,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.5.8";
+        public const string Version = "0.5.9";
 
         internal static ManualLogSource Log;
 
@@ -76,6 +76,9 @@ namespace PortalHeimSG1
         internal static ConfigEntry<KeyboardShortcut> PreviewKey;
         internal static PortalHeimSG1Plugin Instance;
         internal static bool Headless;
+        /// <summary>When the local player last finished a teleport (the gate they arrive at counts as the incoming one for a while).</summary>
+        internal static float ArrivedAt = -1000f;
+        private static bool _wasTeleporting;
 
         private Harmony _harmony;
 
@@ -146,7 +149,7 @@ namespace PortalHeimSG1
             PreviewKey = Config.Bind("Diagnostics", "PreviewKey", new KeyboardShortcut(KeyCode.F8),
                 "Stand near a gate and press this to replay the opening sequence (Chevrunes locking, the water, and all the sounds) " +
                 "without having to disconnect and reconnect the portal.");
-            ShowStatus = Config.Bind("Diagnostics", "ShowStatusOnSpawn", true,
+            ShowStatus = Config.Bind("Diagnostics", "ShowStatusMessage", false,
                 "Show a one-line status message a few seconds after you spawn (how many portals are gates, whether the water and sounds loaded, any error). " +
                 "Handy while testing; turn off once everything works.");
             TravelSounds = Config.Bind("Sound", "TravelSounds", true,
@@ -190,6 +193,7 @@ namespace PortalHeimSG1
             if (Headless) return;
 
             GateClient.Tick();
+            TrackArrival();
             CartFollow.Tick();
             DialMap.Tick();
             WaterSurface.Tick();
@@ -216,6 +220,13 @@ namespace PortalHeimSG1
                     Player.m_localPlayer.Message(MessageHud.MessageType.Center, "No gate within 30 m to preview.");
                 }
             }
+        }
+
+        private static void TrackArrival()
+        {
+            bool teleporting = Player.m_localPlayer != null && Player.m_localPlayer.IsTeleporting();
+            if (_wasTeleporting && !teleporting) ArrivedAt = Time.time;
+            _wasTeleporting = teleporting;
         }
 
         private void OnDestroy()

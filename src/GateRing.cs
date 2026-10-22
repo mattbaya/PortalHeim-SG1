@@ -42,6 +42,8 @@ namespace PortalHeimSG1
         private const float SoundRange = 45f;
         // Standing within the portal's activation range plus this much counts as being at the gate.
         private const float IncomingMargin = 3f;
+        // The gate you step out of after a trip is the incoming one too: it starts up as you arrive, and stays quiet for this long.
+        private const float ArrivalQuietSeconds = 15f;
         // A gate stays live this long after the last person leaves range, so standing at the edge doesn't flicker it.
         private const float LiveGraceSeconds = 2f;
         // The water splashes open, then settles; it drains away faster than it fills.
@@ -104,6 +106,7 @@ namespace PortalHeimSG1
             get
             {
                 if (_previewing || Player.m_localPlayer == null || _portal == null) return false;
+                if (Time.time - PortalHeimSG1Plugin.ArrivedAt < ArrivalQuietSeconds) return true;
                 var root = _portal.m_proximityRoot != null ? _portal.m_proximityRoot : _portal.transform;
                 return Vector3.Distance(Player.m_localPlayer.transform.position, root.position) > _portal.m_activationRange + IncomingMargin;
             }
