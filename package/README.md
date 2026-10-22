@@ -63,7 +63,7 @@ With the mod on the server too, you aren't limited to portals that share a name.
 
 **Home gate.** Press **Set home** next to a gate. From then on it's highlighted first in the window, and **Shift+E** on any gate dials home straight away: the "I'm in a hurry" button.
 
-**On the map.** Known gates appear on your map as a small gate icon (the powered-off gate, sunk in the ground with its ramp). Stand at a gate, open the map, and **Shift+click** a gate's icon to dial it. The map updates by itself whenever a gate is built, removed or renamed.
+**On the map.** Known gates appear on your map as a small gate icon (the powered-off gate, sunk in the ground with its ramp). In the dial window, click **Pick on map**: the map opens with a banner, and a click on any gate's icon dials it from the gate you're at (Esc cancels). You can also stand at a free gate, open the map yourself, and **Shift+click** a gate's icon. The map updates by itself whenever a gate is built, removed or renamed.
 
 <!-- IMAGE: map-pins.png (the map with several gate icons and their names) -->
 

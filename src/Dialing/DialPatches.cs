@@ -85,6 +85,53 @@ namespace PortalHeimSG1
         private static bool _subscribed;
         private static Sprite _icon;
 
+        // "Pick on map": the dial window opens the map, and a click on a gate there dials it from this gate.
+        private static TeleportWorld _pickFrom;
+        private static bool _pickSawMap;
+        private static GUIStyle _hint;
+
+        public static bool Picking => _pickFrom != null;
+
+        public static void BeginPick(TeleportWorld from)
+        {
+            if (from == null || Minimap.instance == null) return;
+            _pickFrom = from;
+            _pickSawMap = false;
+            Minimap.instance.SetMapMode(Minimap.MapMode.Large);
+        }
+
+        private static void UpdatePick()
+        {
+            if (_pickFrom == null) return;
+
+            var player = Player.m_localPlayer;
+            if (player == null || Vector3.Distance(player.transform.position, _pickFrom.transform.position) > 20f)
+            {
+                _pickFrom = null;
+                return;
+            }
+
+            if (Minimap.IsOpen()) _pickSawMap = true;
+            else if (_pickSawMap) _pickFrom = null;   // the map was closed: cancelled
+        }
+
+        /// <summary>The banner at the top of the map while picking a gate.</summary>
+        public static void DrawHint()
+        {
+            if (_pickFrom == null || !Minimap.IsOpen()) return;
+
+            float scale = Mathf.Clamp(Screen.height / 1080f, 0.8f, 2.5f);
+            if (_hint == null) _hint = new GUIStyle(GUI.skin.box) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };
+            _hint.fontSize = Mathf.RoundToInt(22f * scale);
+            string name = "this gate";
+            var id = GateRegistry.IdOf(_pickFrom);
+            foreach (var gate in GateClient.Gates)
+                if (gate.Id == id && !string.IsNullOrWhiteSpace(gate.Name)) name = gate.Name;
+
+            float width = 640f * scale, height = 46f * scale;
+            GUI.Box(new Rect((Screen.width - width) / 2f, 14f * scale, width, height), "Click a gate to dial it from " + name + "   (Esc to cancel)", _hint);
+        }
+
         /// <summary>The gate-shaped map icon, painted in code the first time it's needed.</summary>
         private static Sprite GateIcon()
         {
@@ -108,6 +155,8 @@ namespace PortalHeimSG1
                 _subscribed = true;
                 GateClient.GatesChanged += () => _dirty = true;
             }
+
+            UpdatePick();
 
             var map = Minimap.instance;
             if (map != _forMap)
@@ -165,7 +214,8 @@ namespace PortalHeimSG1
         public static bool TryDialFromClick(Minimap map)
         {
             if (!PortalHeimSG1Plugin.DialingEnabled.Value || !GateClient.ServerHasMod) return false;
-            if (!(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))) return false;
+            bool picking = _pickFrom != null;
+            if (!picking && !(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))) return false;
 
             var pin = map.GetClosestPin(map.ScreenToWorldPoint(ZInput.pointerPosition), map.PinInteractRadius);
             if (pin == null) return false;
@@ -187,7 +237,7 @@ namespace PortalHeimSG1
                     found = true;
                 }
 
-            var here = GateRegistry.Nearest(player.transform.position, 8f);
+            var here = picking ? _pickFrom : GateRegistry.Nearest(player.transform.position, 8f);
             if (!found) return true;
             if (here == null)
             {
@@ -196,6 +246,12 @@ namespace PortalHeimSG1
             }
 
             DialMenu.DialFrom(here, target);
+            if (picking)
+            {
+                _pickFrom = null;
+                map.SetMapMode(Minimap.MapMode.None);
+            }
+
             return true;
         }
     }

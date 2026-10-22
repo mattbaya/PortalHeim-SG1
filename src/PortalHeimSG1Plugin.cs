@@ -47,7 +47,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.5.11";
+        public const string Version = "0.5.12";
 
         internal static ManualLogSource Log;
 
@@ -202,7 +202,9 @@ namespace PortalHeimSG1
 
         private void OnGUI()
         {
-            if (!Headless) DialMenu.Draw();
+            if (Headless) return;
+            DialMenu.Draw();
+            DialMap.DrawHint();
         }
 
         private void Update()

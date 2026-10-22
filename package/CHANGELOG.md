@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.12
+- **Pick the gate on the map.** The dial window has a new **Pick on map** button. It opens the map with a banner ("Click a gate to dial it from ..."), and a plain click on a gate's icon dials it. Esc or closing the map cancels. (Shift+click on a gate icon while standing at a free gate still works too.)
+
 ## 0.5.11
 - **The ramp starts below the ground.** It used to dip 0.4 m below the base and run 1.25 m, so where the ground fell away in front of a portal, its end stood above the ground and was a step too high to walk onto when overencumbered. It now starts 1 m down and runs out further at the same gentle angle, meeting the ground however it falls (`Look / RampDepth` to change it).
 

@@ -138,6 +138,14 @@ namespace PortalHeimSG1
             GUILayout.FlexibleSpace();
             GUILayout.BeginHorizontal();
             // Renaming a gate that is mid-dial would cut the connection, so only offer it when the gate is free.
+            if (self.Value.State != GateState.Dialing && GUILayout.Button("Pick on map", GUILayout.Height(30f * scale)))
+            {
+                var from = _source;
+                Close();
+                DialMap.BeginPick(from);
+                return;
+            }
+
             if (self.Value.State != GateState.Dialing && GUILayout.Button("Rename this gate", GUILayout.Height(30f * scale))) Rename();
             if (GUILayout.Button("Close (Esc)", GUILayout.Height(30f * scale))) Close();
             GUILayout.EndHorizontal();
