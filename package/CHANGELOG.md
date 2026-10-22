@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.4
+- **No chevrune lock sounds on the incoming gate.** A gate that's opening but isn't the one you're standing at (someone else dialed it, or it's the far end of your trip) no longer thuds as each chevrune locks. The gate you're at still does. Switch it back on with `Sound / MuteIncomingChevrunes`.
+
 ## 0.5.3
 - The ramp on the **back** of the gate is gone: only the front ramp (the side you step out of) is built. `Look / BackRamp` brings it back.
 

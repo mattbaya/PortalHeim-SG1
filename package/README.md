@@ -163,6 +163,7 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 | Sound / TravelSounds | true | The bass loop on the portal-travel loading screen |
 | Sound / TravelMusicVolume | 0.75 | Volume of the travel music |
 | Sound / TravelEffectVolume | 0.5 | Volume of an optional second `travelfx` layer (none ships) |
+| Sound / MuteIncomingChevrunes | true | No chevrune lock sounds on an incoming gate (one that's opening but isn't the gate you're standing at) |
 | Sound / UseBundledSounds | true | Turn off the included sounds (restart the game) |
 | Sound / Volume | 1.0 | Also follows the game's sound-effects volume |
 | Diagnostics / PreviewKey | F8 | Stand near a gate and press it to replay the opening sequence and sounds |

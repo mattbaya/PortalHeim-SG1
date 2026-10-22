@@ -40,6 +40,8 @@ namespace PortalHeimSG1
         };
         // Sounds are only made for gates this close (they can't be heard from further anyway).
         private const float SoundRange = 45f;
+        // Standing within the portal's activation range plus this much counts as being at the gate.
+        private const float IncomingMargin = 3f;
         // A gate stays live this long after the last person leaves range, so standing at the edge doesn't flicker it.
         private const float LiveGraceSeconds = 2f;
         // The water splashes open, then settles; it drains away faster than it fills.
@@ -92,6 +94,20 @@ namespace PortalHeimSG1
         private void OnDisable() => CountWater(false);
 
         private void OnDestroy() => CountWater(false);
+
+        /// <summary>
+        /// A gate that's opening but isn't the one the local player is standing at (someone else dialed it, or it's the
+        /// far end of the trip). Its chevrune lock sounds can be switched off.
+        /// </summary>
+        private bool IsIncoming
+        {
+            get
+            {
+                if (!PortalHeimSG1Plugin.MuteIncomingChevrunes.Value || _previewing || Player.m_localPlayer == null || _portal == null) return false;
+                var root = _portal.m_proximityRoot != null ? _portal.m_proximityRoot : _portal.transform;
+                return Vector3.Distance(Player.m_localPlayer.transform.position, root.position) > _portal.m_activationRange + IncomingMargin;
+            }
+        }
 
         private bool Near => Player.m_localPlayer != null
             && Vector3.Distance(Player.m_localPlayer.transform.position, transform.position) < SoundRange;
@@ -202,7 +218,7 @@ namespace PortalHeimSG1
             {
                 // This step's Chevrunes (a left and right pair, or the last one) turn from arrows into runes.
                 foreach (int index in LockOrder[_locked]) SetChevrune(index, ChevruneState.Lit);
-                PlaySound(GateSounds.Chevrune);
+                if (!IsIncoming) PlaySound(GateSounds.Chevrune);
                 _locked++;
                 _phaseTime = 0f;
                 _spinDirection = -_spinDirection;

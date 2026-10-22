@@ -37,7 +37,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.5.3";
+        public const string Version = "0.5.4";
 
         internal static ManualLogSource Log;
 
@@ -53,6 +53,7 @@ namespace PortalHeimSG1
         internal static ConfigEntry<TravelMode> Travel;
         internal static ConfigEntry<float> Volume;
         internal static ConfigEntry<bool> UseBundledSounds;
+        internal static ConfigEntry<bool> MuteIncomingChevrunes;
         internal static ConfigEntry<bool> TravelSounds;
         internal static ConfigEntry<float> TravelMusicVolume;
         internal static ConfigEntry<float> TravelEffectVolume;
@@ -149,6 +150,9 @@ namespace PortalHeimSG1
                 new ConfigDescription("Volume of the travel music.", new AcceptableValueRange<float>(0f, 1f)));
             TravelEffectVolume = Config.Bind("Sound", "TravelEffectVolume", 0.5f,
                 new ConfigDescription("Volume of the optional second sound (a 'travelfx' clip you add) layered under the travel music. Nothing ships for it.", new AcceptableValueRange<float>(0f, 1f)));
+            MuteIncomingChevrunes = Config.Bind("Sound", "MuteIncomingChevrunes", true,
+                "Don't play the chevrune lock sounds on an incoming gate: one that's opening but isn't the gate you're standing at " +
+                "(someone else dialed it, or it's the far end of your trip). The gate you're at still plays them.");
             UseBundledSounds = Config.Bind("Sound", "UseBundledSounds", true,
                 "Play the sounds that come with the mod. Turn off for silence (or to use only your own clips). Takes effect on next game start.");
             Volume = Config.Bind("Sound", "Volume", 1.0f,
