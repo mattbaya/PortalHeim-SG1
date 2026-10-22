@@ -103,7 +103,7 @@ namespace PortalHeimSG1
         {
             get
             {
-                if (!PortalHeimSG1Plugin.MuteIncomingChevrunes.Value || _previewing || Player.m_localPlayer == null || _portal == null) return false;
+                if (_previewing || Player.m_localPlayer == null || _portal == null) return false;
                 var root = _portal.m_proximityRoot != null ? _portal.m_proximityRoot : _portal.transform;
                 return Vector3.Distance(Player.m_localPlayer.transform.position, root.position) > _portal.m_activationRange + IncomingMargin;
             }
@@ -218,7 +218,7 @@ namespace PortalHeimSG1
             {
                 // This step's Chevrunes (a left and right pair, or the last one) turn from arrows into runes.
                 foreach (int index in LockOrder[_locked]) SetChevrune(index, ChevruneState.Lit);
-                if (!IsIncoming) PlaySound(GateSounds.Chevrune);
+                if (!IsIncoming || !PortalHeimSG1Plugin.MuteIncomingChevrunes.Value) PlaySound(GateSounds.Chevrune);
                 _locked++;
                 _phaseTime = 0f;
                 _spinDirection = -_spinDirection;
@@ -228,7 +228,7 @@ namespace PortalHeimSG1
                     _spinSource.Stop();
                     _phase = Phase.Open;
                     if (_previewing) _previewHoldUntil = Time.time + 5f;
-                    PlaySound(GateSounds.Activate);
+                    if (!IsIncoming || !PortalHeimSG1Plugin.MuteIncomingOpening.Value) PlaySound(GateSounds.Activate);
                 }
                 else
                 {

@@ -54,6 +54,7 @@ namespace PortalHeimSG1
         internal static ConfigEntry<float> Volume;
         internal static ConfigEntry<bool> UseBundledSounds;
         internal static ConfigEntry<bool> MuteIncomingChevrunes;
+        internal static ConfigEntry<bool> MuteIncomingOpening;
         internal static ConfigEntry<bool> TravelSounds;
         internal static ConfigEntry<float> TravelMusicVolume;
         internal static ConfigEntry<float> TravelEffectVolume;
@@ -153,6 +154,8 @@ namespace PortalHeimSG1
             MuteIncomingChevrunes = Config.Bind("Sound", "MuteIncomingChevrunes", true,
                 "Don't play the chevrune lock sounds on an incoming gate: one that's opening but isn't the gate you're standing at " +
                 "(someone else dialed it, or it's the far end of your trip). The gate you're at still plays them.");
+            MuteIncomingOpening = Config.Bind("Sound", "MuteIncomingOpening", true,
+                "Don't play the gate-opening sound (the rumble and splash) on an incoming gate. The gate you're standing at still plays it.");
             UseBundledSounds = Config.Bind("Sound", "UseBundledSounds", true,
                 "Play the sounds that come with the mod. Turn off for silence (or to use only your own clips). Takes effect on next game start.");
             Volume = Config.Bind("Sound", "Volume", 1.0f,
