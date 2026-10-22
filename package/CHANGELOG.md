@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.6
+- **Clicking in the dial window no longer swings your weapon.** The game's player controller has its own input gate, which the window wasn't blocking.
+
 ## 0.5.5
 - **Portals wake up from closer.** You have to be within 3 metres of a portal now (it was 5) before the ring starts up and the portal can be used. Change it with `Portals / ActivationRange`.
 - **No door creak.** The chevrune lock sound is now just the heavy thud: the lock-and-door recording that was mixed in behind it is gone, for every gate. The stone scrape is unchanged.

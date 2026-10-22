@@ -273,4 +273,17 @@ namespace PortalHeimSG1
             if (DialMenu.IsOpen) __result = false;
         }
     }
+
+    /// <summary>
+    /// The player controller has its own input gate, separate from the player's. Without this, a click in the dial
+    /// window also made the player swing their weapon.
+    /// </summary>
+    [HarmonyPatch(typeof(PlayerController), "TakeInput")]
+    internal static class ControllerTakeInputPatch
+    {
+        private static void Postfix(ref bool __result)
+        {
+            if (DialMenu.IsOpen) __result = false;
+        }
+    }
 }
