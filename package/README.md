@@ -6,7 +6,7 @@ Every portal becomes a ring of carved stone with nine glowing **Chevrunes** and 
 
 And it isn't only cosmetic. With the mod on your server too, you can **dial any gate** instead of pairing by name, see your gates on the **map**, **carry ore and metal** through, and **pull your cart through** with you.
 
-<!-- IMAGE: hero-gate.png (an open gate, front-on, at dusk) -->
+![An open gate: carved stone ring, orange Chevrunes and a pool of water](https://raw.githubusercontent.com/mattbaya/PortalHeim-SG1/main/docs/images/hero-gate.jpg)
 
 ## Contents
 
@@ -30,10 +30,12 @@ And it isn't only cosmetic. With the mod on your server too, you can **dial any 
 - **Dormant glow:** a connected gate that nobody is near glows faintly, so you can tell it's live from across the base.
 - **Ramps and a sunk ring:** the bottom of the ring sits at ground level and a gentle ramp on the front lets anyone walk in, even when overencumbered. (Want one on the back too? Set `Look / BackRamp` to true.)
 
-<!-- IMAGE: gate-sequence.png (three frames: dormant, Chevrunes locking, open with water) -->
+![The start-up: the gate is dormant, the Chevrunes light up, then the water fills the opening](https://raw.githubusercontent.com/mattbaya/PortalHeim-SG1/main/docs/images/gate-sequence.jpg)
 
 **The trip**
 - A long portal trip shows an **endless swirling tunnel** flying toward a bright light, with a deep bass loop, instead of the game's spinner.
+
+![The travel tunnel](https://raw.githubusercontent.com/mattbaya/PortalHeim-SG1/main/docs/images/travel-tunnel.jpg)
 
 **The network**
 - **Dial any gate** you've visited from a menu at the gate, or by clicking its pin on the map.

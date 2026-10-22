@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.7
+- New icon and screenshots in the description. No changes to how the mod works.
+
 ## 0.5.6
 - **Clicking in the dial window no longer swings your weapon.** The game's player controller has its own input gate, which the window wasn't blocking.
 
