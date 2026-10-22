@@ -221,7 +221,7 @@ namespace PortalHeimSG1
             {
                 // This step's Chevrunes (a left and right pair, or the last one) turn from arrows into runes.
                 foreach (int index in LockOrder[_locked]) SetChevrune(index, ChevruneState.Lit);
-                if (!IsIncoming || !PortalHeimSG1Plugin.MuteIncomingChevrunes.Value) PlaySound(GateSounds.Chevrune);
+                if (PortalHeimSG1Plugin.ChevruneThuds.Value && (!IsIncoming || !PortalHeimSG1Plugin.MuteIncomingChevrunes.Value)) PlaySound(GateSounds.Chevrune);
                 _locked++;
                 _phaseTime = 0f;
                 _spinDirection = -_spinDirection;
@@ -231,7 +231,7 @@ namespace PortalHeimSG1
                     _spinSource.Stop();
                     _phase = Phase.Open;
                     if (_previewing) _previewHoldUntil = Time.time + 5f;
-                    if (!IsIncoming || !PortalHeimSG1Plugin.MuteIncomingOpening.Value) PlaySound(GateSounds.Activate);
+                    if (PortalHeimSG1Plugin.OpeningSound.Value && (!IsIncoming || !PortalHeimSG1Plugin.MuteIncomingOpening.Value)) PlaySound(GateSounds.Activate);
                 }
                 else
                 {
