@@ -47,7 +47,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.5.10";
+        public const string Version = "0.5.11";
 
         internal static ManualLogSource Log;
 
@@ -57,6 +57,7 @@ namespace PortalHeimSG1
         internal static ConfigEntry<float> DormantGlow;
         internal static ConfigEntry<bool> Ramps;
         internal static ConfigEntry<bool> BackRamp;
+        internal static ConfigEntry<float> RampDepth;
         internal static ConfigEntry<bool> SinkRing;
         internal static ConfigEntry<ShadingMode> Shading;
         internal static ConfigEntry<InteriorMode> Interior;
@@ -108,6 +109,9 @@ namespace PortalHeimSG1
             Ramps = Config.Bind("Look", "Ramps", true,
                 "Add a gentle ramp up to the portal's base on the front (the side you step out of), so anyone can walk in, even when overencumbered. " +
                 "Takes effect for portals loaded after this is changed.");
+            RampDepth = Config.Bind("Look", "RampDepth", 1.0f,
+                new ConfigDescription("How far below the portal's base the ramp starts, in meters. Deeper means it also runs further out, at the same gentle angle, so it meets the ground " +
+                    "even where the ground falls away in front of the portal and there's no step up onto it. Takes effect for portals loaded after this is changed.", new AcceptableValueRange<float>(0.4f, 3f)));
             BackRamp = Config.Bind("Look", "BackRamp", false,
                 "Also add a ramp on the back of the portal. Off by default. Takes effect for portals loaded after this is changed.");
             SinkRing = Config.Bind("Look", "SinkRing", true,

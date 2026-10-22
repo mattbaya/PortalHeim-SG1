@@ -142,6 +142,7 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 | Look / Reskin | true | Set to false to keep ordinary portals |
 | Look / ChevruneColor | orange | Glow colour of a locked Chevrune |
 | Look / Ramps | true | A gentle ramp up to the portal's base on the front |
+| Look / RampDepth | 1.0 | How far below the base the ramp starts (m). Deeper also runs it further out, so it meets the ground even where the ground falls away |
 | Look / BackRamp | false | Also add a ramp on the back |
 | Look / SinkRing | true | The ring sits low so the opening is level with the ground |
 | Look / DormantGlow | 0.3 | How brightly a connected but idle gate's Chevrunes glow (0 = dark) |

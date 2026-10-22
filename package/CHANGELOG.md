@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.11
+- **The ramp starts below the ground.** It used to dip 0.4 m below the base and run 1.25 m, so where the ground fell away in front of a portal, its end stood above the ground and was a step too high to walk onto when overencumbered. It now starts 1 m down and runs out further at the same gentle angle, meeting the ground however it falls (`Look / RampDepth` to change it).
+
 ## 0.5.10
 - **The incoming gate plays one burst as it opens.** A gate that's opening but isn't the one you're standing at (someone dialed it, or it's where you arrive) no longer plays the five spaced chevrune thuds. Instead it plays one chevrune thud together with the opening sound, at the moment it opens. The gate you start from still plays everything. `Sound / IncomingGate` chooses: `Burst` (default), `Silent` (nothing) or `Normal` (the full sequence). This replaces `MuteIncomingChevrunes` and `MuteIncomingOpening`.
 

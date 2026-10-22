@@ -18,7 +18,8 @@ namespace PortalHeimSG1
         private const float SlabHalfDepth = 0.395f;
         private const float SlabTop = 0.10f;
         private const float RampHalfWidth = 1.45f;
-        private const float RampLength = 1.25f;
+        // How steep the ramp is (rise over run). It runs out as far as it needs to reach its depth at this gentle angle.
+        private const float RampSlope = 0.32f;
         private static Mesh _ramp;
 
         private const int MaxBuildAttempts = 3;
@@ -207,7 +208,11 @@ namespace PortalHeimSG1
                 _innerRing = GateMeshes.Annulus("SG1InnerRing", GateMeshes.InnerRingIn, GateMeshes.InnerRingOut, GateMeshes.InnerHalfDepth);
                 _chevrune = GateMeshes.Chevrune();
                 _runes = System.Array.ConvertAll(RuneAt, GateMeshes.Rune);
-                _ramp = GateMeshes.Ramp(RampHalfWidth, SlabHalfDepth, SlabHalfDepth + RampLength, SlabTop, -0.40f);
+                // The ramp starts well below the ground and runs far enough out to meet it however the ground falls away,
+                // so there's no lip to step onto (the part under the ground is never seen).
+                float depth = PortalHeimSG1Plugin.RampDepth.Value;
+                float run = (SlabTop + depth) / RampSlope;
+                _ramp = GateMeshes.Ramp(RampHalfWidth, SlabHalfDepth, SlabHalfDepth + run, SlabTop, -depth);
                 // Slightly wider than the opening so its edge tucks under the inner ring.
                 _waterDisc = GateMeshes.Disc(GateMeshes.InnerRingIn + 0.03f, 64);
 
