@@ -47,7 +47,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.5.15";
+        public const string Version = "0.6.0";
 
         internal static ManualLogSource Log;
 
@@ -58,6 +58,8 @@ namespace PortalHeimSG1
         internal static ConfigEntry<bool> Ramps;
         internal static ConfigEntry<bool> BackRamp;
         internal static ConfigEntry<float> RampDepth;
+        internal static ConfigEntry<bool> ComboEnabled;
+        internal static ConfigEntry<float> ComboBenchDistance;
         internal static ConfigEntry<bool> SinkRing;
         internal static ConfigEntry<ShadingMode> Shading;
         internal static ConfigEntry<InteriorMode> Interior;
@@ -110,7 +112,7 @@ namespace PortalHeimSG1
             Ramps = Config.Bind("Look", "Ramps", true,
                 "Add a gentle ramp up to the portal's base on the front (the side you step out of), so anyone can walk in, even when overencumbered. " +
                 "Takes effect for portals loaded after this is changed.");
-            RampDepth = Config.Bind("Look", "RampDepth", 1.0f,
+            RampDepth = Config.Bind("Look", "RampDepth", 1.5f,
                 new ConfigDescription("How far below the portal's base the ramp starts, in meters. Deeper means it also runs further out, at the same gentle angle, so it meets the ground " +
                     "even where the ground falls away in front of the portal and there's no step up onto it. Takes effect for portals loaded after this is changed.", new AcceptableValueRange<float>(0.4f, 3f)));
             BackRamp = Config.Bind("Look", "BackRamp", false,
@@ -130,6 +132,10 @@ namespace PortalHeimSG1
             Shading = Config.Bind("Look", "Shading", ShadingMode.PortalShader,
                 "How the stone is shaded. PortalShader reuses the portal's own shader. If the ring looks wrong or is missing, try Standard. " +
                 "Takes effect on next game start.");
+            ComboEnabled = Config.Bind("Portals", "PortalAndWorkbench", true,
+                "Add a 'Portal and Workbench' piece to the hammer's build list: a portal with a normal workbench built beside it (cost of both). Needs this mod on the server too. Takes effect when the game starts.");
+            ComboBenchDistance = Config.Bind("Portals", "WorkbenchDistance", 3.6f,
+                new ConfigDescription("How far to the side of the portal the combined piece puts its workbench, in metres.", new AcceptableValueRange<float>(2.5f, 8f)));
             AllowAllItems = Config.Bind("Portals", "AllowAllItems", true,
                 "Let players carry anything through a portal, including ore, metal and other items the game normally keeps out. " +
                 "Takes effect for portals loaded after this is changed. Each player's own setting applies to them.");

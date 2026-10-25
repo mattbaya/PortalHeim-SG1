@@ -19,6 +19,8 @@ namespace PortalHeimSG1
         private static bool _placed;
         private static string _selected = "";
         private static bool _hadDefault;
+        private static string _renaming = "";
+        private static string _renameText = "";
         private static CursorLockMode _lockBefore;
         private static bool _visibleBefore;
         private static GUIStyle _title, _label, _small, _row, _rowSelected;
@@ -33,6 +35,7 @@ namespace PortalHeimSG1
             _scroll = Vector2.zero;
             _selected = "";
             _hadDefault = false;
+            _renaming = "";
             _lockBefore = Cursor.lockState;
             _visibleBefore = Cursor.visible;
             GateNet.RequestGates();
@@ -82,7 +85,7 @@ namespace PortalHeimSG1
                     return;
                 }
 
-                if ((e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter) && TryDialSelected())
+                if (_renaming.Length == 0 && (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter) && TryDialSelected())
                 {
                     e.Use();
                     return;
@@ -220,6 +223,12 @@ namespace PortalHeimSG1
                 bool selected = key == _selected;
                 int meters = Mathf.RoundToInt(Vector3.Distance(gate.Position, self.Position));
 
+                if (_renaming == key)
+                {
+                    DrawRenameRow(gate);
+                    continue;
+                }
+
                 GUILayout.BeginHorizontal(selected ? _rowSelected : _row);
                 string star = GateClient.IsHome(gate.Id) ? "* " : "";
                 string state = gate.State == GateState.Dialing ? "  (in use)" : (gate.State == GateState.Linked ? "  (paired)" : "");
@@ -229,6 +238,12 @@ namespace PortalHeimSG1
                 bool isHome = GateClient.IsHome(gate.Id);
                 if (GUILayout.Button(isHome ? "Unset home" : "Set home", GUILayout.Width(100f * scale)))
                     GateClient.SetHome(gate.Id, !isHome);
+                GUI.enabled = gate.State != GateState.Dialing;
+                if (GUILayout.Button(gate.State == GateState.Linked ? "Rename pair" : "Rename", GUILayout.Width(110f * scale)))
+                {
+                    _renaming = key;
+                    _renameText = gate.Name ?? "";
+                }
                 GUI.enabled = free;
                 if (GUILayout.Button("Dial", GUILayout.Width(70f * scale)))
                 {
@@ -244,6 +259,26 @@ namespace PortalHeimSG1
 
             if (hidden > 0 && PortalHeimSG1Plugin.OnlyVisited.Value)
                 GUILayout.Label(hidden + (hidden == 1 ? " gate" : " gates") + " you haven't visited yet.", _small);
+        }
+
+        /// <summary>A gate's row while it's being renamed: a text box and OK / Cancel. The name changes for everyone.</summary>
+        private static void DrawRenameRow(GateInfo gate)
+        {
+            float scale = Mathf.Clamp(Screen.height / 1080f, 0.8f, 2.5f);
+            GUILayout.BeginHorizontal(_rowSelected);
+            GUI.SetNextControlName("SG1Rename");
+            _renameText = GUILayout.TextField(_renameText, 24, GUILayout.ExpandWidth(true));
+            var e = Event.current;
+            bool enter = e.type == EventType.KeyDown && (e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter);
+            if (enter) e.Use();
+            if (GUILayout.Button("OK", GUILayout.Width(60f * scale)) || enter)
+            {
+                GateNet.RequestRename(gate.Id, _renameText, gate.State == GateState.Linked);
+                _renaming = "";
+            }
+
+            if (GUILayout.Button("Cancel", GUILayout.Width(80f * scale))) _renaming = "";
+            GUILayout.EndHorizontal();
         }
 
         private static bool TryDialSelected()

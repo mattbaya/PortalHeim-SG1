@@ -22,6 +22,7 @@ namespace PortalHeimSG1
         private const string HangUpRpc = "SG1_HangUp";
         private const string Result = "SG1_Result";
         private const string MoveCart = "SG1_MoveCart";
+        private const string RenameRpc = "SG1_Rename";
 
         private static ZRoutedRpc _registeredOn;
 
@@ -38,6 +39,7 @@ namespace PortalHeimSG1
             rpc.Register<ZPackage>(Gates, RpcGates);
             rpc.Register<ZDOID, ZDOID>(DialRpc, RpcDial);
             rpc.Register<ZDOID>(HangUpRpc, RpcHangUp);
+            rpc.Register<ZDOID, string, bool>(RenameRpc, RpcRename);
             rpc.Register<string>(Result, RpcResult);
             rpc.Register<ZDOID, Vector3, Quaternion>(MoveCart, RpcMoveCart);
         }
@@ -59,6 +61,19 @@ namespace PortalHeimSG1
         public static void RequestDial(ZDOID from, ZDOID to)
         {
             if (ZRoutedRpc.instance != null) ZRoutedRpc.instance.InvokeRoutedRPC(DialRpc, from, to);
+        }
+
+        /// <summary>Asks the server to rename a gate (or, if it is paired, both gates of the pair) for everyone.</summary>
+        public static void RequestRename(ZDOID gate, string name, bool pair)
+        {
+            if (ZRoutedRpc.instance != null) ZRoutedRpc.instance.InvokeRoutedRPC(RenameRpc, gate, name, pair);
+        }
+
+        private static void RpcRename(long sender, ZDOID gate, string name, bool pair)
+        {
+            if (!GateServer.IsServer) return;
+            string problem = GateServer.TryRename(gate, name, pair);
+            ZRoutedRpc.instance.InvokeRoutedRPC(sender, Result, problem ?? "Renamed.");
         }
 
         public static void RequestHangUp(ZDOID gate)

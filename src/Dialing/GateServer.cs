@@ -196,6 +196,37 @@ namespace PortalHeimSG1
             return null;
         }
 
+        /// <summary>Renames a gate for everyone. With <paramref name="pair"/> a paired gate's partner gets the same name, so they stay paired.</summary>
+        public static string TryRename(ZDOID gateId, string name, bool pair)
+        {
+            if (!PortalHeimSG1Plugin.DialingEnabled.Value) return "Dialing is switched off on this server.";
+            name = (name ?? "").Trim();
+            if (name.Length > 24) name = name.Substring(0, 24);
+
+            var zdo = ZDOMan.instance.GetZDO(gateId);
+            if (zdo == null || !IsPortal(zdo)) return "That gate is gone.";
+            if (IsInDial(gateId) || StateOf(zdo) == GateState.Dialing) return "Hang up first: a gate can't be renamed while it is dialed.";
+
+            var targets = new List<ZDO> { zdo };
+            if (pair && StateOf(zdo) == GateState.Linked)
+            {
+                var other = ZDOMan.instance.GetZDO(PartnerOf(zdo));
+                if (other != null && IsPortal(other)) targets.Add(other);
+            }
+
+            foreach (var target in targets)
+            {
+                target.SetOwner(ZDOMan.GetSessionID());
+                target.Set(ZDOVars.s_tag, name);
+                ZDOMan.instance.ForceSendZDO(target.m_uid);
+            }
+
+            Game.instance.ConnectPortals();
+            PortalHeimSG1Plugin.Log.LogInfo($"Renamed {targets.Count} gate(s) to '{name}'.");
+            GateNet.BroadcastGates();
+            return null;
+        }
+
         /// <summary>Ends a dial from either gate.</summary>
         public static string TryHangUp(ZDOID gateId)
         {

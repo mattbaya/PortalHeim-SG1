@@ -73,6 +73,10 @@ With the mod on the server too, you aren't limited to portals that share a name.
 
 **Naming.** Give each gate its own name so you can tell them apart in the list (use a gate, then **Rename this gate**). Gates sharing a name pair in twos at random, the way Valheim always has, which is confusing in a list. Unnamed gates pair with each other the same way, so name them all.
 
+**Renaming from anywhere.** Every gate in the dial list has a **Rename** button (**Rename pair** for a paired gate, which renames both so they stay paired). Type the name and press Enter. The name changes for everyone on the server. A gate that's dialed has to be hung up first.
+
+**Portal and Workbench.** The hammer's build list has an extra piece, *Portal and Workbench*, that builds a portal with an ordinary workbench beside it, for the cost of both (and without needing a workbench nearby). The workbench is a separate piece you can take down on its own. It needs the mod on the server.
+
 ## Carts and heavy loads
 
 - **No item limits.** Valheim refuses to let you through a portal carrying ore, metal bars and a few other items. PortalHeim lifts that limit (`Portals / AllowAllItems`, on by default), so hauling a pack full of copper to the forge takes one step.
@@ -142,7 +146,10 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 | Look / Reskin | true | Set to false to keep ordinary portals |
 | Look / ChevruneColor | orange | Glow colour of a locked Chevrune |
 | Look / Ramps | true | A gentle ramp up to the portal's base on the front |
-| Look / RampDepth | 1.0 | How far below the base the ramp starts (m). Deeper also runs it further out, so it meets the ground even where the ground falls away |
+| Portals / PortalAndWorkbench | true | Adds the *Portal and Workbench* piece to the hammer's list (needs the mod on the server) |
+| Portals / WorkbenchDistance | 3.6 | How far to the side of the portal its workbench is built (m) |
+| Dialing / DialWindowPosition | -1, -1 | Where you left the dial window (drag it; -1 = centred) |
+| Look / RampDepth | 1.5 | How far below the base the ramp starts (m). Deeper also runs it further out, so it meets the ground even where the ground falls away |
 | Look / BackRamp | false | Also add a ramp on the back |
 | Look / SinkRing | true | The ring sits low so the opening is level with the ground |
 | Look / DormantGlow | 0.3 | How brightly a connected but idle gate's Chevrunes glow (0 = dark) |

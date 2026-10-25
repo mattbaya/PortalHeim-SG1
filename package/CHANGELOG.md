@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.0
+- **Rename any gate from the dial list.** Each gate has a **Rename** button (or **Rename pair** if it's paired, which renames both so they stay paired). The new name is the same for everyone. Needs the mod on the server; a gate that is dialed has to be hung up first.
+- **New build piece: Portal and Workbench.** In the hammer's list, next to the portal: it builds a portal and a normal workbench beside it, for the cost of both and without needing a workbench nearby. The workbench is a separate piece and can be removed on its own. Needs the mod on the server. (`Portals / PortalAndWorkbench`, `Portals / WorkbenchDistance`.)
+- The ramp now starts 1.5 m below the base by default (it was 1.0), so it meets the ground even on slopes. If you've changed `Look / RampDepth` before, your own value is kept.
+
 ## 0.5.15
 - **The chevrune thud now plays once, when the gate opens, on both ends.** The thud for each chevrune as it locks is gone, on the gate you dial from as well as the one that receives you. (`Sound / IncomingGate = Silent` still silences the receiving gate.)
 
