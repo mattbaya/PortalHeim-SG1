@@ -47,7 +47,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.6.0";
+        public const string Version = "0.7.0";
 
         internal static ManualLogSource Log;
 
@@ -59,6 +59,7 @@ namespace PortalHeimSG1
         internal static ConfigEntry<bool> BackRamp;
         internal static ConfigEntry<float> RampDepth;
         internal static ConfigEntry<bool> ComboEnabled;
+        internal static ConfigEntry<bool> StonePortalStyle;
         internal static ConfigEntry<float> ComboBenchDistance;
         internal static ConfigEntry<bool> SinkRing;
         internal static ConfigEntry<ShadingMode> Shading;
@@ -132,6 +133,8 @@ namespace PortalHeimSG1
             Shading = Config.Bind("Look", "Shading", ShadingMode.PortalShader,
                 "How the stone is shaded. PortalShader reuses the portal's own shader. If the ring looks wrong or is missing, try Standard. " +
                 "Takes effect on next game start.");
+            StonePortalStyle = Config.Bind("Look", "StonePortalStyle", true,
+                "Give the game's Stone Portal its own look: thicker, darker stone with chunkier runes, and chevrunes that lock from the top down. Takes effect for portals loaded after this is changed.");
             ComboEnabled = Config.Bind("Portals", "PortalAndWorkbench", true,
                 "Add a 'Portal and Workbench' piece to the hammer's build list: a portal with a normal workbench built beside it (cost of both). Needs this mod on the server too. Takes effect when the game starts.");
             ComboBenchDistance = Config.Bind("Portals", "WorkbenchDistance", 3.6f,

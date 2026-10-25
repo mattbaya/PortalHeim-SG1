@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.0
+- **The Stone Portal looks different from the wooden one.** Its gate has thicker, darker, cooler stone and chunkier runes, and its chevrunes lock from the top down (the wooden portal's lock from the bottom up). Switch off with `Look / StonePortalStyle`.
+
 ## 0.6.0
 - **Rename any gate from the dial list.** Each gate has a **Rename** button (or **Rename pair** if it's paired, which renames both so they stay paired). The new name is the same for everyone. Needs the mod on the server; a gate that is dialed has to be hung up first.
 - **New build piece: Portal and Workbench.** In the hammer's list, next to the portal: it builds a portal and a normal workbench beside it, for the cost of both and without needing a workbench nearby. The workbench is a separate piece and can be removed on its own. Needs the mod on the server. (`Portals / PortalAndWorkbench`, `Portals / WorkbenchDistance`.)

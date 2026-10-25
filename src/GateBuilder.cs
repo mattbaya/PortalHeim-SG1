@@ -25,6 +25,14 @@ namespace PortalHeimSG1
         private const int MaxBuildAttempts = 3;
 
         private static Mesh _outerRing, _innerRing, _chevrune, _waterDisc;
+        // The Stone Portal's heavier ring, and its own darker stone.
+        private static Mesh _heavyOuter, _heavyInner;
+        private static Material _heavyOuterMaterial, _heavyInnerMaterial;
+        private const float HeavyDepth = 1.8f;
+        private const float HeavyRuneScale = 1.4f;
+
+        private static bool IsStonePortal(TeleportWorld portal) =>
+            PortalHeimSG1Plugin.StonePortalStyle.Value && Utils.GetPrefabName(portal.gameObject) == "portal_stone";
         private static Mesh[] _runes;
 
         // The rune on each Chevrune, in ring order starting from the top and going round: Othala (home) at the top,
@@ -50,8 +58,10 @@ namespace PortalHeimSG1
             root.SetParent(portal.transform, false);
             root.localPosition = GateCenter;
 
-            Add(root, "OuterRing", _outerRing, _outerMaterial);
-            var inner = Add(root, "InnerRing", _innerRing, _innerMaterial);
+            bool stone = IsStonePortal(portal);
+            if (stone) EnsureHeavy();
+            Add(root, "OuterRing", stone ? _heavyOuter : _outerRing, stone ? _heavyOuterMaterial : _outerMaterial);
+            var inner = Add(root, "InnerRing", stone ? _heavyInner : _innerRing, stone ? _heavyInnerMaterial : _innerMaterial);
 
             if (PortalHeimSG1Plugin.Ramps.Value) AddRamps(portal, root);
 
@@ -65,6 +75,7 @@ namespace PortalHeimSG1
                 holder.SetParent(root, false);
                 holder.localPosition = Quaternion.Euler(0, 0, angle) * new Vector3(radius, 0, 0);
                 holder.localRotation = Quaternion.Euler(0, 0, angle);
+                if (stone) holder.localScale = new Vector3(HeavyRuneScale, HeavyRuneScale, HeavyRuneScale * 1.5f);
 
                 // The arrow it shows while idle, and the rune it turns into when it locks (hidden until then).
                 var arrow = Add(holder, "Arrow", _chevrune, ChevruneOff).GetComponent<MeshRenderer>();
@@ -98,6 +109,7 @@ namespace PortalHeimSG1
                 : new ParticleSystemRenderer[0];
 
             var ring = root.gameObject.AddComponent<GateRing>();
+            ring.TopDown = stone;
             ring.Setup(portal, inner.transform, chevrunes.ToArray(), water, swirl);
 
             // Say what happened for the first few gates, so problems are easy to diagnose from the log.
@@ -108,6 +120,18 @@ namespace PortalHeimSG1
                     $"Gate #{_attached} attached to '{portal.name}': hid {hidden} frame renderer(s), " +
                     $"ring at {root.position}, stone shader '{_outerMaterial.shader.name}', " +
                     $"portal enabled={portal.enabled}.");
+        }
+
+        /// <summary>The Stone Portal's thicker rings and darker, cooler stone, made the first time one is needed.</summary>
+        private static void EnsureHeavy()
+        {
+            if (_heavyOuter != null) return;
+            _heavyOuter = GateMeshes.Annulus("SG1HeavyOuter", GateMeshes.OuterRingIn, GateMeshes.OuterRadius, GateMeshes.OuterHalfDepth * HeavyDepth);
+            _heavyInner = GateMeshes.Annulus("SG1HeavyInner", GateMeshes.InnerRingIn, GateMeshes.InnerRingOut, GateMeshes.InnerHalfDepth * HeavyDepth);
+            _heavyOuterMaterial = new Material(_outerMaterial) { name = "SG1HeavyOuterStone", color = new Color(0.72f, 0.78f, 0.9f, 1f) };
+            _heavyInnerMaterial = new Material(_innerMaterial) { name = "SG1HeavyInnerStone", color = new Color(0.72f, 0.78f, 0.9f, 1f) };
+            foreach (var obj in new UnityEngine.Object[] { _heavyOuter, _heavyInner, _heavyOuterMaterial, _heavyInnerMaterial })
+                obj.hideFlags |= HideFlags.DontUnloadUnusedAsset;
         }
 
         /// <summary>A gentle ramp up to the base slab on the front (and the back, if enabled), with collision, so anyone can walk in (even overencumbered).</summary>

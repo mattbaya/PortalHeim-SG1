@@ -38,6 +38,19 @@ namespace PortalHeimSG1
             new[] { 1, 8 },
             new[] { 0 },
         };
+        // The Stone Portal's order: the top one locks first and the pairs come down the sides to the bottom.
+        private static readonly int[][] LockOrderTopDown =
+        {
+            new[] { 0 },
+            new[] { 1, 8 },
+            new[] { 2, 7 },
+            new[] { 3, 6 },
+            new[] { 4, 5 },
+        };
+
+        /// <summary>True for the Stone Portal: its chevrunes lock from the top down.</summary>
+        public bool TopDown;
+        private int[][] Order => TopDown ? LockOrderTopDown : LockOrder;
         // Sounds are only made for gates this close (they can't be heard from further anyway).
         private const float SoundRange = 45f;
         // Standing within the portal's activation range plus this much counts as being at the gate.
@@ -220,13 +233,13 @@ namespace PortalHeimSG1
             if (_phaseTime >= seconds)
             {
                 // This step's Chevrunes (a left and right pair, or the last one) turn from arrows into runes.
-                foreach (int index in LockOrder[_locked]) SetChevrune(index, ChevruneState.Lit);
+                foreach (int index in Order[_locked]) SetChevrune(index, ChevruneState.Lit);
                 // No thud per chevrune: the chevrune sound plays once, as the gate opens (see PlayOpening).
                 _locked++;
                 _phaseTime = 0f;
                 _spinDirection = -_spinDirection;
 
-                if (_locked >= LockOrder.Length)
+                if (_locked >= Order.Length)
                 {
                     _spinSource.Stop();
                     _phase = Phase.Open;

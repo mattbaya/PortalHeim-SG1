@@ -149,6 +149,7 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 | Portals / PortalAndWorkbench | true | Adds the *Portal and Workbench* piece to the hammer's list (needs the mod on the server) |
 | Portals / WorkbenchDistance | 3.6 | How far to the side of the portal its workbench is built (m) |
 | Dialing / DialWindowPosition | -1, -1 | Where you left the dial window (drag it; -1 = centred) |
+| Look / StonePortalStyle | true | The Stone Portal gets thicker, darker stone, chunkier runes and top-down locking |
 | Look / RampDepth | 1.5 | How far below the base the ramp starts (m). Deeper also runs it further out, so it meets the ground even where the ground falls away |
 | Look / BackRamp | false | Also add a ramp on the back |
 | Look / SinkRing | true | The ring sits low so the opening is level with the ground |
