@@ -15,6 +15,8 @@ namespace PortalHeimSG1
 
         private static TeleportWorld _source;
         private static Vector2 _scroll;
+        private static Rect _rect;
+        private static bool _placed;
         private static string _selected = "";
         private static bool _hadDefault;
         private static CursorLockMode _lockBefore;
@@ -27,6 +29,7 @@ namespace PortalHeimSG1
         {
             if (portal == null) return;
             _source = portal;
+            _placed = false;
             _scroll = Vector2.zero;
             _selected = "";
             _hadDefault = false;
@@ -90,9 +93,24 @@ namespace PortalHeimSG1
             EnsureStyles(scale);
 
             float width = 520f * scale, height = 520f * scale;
-            var rect = new Rect((Screen.width - width) / 2f, (Screen.height - height) / 2f, width, height);
-            GUI.Box(rect, GUIContent.none);
-            GUI.Window(WindowId, rect, DrawWindow, "Gate");
+            if (!_placed)
+            {
+                var saved = PortalHeimSG1Plugin.DialWindowPos.Value;
+                float x = saved.x < 0f ? (Screen.width - width) / 2f : saved.x;
+                float y = saved.y < 0f ? (Screen.height - height) / 2f : saved.y;
+                _rect = new Rect(x, y, width, height);
+                _placed = true;
+            }
+
+            _rect.width = width;
+            _rect.height = height;
+            _rect.x = Mathf.Clamp(_rect.x, 0f, Mathf.Max(0f, Screen.width - width));
+            _rect.y = Mathf.Clamp(_rect.y, 0f, Mathf.Max(0f, Screen.height - height));
+            GUI.Box(_rect, GUIContent.none);
+            _rect = GUI.Window(WindowId, _rect, DrawWindow, "Gate");
+            // Remember where it was dropped (not on every frame of the drag).
+            if (Event.current.type == EventType.MouseUp)
+                PortalHeimSG1Plugin.DialWindowPos.Value = new Vector2(_rect.x, _rect.y);
         }
 
         private static void DrawWindow(int id)
@@ -149,6 +167,8 @@ namespace PortalHeimSG1
             if (self.Value.State != GateState.Dialing && GUILayout.Button("Rename this gate", GUILayout.Height(30f * scale))) Rename();
             if (GUILayout.Button("Close (Esc)", GUILayout.Height(30f * scale))) Close();
             GUILayout.EndHorizontal();
+            // Drag the window by any part that isn't a control.
+            GUI.DragWindow();
         }
 
         private static void DrawList(ZDOID here, GateInfo self, float scale)

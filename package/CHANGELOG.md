@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.14
+- **The dial window can be moved.** Drag it by any empty part; it remembers where you left it (`Dialing / DialWindowPosition`, -1 = centred).
+
 ## 0.5.13
 - **Hang up from either end, faster.** On a gate that's part of a dial (the one you dialed from, the one you dialed, or one that was set aside to make room for it), **Shift+E** now hangs up straight away, and the gate's prompt says so. (Pressing E and clicking **Hang up** still works too.)
 

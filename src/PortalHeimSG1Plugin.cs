@@ -47,7 +47,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.5.13";
+        public const string Version = "0.5.14";
 
         internal static ManualLogSource Log;
 
@@ -77,6 +77,7 @@ namespace PortalHeimSG1
         internal static ConfigEntry<bool> DialingEnabled;
         internal static ConfigEntry<bool> AllowDialingLinkedGates;
         internal static ConfigEntry<bool> OnlyVisited;
+        internal static ConfigEntry<Vector2> DialWindowPos;
         internal static ConfigEntry<bool> GatePins;
         internal static ConfigEntry<bool> GateIconOnMap;
         internal static ConfigEntry<Minimap.PinType> PinIcon;
@@ -145,6 +146,8 @@ namespace PortalHeimSG1
             AllowDialingLinkedGates = Config.Bind("Dialing", "AllowDialingLinkedGates", true,
                 "Gates paired the old way (two sharing a name) can be dialed from, or dialed to, too. The gate they were paired with is set aside " +
                 "until the dial closes, and then the original pair is put back. Set to false to leave paired gates alone. (Server setting for what's allowed.)");
+            DialWindowPos = Config.Bind("Dialing", "DialWindowPosition", new Vector2(-1f, -1f),
+                "Where the dial window sits (top-left corner, in pixels). Drag the window by any empty part to move it; -1 means centred.");
             OnlyVisited = Config.Bind("Dialing", "OnlyShowVisitedGates", true,
                 "Only list (and put on the map) gates you have been near, or built yourself. Set to false to see every gate in the world.");
             GatePins = Config.Bind("Dialing", "ShowGatePins", true,
