@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.15
+- **The chevrune thud now plays once, when the gate opens, on both ends.** The thud for each chevrune as it locks is gone, on the gate you dial from as well as the one that receives you. (`Sound / IncomingGate = Silent` still silences the receiving gate.)
+
 ## 0.5.14
 - **The dial window can be moved.** Drag it by any empty part; it remembers where you left it (`Dialing / DialWindowPosition`, -1 = centred).
 

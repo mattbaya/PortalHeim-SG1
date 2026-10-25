@@ -47,7 +47,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.5.14";
+        public const string Version = "0.5.15";
 
         internal static ManualLogSource Log;
 
@@ -177,7 +177,7 @@ namespace PortalHeimSG1
             TravelEffectVolume = Config.Bind("Sound", "TravelEffectVolume", 0.5f,
                 new ConfigDescription("Volume of the optional second sound (a 'travelfx' clip you add) layered under the travel music. Nothing ships for it.", new AcceptableValueRange<float>(0f, 1f)));
             ChevruneThuds = Config.Bind("Sound", "ChevruneThuds", true,
-                "Play a heavy thud as each chevrune locks while a gate starts up. (What an incoming gate does is set by IncomingGate.)");
+                "Play the chevrune thud once, as a gate opens (on both the gate you dial from and the one that receives you).");
             OpeningSound = Config.Bind("Sound", "OpeningSound", true,
                 "Play the gate-opening rumble and splash when the start-up sequence finishes. (What an incoming gate does is set by IncomingGate.)");
             IncomingGate = Config.Bind("Sound", "IncomingGate", IncomingSounds.Burst,

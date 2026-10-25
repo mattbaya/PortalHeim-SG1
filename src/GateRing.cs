@@ -221,8 +221,7 @@ namespace PortalHeimSG1
             {
                 // This step's Chevrunes (a left and right pair, or the last one) turn from arrows into runes.
                 foreach (int index in LockOrder[_locked]) SetChevrune(index, ChevruneState.Lit);
-                // On an incoming gate the five spaced thuds are skipped (unless it's set to the full sequence); see the opening below.
-                if (PortalHeimSG1Plugin.ChevruneThuds.Value && (!IsIncoming || PortalHeimSG1Plugin.IncomingGate.Value == IncomingSounds.Normal)) PlaySound(GateSounds.Chevrune);
+                // No thud per chevrune: the chevrune sound plays once, as the gate opens (see PlayOpening).
                 _locked++;
                 _phaseTime = 0f;
                 _spinDirection = -_spinDirection;
@@ -247,15 +246,9 @@ namespace PortalHeimSG1
         /// </summary>
         private void PlayOpening()
         {
-            if (!IsIncoming)
-            {
-                if (PortalHeimSG1Plugin.OpeningSound.Value) PlaySound(GateSounds.Activate);
-                return;
-            }
-
-            var mode = PortalHeimSG1Plugin.IncomingGate.Value;
-            if (mode == IncomingSounds.Silent) return;
-            if (mode == IncomingSounds.Burst && PortalHeimSG1Plugin.ChevruneThuds.Value) PlaySound(GateSounds.Chevrune);
+            // Both ends, the same: one chevrune sound together with the opening sound.
+            if (IsIncoming && PortalHeimSG1Plugin.IncomingGate.Value == IncomingSounds.Silent) return;
+            if (PortalHeimSG1Plugin.ChevruneThuds.Value) PlaySound(GateSounds.Chevrune);
             if (PortalHeimSG1Plugin.OpeningSound.Value) PlaySound(GateSounds.Activate);
         }
 
