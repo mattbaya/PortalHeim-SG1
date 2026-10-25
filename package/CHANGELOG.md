@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.1
+- **The storage hatch is two lids**, left and right. By default they open like DeLorean gull-wings: hinged down the middle, the outer edges lifting. `Storage / HatchStyle = CellarDoors` hinges them at the outer edges so the middle lifts instead.
+
 ## 0.9.0
 - **A chest in every gate.** **Shift+E** on a gate (or **Open storage** in its dial window) opens its built-in storage, 6 by 4 slots by default, the same from either side. A stone hatch in front of the gate lifts like a boot while it's open. `Storage / Enabled`, `Columns`, `Rows`. Needs the mod on the server.
 - **Make each gate your own.** In the dial window, **More** then **Style...** sets a gate's chevrune colour, a word spelled in runes on its chevrunes, and an icon from a searchable list. For everyone; both gates of a pair if you like. The icon also shows as the gate's pin on the map.

@@ -111,7 +111,7 @@ namespace PortalHeimSG1
 
             var ring = root.gameObject.AddComponent<GateRing>();
             ring.TopDown = stone;
-            if (PortalHeimSG1Plugin.Ramps.Value && PortalHeimSG1Plugin.StorageEnabled.Value) ring.Lid = AddHatch(root, stone ? _heavyOuterMaterial : _outerMaterial);
+            if (PortalHeimSG1Plugin.Ramps.Value && PortalHeimSG1Plugin.StorageEnabled.Value) { var lids = AddHatch(root, stone ? _heavyOuterMaterial : _outerMaterial); ring.LidLeft = lids[0]; ring.LidRight = lids[1]; ring.LidSign = PortalHeimSG1Plugin.HatchStyle.Value == HatchStyles.GullWing ? 1f : -1f; }
             ring.Setup(portal, inner.transform, chevrunes.ToArray(), water, swirl);
 
             // Say what happened for the first few gates, so problems are easy to diagnose from the log.
@@ -128,22 +128,38 @@ namespace PortalHeimSG1
         /// The storage hatch: a stone lid lying on the ramp in front of the gate, with a dark opening under it. It lifts like a boot
         /// while the gate's storage is open (see GateRing).
         /// </summary>
-        private static Transform AddHatch(Transform gateRoot, Material stone)
+        private static Transform[] AddHatch(Transform gateRoot, Material stone)
         {
-            const float width = 2.1f, length = 0.95f;
-            var pivot = new GameObject("StorageHatch").transform;
-            pivot.SetParent(gateRoot, false);
-            pivot.localPosition = -gateRoot.localPosition + new Vector3(0f, SlabTop + 0.03f, SlabHalfDepth + 0.01f);
-            pivot.localRotation = Quaternion.Euler(HatchClosedAngle, 0f, 0f);
+            const float width = 2.1f, length = 0.95f, gap = 0.012f;
+            var root = new GameObject("StorageHatch").transform;
+            root.SetParent(gateRoot, false);
+            root.localPosition = -gateRoot.localPosition + new Vector3(0f, SlabTop + 0.03f, SlabHalfDepth + 0.01f);
+            // Lies along the ramp.
+            root.localRotation = Quaternion.Euler(HatchClosedAngle, 0f, 0f);
 
-            var opening = Add(pivot, "Opening", Box(width - 0.1f, 0.01f, length - 0.1f), GateBuilder.ChevruneOff);
+            var opening = Add(root, "Opening", Box(width - 0.1f, 0.01f, length - 0.1f), GateBuilder.ChevruneOff);
             opening.transform.localPosition = new Vector3(0f, -0.02f, length / 2f);
             opening.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 
-            var lid = Add(pivot, "Lid", Box(width, 0.07f, length), stone);
-            lid.transform.localPosition = new Vector3(0f, 0.01f, length / 2f);
-            lid.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            return pivot;
+            // Two lids, left and right. Gull-wing: hinged down the middle, the outer edges lift. Cellar doors: hinged at the outer
+            // edges, the middle lifts.
+            bool gull = PortalHeimSG1Plugin.HatchStyle.Value == HatchStyles.GullWing;
+            float half = width / 2f;
+            var lids = new Transform[2];
+            for (int k = 0; k < 2; k++)
+            {
+                float side = k == 0 ? -1f : 1f;
+                var pivot = new GameObject(k == 0 ? "LidLeft" : "LidRight").transform;
+                pivot.SetParent(root, false);
+                pivot.localPosition = new Vector3(gull ? 0f : side * half, 0f, 0f);
+
+                var lid = Add(pivot, "Lid", Box(half - gap, 0.07f, length), stone);
+                lid.transform.localPosition = new Vector3(gull ? side * half / 2f : -side * half / 2f, 0.01f, length / 2f);
+                lid.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                lids[k] = pivot;
+            }
+
+            return lids;
         }
 
         /// <summary>Tilted to lie along the ramp when closed.</summary>

@@ -24,6 +24,8 @@ namespace PortalHeimSG1
         Vanilla
     }
 
+    public enum HatchStyles { GullWing, CellarDoors }
+
     public enum IncomingSounds
     {
         /// <summary>One chevrune thud, together with the opening sound, as the gate opens.</summary>
@@ -47,7 +49,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.9.0";
+        public const string Version = "0.9.1";
 
         internal static ManualLogSource Log;
 
@@ -62,6 +64,7 @@ namespace PortalHeimSG1
         internal static ConfigEntry<bool> StonePortalStyle;
         internal static ConfigEntry<bool> SortByDistance;
         internal static ConfigEntry<bool> StorageEnabled;
+        internal static ConfigEntry<HatchStyles> HatchStyle;
         internal static ConfigEntry<int> StorageColumns;
         internal static ConfigEntry<int> StorageRows;
         internal static ConfigEntry<float> ComboBenchDistance;
@@ -139,6 +142,8 @@ namespace PortalHeimSG1
                 "Takes effect on next game start.");
             StorageEnabled = Config.Bind("Storage", "Enabled", true,
                 "Every portal has a built-in chest: Shift+E on the gate (or the button in its dial window) opens it, and a hatch in front of the gate lifts. Needs this mod on the server too. Takes effect for portals loaded after this is changed.");
+            HatchStyle = Config.Bind("Storage", "HatchStyle", HatchStyles.GullWing,
+                "How the hatch in front of a gate opens: GullWing (two lids hinged down the middle, the outer edges lift, like a DeLorean) or CellarDoors (hinged at the outer edges, the middle lifts). Takes effect for portals loaded after this is changed.");
             StorageColumns = Config.Bind("Storage", "Columns", 6, new ConfigDescription("Width of a gate's storage, in slots.", new AcceptableValueRange<int>(1, 8)));
             StorageRows = Config.Bind("Storage", "Rows", 4, new ConfigDescription("Height of a gate's storage, in slots.", new AcceptableValueRange<int>(1, 8)));
             SortByDistance = Config.Bind("Dialing", "SortByDistance", false,

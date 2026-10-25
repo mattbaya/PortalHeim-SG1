@@ -53,7 +53,7 @@ That's all for the new look: there's nothing to build or craft. Portals are buil
 
 ## Storage in every gate
 
-Every gate has a built-in chest (6 by 4 slots by default). Press **Shift+E** on a gate, or click **Open storage** in its dial window, and a stone hatch in front of the gate lifts like a boot to show it. It's the same chest from either side of the gate, and it saves with the gate. Resize it with `Storage / Columns` and `Storage / Rows`, or turn it off with `Storage / Enabled`. Needs the mod on the server.
+Every gate has a built-in chest (6 by 4 slots by default). Press **Shift+E** on a gate, or click **Open storage** in its dial window, and two stone lids in front of the gate lift like gull-wing doors to show it (or, with `Storage / HatchStyle = CellarDoors`, like cellar doors). It's the same chest from either side of the gate, and it saves with the gate. Resize it with `Storage / Columns` and `Storage / Rows`, or turn it off with `Storage / Enabled`. Needs the mod on the server.
 
 ## Making a gate your own
 
@@ -168,6 +168,7 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 | Dialing / DialWindowPosition | -1, -1 | Where you left the dial window (drag it; -1 = centred) |
 | Dialing / SortByDistance | false | Dial list nearest first instead of A to Z |
 | Look / StonePortalStyle | true | The Stone Portal gets thicker, darker stone, chunkier runes and top-down locking |
+| Storage | HatchStyle | GullWing | `GullWing` (hinged down the middle, outer edges lift) or `CellarDoors` (hinged at the outer edges) |
 | Storage | Enabled / Columns / Rows | true / 6 / 4 | The chest built into every gate |
 | Look / RampDepth | 1.5 | How far below the base the ramp starts (m). Deeper also runs it further out, so it meets the ground even where the ground falls away |
 | Look / BackRamp | false | Also add a ramp on the back |

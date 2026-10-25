@@ -57,11 +57,13 @@ namespace PortalHeimSG1
         private float _nextStyleCheck;
 
         /// <summary>The storage hatch in front of the gate, which lifts while its storage is open.</summary>
-        public Transform Lid;
+        public Transform LidLeft, LidRight;
+        /// <summary>+1 when the outer edges lift (gull-wing), -1 when the middle lifts (cellar doors).</summary>
+        public float LidSign = 1f;
         public float LidTarget;
         private float _lid;
         private const float LidSeconds = 0.6f;
-        private const float LidOpenAngle = 75f;
+        private const float LidOpenAngle = 72f;
         private int[][] Order => TopDown ? LockOrderTopDown : LockOrder;
         // Sounds are only made for gates this close (they can't be heard from further anyway).
         private const float SoundRange = 45f;
@@ -165,11 +167,11 @@ namespace PortalHeimSG1
         /// <summary>Lifts the storage hatch like a boot while the storage is open, and closes it again.</summary>
         private void UpdateLid()
         {
-            if (Lid == null) return;
-            if (_lid == LidTarget) return;
+            if (LidLeft == null || LidRight == null || _lid == LidTarget) return;
             _lid = Mathf.MoveTowards(_lid, LidTarget, Time.deltaTime / LidSeconds);
-            float eased = Mathf.SmoothStep(0f, 1f, _lid);
-            Lid.localRotation = Quaternion.Euler(Mathf.Lerp(GateBuilder.HatchClosedAngle, -LidOpenAngle, eased), 0f, 0f);
+            float angle = Mathf.SmoothStep(0f, 1f, _lid) * LidOpenAngle * LidSign;
+            LidLeft.localRotation = Quaternion.Euler(0f, 0f, -angle);
+            LidRight.localRotation = Quaternion.Euler(0f, 0f, angle);
         }
 
         /// <summary>
