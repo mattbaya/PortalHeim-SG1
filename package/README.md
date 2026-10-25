@@ -39,7 +39,7 @@ And it isn't only cosmetic. With the mod on your server too, you can **dial any 
 
 **The network**
 - **Dial any gate** you've visited from a menu at the gate, or by clicking its pin on the map.
-- **Set a home gate** and dial it in one keypress.
+- **Set a home gate** and dial it with **E** then **Enter**.
 - **Carry anything** through a portal, ore and metal included.
 - **Take your cart with you:** it comes through and hooks back on.
 
@@ -51,17 +51,30 @@ And it isn't only cosmetic. With the mod on your server too, you can **dial any 
 
 That's all for the new look: there's nothing to build or craft. Portals are built from the Hammer exactly as before.
 
+## Storage in every gate
+
+Every gate has a built-in chest (6 by 4 slots by default). Press **Shift+E** on a gate, or click **Open storage** in its dial window, and a stone hatch in front of the gate lifts like a boot to show it. It's the same chest from either side of the gate, and it saves with the gate. Resize it with `Storage / Columns` and `Storage / Rows`, or turn it off with `Storage / Enabled`. Needs the mod on the server.
+
+## Making a gate your own
+
+In the dial window, click **More** on a gate, then **Style...** to give it:
+- **A colour** for its chevrunes (and its name in the list).
+- **A word spelled in runes** on its chevrunes: type up to nine letters, or press **Use its name**. The other chevrunes keep the usual runes.
+- **An icon**, picked from a searchable list of the game's items. It shows beside the gate in the list and as its pin on the map.
+
+The changes are for everyone, on a gate or on both gates of a pair. The list shows each gate as a card, with its icon, its name in its colour and how far away it is; **More** also has **Set home** and **Rename**.
+
 ## Dialing any gate
 
 With the mod on the server too, you aren't limited to portals that share a name.
 
 1. Walk up to a gate and press **E** (the normal use key). A window opens listing the gates you know, **nearest first**, with their distance.
 2. Pick a gate and press **Dial** (or highlight it and press **Enter**). Both gates run their start-up sequence and open. Walk in.
-3. The gate closes by itself about 15 seconds after the last player has left both gates. To close it sooner, use either gate (the one you dialed from, the one you dialed, or one that was set aside for the dial) and press **Shift+E**, or press **E** and click **Hang up**. Either end can hang up.
+3. The gate closes by itself about 15 seconds after the last player has left both gates. To close it sooner, use either gate (the one you dialed from, the one you dialed, or one that was set aside for the dial), press **E** and click **Hang up**. Either end can hang up.
 
 <!-- IMAGE: dial-menu.png (the dial window with a few gates listed) -->
 
-**Home gate.** Press **Set home** next to a gate. From then on it's highlighted first in the window, and **Shift+E** on any gate dials home straight away: the "I'm in a hurry" button.
+**Home gate.** Press **Set home** next to a gate. From then on it's highlighted first in the window, so at any gate, **E** then **Enter** dials home: the "I'm in a hurry" button.
 
 **On the map.** Known gates appear on your map as a small gate icon (the powered-off gate, sunk in the ground with its ramp). In the dial window, click **Pick on map**: the map opens with a banner, and a click on any gate's icon dials it from the gate you're at (Esc cancels). You can also stand at a free gate, open the map yourself, and **Shift+click** a gate's icon. The map updates by itself whenever a gate is built, removed or renamed.
 
@@ -90,11 +103,11 @@ With the mod on the server too, you aren't limited to portals that share a name.
 
 ## Examples
 
-**A home gate network.** Build a gate at your main base, name it *Home*, and press **Set home**. Build one at each outpost: *Mines*, *Swamp*, *Plains*, *Boss altar*. From any of them, **Shift+E** sends you home. From home, **E** and pick where to go. No more guessing which two portals share a name.
+**A home gate network.** Build a gate at your main base, name it *Home*, and press **Set home**. Build one at each outpost: *Mines*, *Swamp*, *Plains*, *Boss altar*. From any of them, **E** then **Enter** sends you home. From home, **E** and pick where to go. No more guessing which two portals share a name.
 
 **Hauling ore.** Load a cart at the mine gate, pull it into the gate, dial *Home* and walk out the other side with the cart behind you. Unload at the smelter.
 
-**A quick escape.** In trouble at an outpost? **Shift+E** on its gate dials home. (The gate closes again by itself once everyone has left.)
+**A quick escape.** In trouble at an outpost? **E** on its gate, then **Enter**, dials home. (The gate closes again by itself once everyone has left.)
 
 **Keeping old pairs.** You already have two pairs of gates named *SG1*. They keep working as two pairs. Dialing from one of them sets its partner aside until the dial closes, then puts the pair back as it was.
 
@@ -155,6 +168,7 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 | Dialing / DialWindowPosition | -1, -1 | Where you left the dial window (drag it; -1 = centred) |
 | Dialing / SortByDistance | false | Dial list nearest first instead of A to Z |
 | Look / StonePortalStyle | true | The Stone Portal gets thicker, darker stone, chunkier runes and top-down locking |
+| Storage | Enabled / Columns / Rows | true / 6 / 4 | The chest built into every gate |
 | Look / RampDepth | 1.5 | How far below the base the ramp starts (m). Deeper also runs it further out, so it meets the ground even where the ground falls away |
 | Look / BackRamp | false | Also add a ramp on the back |
 | Look / SinkRing | true | The ring sits low so the opening is level with the ground |

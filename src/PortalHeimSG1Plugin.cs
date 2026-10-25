@@ -47,7 +47,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.8.1";
+        public const string Version = "0.9.0";
 
         internal static ManualLogSource Log;
 
@@ -61,6 +61,9 @@ namespace PortalHeimSG1
         internal static ConfigEntry<bool> ComboEnabled;
         internal static ConfigEntry<bool> StonePortalStyle;
         internal static ConfigEntry<bool> SortByDistance;
+        internal static ConfigEntry<bool> StorageEnabled;
+        internal static ConfigEntry<int> StorageColumns;
+        internal static ConfigEntry<int> StorageRows;
         internal static ConfigEntry<float> ComboBenchDistance;
         internal static ConfigEntry<bool> SinkRing;
         internal static ConfigEntry<ShadingMode> Shading;
@@ -134,6 +137,10 @@ namespace PortalHeimSG1
             Shading = Config.Bind("Look", "Shading", ShadingMode.PortalShader,
                 "How the stone is shaded. PortalShader reuses the portal's own shader. If the ring looks wrong or is missing, try Standard. " +
                 "Takes effect on next game start.");
+            StorageEnabled = Config.Bind("Storage", "Enabled", true,
+                "Every portal has a built-in chest: Shift+E on the gate (or the button in its dial window) opens it, and a hatch in front of the gate lifts. Needs this mod on the server too. Takes effect for portals loaded after this is changed.");
+            StorageColumns = Config.Bind("Storage", "Columns", 6, new ConfigDescription("Width of a gate's storage, in slots.", new AcceptableValueRange<int>(1, 8)));
+            StorageRows = Config.Bind("Storage", "Rows", 4, new ConfigDescription("Height of a gate's storage, in slots.", new AcceptableValueRange<int>(1, 8)));
             SortByDistance = Config.Bind("Dialing", "SortByDistance", false,
                 "Sort the dial list nearest first instead of A to Z (favorites and recently dialed gates still come first). Also the button in the dial window.");
             StonePortalStyle = Config.Bind("Look", "StonePortalStyle", true,
@@ -219,6 +226,7 @@ namespace PortalHeimSG1
         {
             if (Headless) return;
             DialMenu.Draw();
+            StyleWindow.Draw();
             DialMap.DrawHint();
         }
 
@@ -278,6 +286,8 @@ namespace PortalHeimSG1
         private static void Awake_Postfix(TeleportWorld __instance)
         {
             GateRegistry.Add(__instance);
+            try { PortalChest.Attach(__instance); }
+            catch (System.Exception e) { PortalHeimSG1Plugin.Log.LogError("Couldn't add storage to a portal: " + e); }
             if (PortalHeimSG1Plugin.AllowAllItems.Value) __instance.m_allowAllItems = true;
             __instance.m_activationRange = PortalHeimSG1Plugin.ActivationRange.Value;
             if (!PortalHeimSG1Plugin.Reskin.Value || PortalHeimSG1Plugin.Headless) return;

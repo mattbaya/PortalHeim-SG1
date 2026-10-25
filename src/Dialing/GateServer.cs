@@ -227,6 +227,39 @@ namespace PortalHeimSG1
             return null;
         }
 
+        /// <summary>Sets a gate's colour, rune word and icon for everyone (and its pair's too, if asked).</summary>
+        public static string TryStyle(ZDOID gateId, string color, string runes, string icon, bool pair)
+        {
+            if (!PortalHeimSG1Plugin.DialingEnabled.Value) return "Dialing is switched off on this server.";
+            var zdo = ZDOMan.instance.GetZDO(gateId);
+            if (zdo == null || !IsPortal(zdo)) return "That gate is gone.";
+
+            color = (color ?? "").Trim();
+            if (color.Length > 0 && !GateStyle.TryParse(color, out _)) color = "";
+            runes = GateStyle.Clean(runes);
+            icon = (icon ?? "").Trim();
+            if (icon.Length > 48) icon = "";
+
+            var targets = new List<ZDO> { zdo };
+            if (pair && StateOf(zdo) == GateState.Linked)
+            {
+                var other = ZDOMan.instance.GetZDO(PartnerOf(zdo));
+                if (other != null && IsPortal(other)) targets.Add(other);
+            }
+
+            foreach (var target in targets)
+            {
+                target.SetOwner(ZDOMan.GetSessionID());
+                target.Set(GateStyle.KeyColor, color);
+                target.Set(GateStyle.KeyRunes, runes);
+                target.Set(GateStyle.KeyIcon, icon);
+                ZDOMan.instance.ForceSendZDO(target.m_uid);
+            }
+
+            GateNet.BroadcastGates();
+            return null;
+        }
+
         /// <summary>Ends a dial from either gate.</summary>
         public static string TryHangUp(ZDOID gateId)
         {
@@ -344,6 +377,9 @@ namespace PortalHeimSG1
                     Position = zdo.GetPosition(),
                     State = StateOf(zdo),
                     Partner = PartnerOf(zdo),
+                    Color = zdo.GetString(GateStyle.KeyColor, ""),
+                    Runes = zdo.GetString(GateStyle.KeyRunes, ""),
+                    Icon = zdo.GetString(GateStyle.KeyIcon, ""),
                 });
             }
 
@@ -361,6 +397,9 @@ namespace PortalHeimSG1
                     int h = 17;
                     h = h * 31 + gate.Id.GetHashCode();
                     h = h * 31 + (gate.Name ?? "").GetHashCode();
+                    h = h * 31 + (gate.Color ?? "").GetHashCode();
+                    h = h * 31 + (gate.Runes ?? "").GetHashCode();
+                    h = h * 31 + (gate.Icon ?? "").GetHashCode();
                     h = h * 31 + (int)gate.State;
                     h = h * 31 + gate.Partner.GetHashCode();
                     h = h * 31 + Mathf.RoundToInt(gate.Position.x) * 73 + Mathf.RoundToInt(gate.Position.z);
@@ -416,5 +455,8 @@ namespace PortalHeimSG1
         public Vector3 Position;
         public GateState State;
         public ZDOID Partner;
+        public string Color;
+        public string Runes;
+        public string Icon;
     }
 }

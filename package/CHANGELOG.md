@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.0
+- **A chest in every gate.** **Shift+E** on a gate (or **Open storage** in its dial window) opens its built-in storage, 6 by 4 slots by default, the same from either side. A stone hatch in front of the gate lifts like a boot while it's open. `Storage / Enabled`, `Columns`, `Rows`. Needs the mod on the server.
+- **Make each gate your own.** In the dial window, **More** then **Style...** sets a gate's chevrune colour, a word spelled in runes on its chevrunes, and an icon from a searchable list. For everyone; both gates of a pair if you like. The icon also shows as the gate's pin on the map.
+- **A nicer gate list.** Each gate is a card: its icon, its name in its colour, how far away it is and whether it's in use or paired. **Dial** and **Fav** are on the card, with **Set home**, **Rename** and **Style...** under **More**.
+- **Changed:** Shift+E no longer dials home or hangs up (it opens the storage). Press **E**: your home gate is already highlighted, so **Enter** dials it, and **Hang up** is in the window.
+
 ## 0.8.1
 - **One entry per pair.** Gates paired by name show once in the dial list (with the distance to the nearer of the two), and the gate you're standing at doesn't list its own partner.
 - **A to Z by default**, with a button at the top of the list to sort nearest first instead (`Dialing / SortByDistance`). Favorites and recently dialed gates still come first.

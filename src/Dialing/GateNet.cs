@@ -23,6 +23,7 @@ namespace PortalHeimSG1
         private const string Result = "SG1_Result";
         private const string MoveCart = "SG1_MoveCart";
         private const string RenameRpc = "SG1_Rename";
+        private const string StyleRpc = "SG1_Style";
 
         private static ZRoutedRpc _registeredOn;
 
@@ -40,6 +41,7 @@ namespace PortalHeimSG1
             rpc.Register<ZDOID, ZDOID>(DialRpc, RpcDial);
             rpc.Register<ZDOID>(HangUpRpc, RpcHangUp);
             rpc.Register<ZDOID, string, bool>(RenameRpc, RpcRename);
+            rpc.Register<ZDOID, string, string, string, bool>(StyleRpc, RpcStyle);
             rpc.Register<string>(Result, RpcResult);
             rpc.Register<ZDOID, Vector3, Quaternion>(MoveCart, RpcMoveCart);
         }
@@ -67,6 +69,18 @@ namespace PortalHeimSG1
         public static void RequestRename(ZDOID gate, string name, bool pair)
         {
             if (ZRoutedRpc.instance != null) ZRoutedRpc.instance.InvokeRoutedRPC(RenameRpc, gate, name, pair);
+        }
+
+        public static void RequestStyle(ZDOID gate, string color, string runes, string icon, bool pair)
+        {
+            if (ZRoutedRpc.instance != null) ZRoutedRpc.instance.InvokeRoutedRPC(StyleRpc, gate, color ?? "", runes ?? "", icon ?? "", pair);
+        }
+
+        private static void RpcStyle(long sender, ZDOID gate, string color, string runes, string icon, bool pair)
+        {
+            if (!GateServer.IsServer) return;
+            string problem = GateServer.TryStyle(gate, color, runes, icon, pair);
+            ZRoutedRpc.instance.InvokeRoutedRPC(sender, Result, problem ?? "Saved.");
         }
 
         private static void RpcRename(long sender, ZDOID gate, string name, bool pair)
@@ -142,6 +156,9 @@ namespace PortalHeimSG1
                 pkg.Write(gate.Position);
                 pkg.Write((int)gate.State);
                 pkg.Write(gate.Partner);
+                pkg.Write(gate.Color ?? "");
+                pkg.Write(gate.Runes ?? "");
+                pkg.Write(gate.Icon ?? "");
             }
 
             return pkg;
@@ -171,6 +188,9 @@ namespace PortalHeimSG1
                         Position = pkg.ReadVector3(),
                         State = (GateState)pkg.ReadInt(),
                         Partner = pkg.ReadZDOID(),
+                        Color = pkg.ReadString(),
+                        Runes = pkg.ReadString(),
+                        Icon = pkg.ReadString(),
                     };
                     list.Add(gate);
                 }

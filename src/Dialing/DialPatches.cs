@@ -33,29 +33,19 @@ namespace PortalHeimSG1
         [HarmonyPatch(nameof(TeleportWorld.Interact))]
         private static bool Interact_Prefix(TeleportWorld __instance, Humanoid human, bool hold, bool alt, ref bool __result)
         {
-            if (Bypass || hold || !Active || human == null || human != Player.m_localPlayer) return true;
+            if (Bypass || hold || human == null || human != Player.m_localPlayer) return true;
+            // Shift+E opens the gate's storage.
+            if (alt && PrivateArea.CheckAccess(__instance.transform.position) && PortalChest.TryOpen(__instance, human))
+            {
+                __result = true;
+                return false;
+            }
+
+            if (!Active) return true;
             // Let the game deal with gates in someone else's protected area (it shows its own message).
             if (!PrivateArea.CheckAccess(__instance.transform.position)) return true;
             // Gates linked the old way (two sharing a name) behave exactly as before, including the naming window.
             if (!TryGetInfo(__instance, out var info) || (info.State == GateState.Linked && !GateClient.Dialable(info.State))) return true;
-
-            // Alt+use on a gate that's part of a dial (either end, or one set aside for it) hangs up straight away.
-            if (alt && info.State == GateState.Dialing)
-            {
-                GateNet.RequestHangUp(info.Id);
-                Player.m_localPlayer?.Message(MessageHud.MessageType.Center, "Hanging up");
-                __result = true;
-                return false;
-            }
-
-            // Alt+use dials the home gate straight away.
-            if (alt && GateClient.Dialable(info.State) && GateClient.TryGetHome(out var home)
-                && GateClient.Dialable(home.State) && home.Id != info.Id)
-            {
-                DialMenu.DialFrom(__instance, home);
-                __result = true;
-                return false;
-            }
 
             DialMenu.Open(__instance);
             __result = true;
@@ -77,10 +67,8 @@ namespace PortalHeimSG1
             string tag = __instance.GetText();
             if (!string.IsNullOrEmpty(tag) && tag.StartsWith("~sg1:") && !string.IsNullOrEmpty(info.Name)) text = text.Replace(tag, info.Name);
             text += info.State == GateState.Dialing
-                ? $"\n[<color=yellow><b>{use}</b></color>] Gate options\n[<color=yellow><b>Shift+{use}</b></color>] Hang up"
+                ? $"\n[<color=yellow><b>{use}</b></color>] Gate options (hang up)"
                 : $"\n[<color=yellow><b>{use}</b></color>] Dial a gate";
-            if (GateClient.Dialable(info.State) && GateClient.TryGetHome(out var home) && GateClient.Dialable(home.State) && home.Id != info.Id)
-                text += $"\n[<color=yellow><b>Shift+{use}</b></color>] Dial home ({DialMenu.DisplayName(home)})";
             __result = text;
         }
     }
@@ -205,13 +193,13 @@ namespace PortalHeimSG1
                 {
                     pin.m_name = label;
                     pin.m_pos = pair.Value.Position;
-                    if (PortalHeimSG1Plugin.GateIconOnMap.Value) pin.m_icon = GateIcon();
+                    if (PortalHeimSG1Plugin.GateIconOnMap.Value) pin.m_icon = GateStyle.SpriteOf(pair.Value.Icon) ?? GateIcon();
                 }
                 else
                 {
                     // Not saved with the map: the list comes from the server every time, so nothing goes stale in the save.
                     var added = map.AddPin(pair.Value.Position, PortalHeimSG1Plugin.PinIcon.Value, label, false, false);
-                    if (PortalHeimSG1Plugin.GateIconOnMap.Value) added.m_icon = GateIcon();
+                    if (PortalHeimSG1Plugin.GateIconOnMap.Value) added.m_icon = GateStyle.SpriteOf(pair.Value.Icon) ?? GateIcon();
                     Pins[pair.Key] = added;
                 }
             }

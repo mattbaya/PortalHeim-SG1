@@ -20,6 +20,8 @@ namespace PortalHeimSG1
         private static string _selected = "";
         private static bool _hadDefault;
         private static string _renaming = "";
+        private static string _expanded = "";
+        private static GUIStyle _nameStyle;
         private static string _renameText = "";
         private static CursorLockMode _lockBefore;
         private static bool _visibleBefore;
@@ -36,6 +38,7 @@ namespace PortalHeimSG1
             _selected = "";
             _hadDefault = false;
             _renaming = "";
+            _expanded = "";
             _lockBefore = Cursor.lockState;
             _visibleBefore = Cursor.visible;
             GateNet.RequestGates();
@@ -96,7 +99,7 @@ namespace PortalHeimSG1
             float scale = Mathf.Clamp(Screen.height / 1080f, 0.8f, 2.5f);
             EnsureStyles(scale);
 
-            float width = 620f * scale, height = 520f * scale;
+            float width = 680f * scale, height = 580f * scale;
             if (!_placed)
             {
                 var saved = PortalHeimSG1Plugin.DialWindowPos.Value;
@@ -165,6 +168,14 @@ namespace PortalHeimSG1
                 var from = _source;
                 Close();
                 DialMap.BeginPick(from);
+                return;
+            }
+
+            if (PortalHeimSG1Plugin.StorageEnabled.Value && GUILayout.Button("Open storage", GUILayout.Height(30f * scale)))
+            {
+                var portal = _source;
+                Close();
+                PortalChest.TryOpen(portal, Player.m_localPlayer);
                 return;
             }
 
@@ -246,7 +257,7 @@ namespace PortalHeimSG1
             if (GUILayout.Button(byDistance ? "Sorted nearest first (click for A-Z)" : "Sorted A-Z (click for nearest first)", GUILayout.Height(24f * scale)))
                 PortalHeimSG1Plugin.SortByDistance.Value = !byDistance;
 
-            _scroll = GUILayout.BeginScrollView(_scroll, GUILayout.Height(276f * scale));
+            _scroll = GUILayout.BeginScrollView(_scroll, GUILayout.Height(330f * scale));
             int lastGroup = -1;
             foreach (var gate in candidates)
             {
@@ -269,33 +280,65 @@ namespace PortalHeimSG1
                     continue;
                 }
 
-                GUILayout.BeginHorizontal(selected ? _rowSelected : _row);
-                string star = GateClient.IsHome(gate.Id) ? "* " : "";
-                string state = gate.State == GateState.Dialing ? "  (in use)" : (gate.State == GateState.Linked ? "  (pair)" : "");
-                if (GUILayout.Button(star + DisplayName(gate) + "  -  " + meters + " m" + state, _label, GUILayout.ExpandWidth(true)) && free)
-                    _selected = key;
-
+                // A row: its icon, its name in its own colour with how far it is, and the buttons.
+                var sprite = GateStyle.SpriteOf(gate.Icon);
+                GateStyle.TryParse(gate.Color, out var tint);
+                string nameColor = string.IsNullOrEmpty(gate.Color) ? "#ffd9a0" : GateStyle.Hex(tint);
                 bool isHome = GateClient.IsHome(gate.Id);
-                if (GUILayout.Button(isHome ? "Unset home" : "Set home", GUILayout.Width(100f * scale)))
-                    GateClient.SetHome(gate.Id, !isHome);
                 bool isFav = GateClient.IsFavorite(gate.Id);
-                if (GUILayout.Button(isFav ? "Unfav" : "Fav", GUILayout.Width(64f * scale)))
-                    GateClient.SetFavorite(gate.Id, !isFav);
-                GUI.enabled = gate.State != GateState.Dialing;
-                if (GUILayout.Button(gate.State == GateState.Linked ? "Rename pair" : "Rename", GUILayout.Width(110f * scale)))
-                {
-                    _renaming = key;
-                    _renameText = gate.Name ?? "";
-                }
+                string state = gate.State == GateState.Dialing ? "in use" : gate.State == GateState.Linked ? "pair" : "";
+                string line = meters + " m" + (state.Length > 0 ? "  -  " + state : "") + (isHome ? "  -  home" : "");
+
+                GUILayout.BeginHorizontal(selected ? _rowSelected : _row, GUILayout.Height(46f * scale));
+                var iconBox = GUILayoutUtility.GetRect(40f * scale, 40f * scale, GUILayout.Width(40f * scale));
+                if (sprite != null) GateStyle.DrawSprite(iconBox, sprite, Color.white);
+                else if (!string.IsNullOrEmpty(gate.Color)) { var old = GUI.color; GUI.color = tint; GUI.DrawTexture(new Rect(iconBox.x + 10f * scale, iconBox.y + 10f * scale, 20f * scale, 20f * scale), Texture2D.whiteTexture); GUI.color = old; }
+
+                GUILayout.BeginVertical();
+                if (GUILayout.Button((isFav ? "\u2605 " : "") + "<color=" + nameColor + "><b>" + DisplayName(gate) + "</b></color>", _nameStyle, GUILayout.ExpandWidth(true)) && free)
+                    _selected = key;
+                GUILayout.Label(line, _small);
+                GUILayout.EndVertical();
+
                 GUI.enabled = free;
-                if (GUILayout.Button("Dial", GUILayout.Width(70f * scale)))
+                if (GUILayout.Button("Dial", GUILayout.Width(76f * scale), GUILayout.Height(34f * scale)))
                 {
                     _selected = key;
                     TryDialSelected();
                 }
 
                 GUI.enabled = true;
+                if (GUILayout.Button(isFav ? "Unfav" : "Fav", GUILayout.Width(64f * scale), GUILayout.Height(34f * scale)))
+                    GateClient.SetFavorite(gate.Id, !isFav);
+                if (GUILayout.Button(_expanded == key ? "Less" : "More", GUILayout.Width(64f * scale), GUILayout.Height(34f * scale)))
+                    _expanded = _expanded == key ? "" : key;
                 GUILayout.EndHorizontal();
+
+                if (_expanded == key)
+                {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(46f * scale);
+                    if (GUILayout.Button(isHome ? "Unset home" : "Set home", GUILayout.Height(28f * scale))) GateClient.SetHome(gate.Id, !isHome);
+                    GUI.enabled = gate.State != GateState.Dialing;
+                    if (GUILayout.Button(gate.State == GateState.Linked ? "Rename pair" : "Rename", GUILayout.Height(28f * scale)))
+                    {
+                        _renaming = key;
+                        _renameText = gate.Name ?? "";
+                    }
+
+                    if (GUILayout.Button("Style...", GUILayout.Height(28f * scale)))
+                    {
+                        var target = gate;
+                        Close();
+                        StyleWindow.Open(target);
+                        return;
+                    }
+
+                    GUI.enabled = true;
+                    GUILayout.EndHorizontal();
+                }
+
+                GUILayout.Space(2f * scale);
             }
 
             GUILayout.EndScrollView();
@@ -357,6 +400,7 @@ namespace PortalHeimSG1
                 _label = new GUIStyle(GUI.skin.label) { wordWrap = true, alignment = TextAnchor.MiddleLeft };
                 _small = new GUIStyle(GUI.skin.label) { wordWrap = true };
                 _row = new GUIStyle();
+                _nameStyle = new GUIStyle(GUI.skin.label) { richText = true, alignment = TextAnchor.MiddleLeft, wordWrap = false };
                 var tint = new Texture2D(1, 1);
                 tint.SetPixel(0, 0, new Color(1f, 0.45f, 0.1f, 0.35f));
                 tint.Apply();
@@ -365,7 +409,8 @@ namespace PortalHeimSG1
 
             _title.fontSize = Mathf.RoundToInt(24f * scale);
             _label.fontSize = Mathf.RoundToInt(17f * scale);
-            _small.fontSize = Mathf.RoundToInt(15f * scale);
+            _small.fontSize = Mathf.RoundToInt(14f * scale);
+            _nameStyle.fontSize = Mathf.RoundToInt(19f * scale);
             GUI.skin.button.fontSize = Mathf.RoundToInt(16f * scale);
         }
     }

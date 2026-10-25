@@ -50,6 +50,18 @@ namespace PortalHeimSG1
 
         /// <summary>True for the Stone Portal: its chevrunes lock from the top down.</summary>
         public bool TopDown;
+
+        // This gate's own look (set from its saved data): its own lit/dim materials, if it has a colour.
+        private Material _onMaterial, _dimMaterial;
+        private string _styleSignature;
+        private float _nextStyleCheck;
+
+        /// <summary>The storage hatch in front of the gate, which lifts while its storage is open.</summary>
+        public Transform Lid;
+        public float LidTarget;
+        private float _lid;
+        private const float LidSeconds = 0.6f;
+        private const float LidOpenAngle = 75f;
         private int[][] Order => TopDown ? LockOrderTopDown : LockOrder;
         // Sounds are only made for gates this close (they can't be heard from further anyway).
         private const float SoundRange = 45f;
@@ -108,7 +120,57 @@ namespace PortalHeimSG1
 
         private void OnDisable() => CountWater(false);
 
-        private void OnDestroy() => CountWater(false);
+        private void OnDestroy()
+        {
+            CountWater(false);
+            if (_onMaterial != null) Destroy(_onMaterial);
+            if (_dimMaterial != null) Destroy(_dimMaterial);
+        }
+
+        /// <summary>Picks up this gate's colour and runes from its saved data (every half second).</summary>
+        private void UpdateStyle()
+        {
+            if (Time.time < _nextStyleCheck) return;
+            _nextStyleCheck = Time.time + 0.5f;
+            var view = _portal.m_nview;
+            if (view == null || !view.IsValid()) return;
+
+            var zdo = view.GetZDO();
+            string color = zdo.GetString(GateStyle.KeyColor, "");
+            string runes = zdo.GetString(GateStyle.KeyRunes, "");
+            string signature = color + "|" + runes;
+            if (signature == _styleSignature) return;
+            _styleSignature = signature;
+
+            if (_onMaterial != null) Destroy(_onMaterial);
+            if (_dimMaterial != null) Destroy(_dimMaterial);
+            _onMaterial = _dimMaterial = null;
+            if (GateStyle.TryParse(color, out var c) && GateBuilder.ChevruneOn != null)
+            {
+                _onMaterial = new Material(GateBuilder.ChevruneOn) { name = "SG1ChevruneOnCustom" };
+                GateBuilder.Tint(_onMaterial, c);
+                _dimMaterial = new Material(GateBuilder.ChevruneDim) { name = "SG1ChevruneDimCustom" };
+                GateBuilder.Tint(_dimMaterial, Color.Lerp(Dark, c, Mathf.Clamp01(PortalHeimSG1Plugin.DormantGlow.Value)));
+            }
+
+            var glyphs = GateStyle.RunesFor(runes);
+            for (int i = 0; i < _chevrunes.Length && i < glyphs.Length; i++)
+            {
+                var filter = _chevrunes[i].Rune != null ? _chevrunes[i].Rune.GetComponent<MeshFilter>() : null;
+                if (filter != null) filter.sharedMesh = GateStyle.RuneMesh(glyphs[i]);
+                SetChevrune(i, _state[i]);
+            }
+        }
+
+        /// <summary>Lifts the storage hatch like a boot while the storage is open, and closes it again.</summary>
+        private void UpdateLid()
+        {
+            if (Lid == null) return;
+            if (_lid == LidTarget) return;
+            _lid = Mathf.MoveTowards(_lid, LidTarget, Time.deltaTime / LidSeconds);
+            float eased = Mathf.SmoothStep(0f, 1f, _lid);
+            Lid.localRotation = Quaternion.Euler(Mathf.Lerp(GateBuilder.HatchClosedAngle, -LidOpenAngle, eased), 0f, 0f);
+        }
 
         /// <summary>
         /// A gate that's opening but isn't the one the local player is standing at (someone else dialed it, or it's the
@@ -133,6 +195,8 @@ namespace PortalHeimSG1
         private void Update()
         {
             if (_portal == null) return;
+            UpdateStyle();
+            UpdateLid();
 
             bool connected = Connected();
             UpdateLive(connected);
@@ -311,8 +375,8 @@ namespace PortalHeimSG1
             _state[index] = state;
             // Swap between shared materials (the game's hover/damage highlighting can clear
             // per-renderer overrides, but it leaves material assignments alone).
-            var material = state == ChevruneState.Lit ? GateBuilder.ChevruneOn
-                : state == ChevruneState.Dim ? GateBuilder.ChevruneDim
+            var material = state == ChevruneState.Lit ? (_onMaterial ?? GateBuilder.ChevruneOn)
+                : state == ChevruneState.Dim ? (_dimMaterial ?? GateBuilder.ChevruneDim)
                 : GateBuilder.ChevruneOff;
             _chevrunes[index].Arrow.sharedMaterial = material;
             _chevrunes[index].Rune.sharedMaterial = material;

@@ -15,11 +15,11 @@ namespace PortalHeimSG1
         private static Vector3 GateCenter => new Vector3(0f, PortalHeimSG1Plugin.SinkRing.Value ? GateMeshes.InnerRingIn + 0.02f : 1.50f, 0f);
 
         // The portal's base slab: about 3 m wide, 0.8 m deep, 0.1 m tall. The ramps lead up to its top edge.
-        private const float SlabHalfDepth = 0.395f;
-        private const float SlabTop = 0.10f;
+        internal const float SlabHalfDepth = 0.395f;
+        internal const float SlabTop = 0.10f;
         private const float RampHalfWidth = 1.45f;
         // How steep the ramp is (rise over run). It runs out as far as it needs to reach its depth at this gentle angle.
-        private const float RampSlope = 0.32f;
+        internal const float RampSlope = 0.32f;
         private static Mesh _ramp;
 
         private const int MaxBuildAttempts = 3;
@@ -38,6 +38,7 @@ namespace PortalHeimSG1
         // The rune on each Chevrune, in ring order starting from the top and going round: Othala (home) at the top,
         // then V-A-L-H-E-I-M (Wunjo, Ansuz, Laguz, Hagalaz, Ehwaz, Isa, Mannaz), then Dagaz.
         private static readonly int[] RuneAt = { 23, 7, 3, 20, 8, 18, 10, 19, 22 };
+        internal static int[] DefaultRunes => RuneAt;
         private static Material _outerMaterial, _innerMaterial;
         private static bool _built;
         private static int _failures;
@@ -110,6 +111,7 @@ namespace PortalHeimSG1
 
             var ring = root.gameObject.AddComponent<GateRing>();
             ring.TopDown = stone;
+            if (PortalHeimSG1Plugin.Ramps.Value && PortalHeimSG1Plugin.StorageEnabled.Value) ring.Lid = AddHatch(root, stone ? _heavyOuterMaterial : _outerMaterial);
             ring.Setup(portal, inner.transform, chevrunes.ToArray(), water, swirl);
 
             // Say what happened for the first few gates, so problems are easy to diagnose from the log.
@@ -120,6 +122,68 @@ namespace PortalHeimSG1
                     $"Gate #{_attached} attached to '{portal.name}': hid {hidden} frame renderer(s), " +
                     $"ring at {root.position}, stone shader '{_outerMaterial.shader.name}', " +
                     $"portal enabled={portal.enabled}.");
+        }
+
+        /// <summary>
+        /// The storage hatch: a stone lid lying on the ramp in front of the gate, with a dark opening under it. It lifts like a boot
+        /// while the gate's storage is open (see GateRing).
+        /// </summary>
+        private static Transform AddHatch(Transform gateRoot, Material stone)
+        {
+            const float width = 2.1f, length = 0.95f;
+            var pivot = new GameObject("StorageHatch").transform;
+            pivot.SetParent(gateRoot, false);
+            pivot.localPosition = -gateRoot.localPosition + new Vector3(0f, SlabTop + 0.03f, SlabHalfDepth + 0.01f);
+            pivot.localRotation = Quaternion.Euler(HatchClosedAngle, 0f, 0f);
+
+            var opening = Add(pivot, "Opening", Box(width - 0.1f, 0.01f, length - 0.1f), GateBuilder.ChevruneOff);
+            opening.transform.localPosition = new Vector3(0f, -0.02f, length / 2f);
+            opening.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+
+            var lid = Add(pivot, "Lid", Box(width, 0.07f, length), stone);
+            lid.transform.localPosition = new Vector3(0f, 0.01f, length / 2f);
+            lid.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            return pivot;
+        }
+
+        /// <summary>Tilted to lie along the ramp when closed.</summary>
+        internal static float HatchClosedAngle => Mathf.Atan(RampSlope) * Mathf.Rad2Deg;
+
+        private static Mesh Box(float width, float height, float length)
+        {
+            var vertices = new List<Vector3>();
+            var uvs = new List<Vector2>();
+            var triangles = new List<int>();
+            float x = width / 2f, y = height / 2f, z = length / 2f;
+            // Each face: its outward direction and four corners.
+            var faces = new (Vector3 n, Vector3 a, Vector3 b, Vector3 c, Vector3 d)[]
+            {
+                (Vector3.up, new Vector3(-x, y, -z), new Vector3(-x, y, z), new Vector3(x, y, z), new Vector3(x, y, -z)),
+                (Vector3.down, new Vector3(-x, -y, -z), new Vector3(x, -y, -z), new Vector3(x, -y, z), new Vector3(-x, -y, z)),
+                (Vector3.forward, new Vector3(-x, -y, z), new Vector3(x, -y, z), new Vector3(x, y, z), new Vector3(-x, y, z)),
+                (Vector3.back, new Vector3(-x, -y, -z), new Vector3(-x, y, -z), new Vector3(x, y, -z), new Vector3(x, -y, -z)),
+                (Vector3.right, new Vector3(x, -y, -z), new Vector3(x, y, -z), new Vector3(x, y, z), new Vector3(x, -y, z)),
+                (Vector3.left, new Vector3(-x, -y, -z), new Vector3(-x, -y, z), new Vector3(-x, y, z), new Vector3(-x, y, -z)),
+            };
+            foreach (var face in faces)
+            {
+                int start = vertices.Count;
+                vertices.AddRange(new[] { face.a, face.b, face.c, face.d });
+                foreach (var v in new[] { face.a, face.b, face.c, face.d }) uvs.Add(new Vector2(v.x / width + 0.5f, v.z / length + 0.5f));
+                // Wind it so it faces outward.
+                bool flip = Vector3.Dot(Vector3.Cross(face.b - face.a, face.c - face.a), face.n) < 0f;
+                triangles.AddRange(flip
+                    ? new[] { start, start + 2, start + 1, start, start + 3, start + 2 }
+                    : new[] { start, start + 1, start + 2, start, start + 2, start + 3 });
+            }
+
+            var mesh = new Mesh { name = "SG1Box" };
+            mesh.SetVertices(vertices);
+            mesh.SetUVs(0, uvs);
+            mesh.SetTriangles(triangles, 0);
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
         }
 
         /// <summary>The Stone Portal's thicker rings and darker, cooler stone, made the first time one is needed.</summary>
@@ -289,7 +353,7 @@ namespace PortalHeimSG1
         };
 
         /// <summary>How a connected gate's Chevrunes look while nobody is near: the lit colour, faded toward dark.</summary>
-        private static Color DimColor() =>
+        internal static Color DimColor() =>
             Color.Lerp(GateRing.Dark, PortalHeimSG1Plugin.ChevruneColor.Value, Mathf.Clamp01(PortalHeimSG1Plugin.DormantGlow.Value));
 
         private static Material Flat(Shader shader, string name, Color color)
@@ -299,7 +363,7 @@ namespace PortalHeimSG1
             return material;
         }
 
-        private static void Tint(Material material, Color color)
+        internal static void Tint(Material material, Color color)
         {
             if (material == null) return;
             material.color = color;
