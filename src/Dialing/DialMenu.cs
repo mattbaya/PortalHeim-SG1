@@ -182,11 +182,28 @@ namespace PortalHeimSG1
             foreach (var gate in GateClient.Gates)
             {
                 if (gate.Id == here) continue;
-                if (GateClient.IsVisible(gate.Id)) candidates.Add(gate);
-                else hidden++;
+                // A gate paired with this one isn't something to dial.
+                if (self.State == GateState.Linked && gate.Id == self.Partner) continue;
+                if (!GateClient.IsVisible(gate.Id)) { hidden++; continue; }
+                // A pair of gates is one entry: the one with the lower id stands for both.
+                if (gate.State == GateState.Linked && gate.Partner != ZDOID.None && gate.Partner != here
+                    && GateClient.IsVisible(gate.Partner) && string.CompareOrdinal(GateClient.Key(gate.Partner), GateClient.Key(gate.Id)) < 0)
+                    continue;
+                candidates.Add(gate);
             }
 
             var origin = self.Position;
+            // How far an entry is: for a pair, the nearer of its two gates.
+            float Dist(GateInfo g)
+            {
+                float d = Vector3.Distance(g.Position, origin);
+                if (g.State == GateState.Linked)
+                    foreach (var other in GateClient.Gates)
+                        if (other.Id == g.Partner) d = Mathf.Min(d, Vector3.Distance(other.Position, origin));
+                return d;
+            }
+
+            bool byDistance = PortalHeimSG1Plugin.SortByDistance.Value;
             // Favorites first, then the ones you dialed lately (latest first), then the rest; nearest first within each.
             int Group(GateInfo g) => GateClient.IsFavorite(g.Id) ? 0 : GateClient.RecentRank(g.Id) >= 0 ? 1 : 2;
             candidates.Sort((a, b) =>
@@ -194,7 +211,9 @@ namespace PortalHeimSG1
                 int byGroup = Group(a).CompareTo(Group(b));
                 if (byGroup != 0) return byGroup;
                 if (Group(a) == 1) return GateClient.RecentRank(a.Id).CompareTo(GateClient.RecentRank(b.Id));
-                return Vector3.Distance(a.Position, origin).CompareTo(Vector3.Distance(b.Position, origin));
+                if (byDistance) return Dist(a).CompareTo(Dist(b));
+                int byName = string.Compare(a.Name ?? "", b.Name ?? "", System.StringComparison.CurrentCultureIgnoreCase);
+                return byName != 0 ? byName : Dist(a).CompareTo(Dist(b));
             });
 
             if (!_hadDefault)
@@ -224,7 +243,10 @@ namespace PortalHeimSG1
                 : "Pick a gate and press Dial (or Enter). The star marks your home gate.";
             GUILayout.Label(note, _small);
 
-            _scroll = GUILayout.BeginScrollView(_scroll, GUILayout.Height(300f * scale));
+            if (GUILayout.Button(byDistance ? "Sorted nearest first (click for A-Z)" : "Sorted A-Z (click for nearest first)", GUILayout.Height(24f * scale)))
+                PortalHeimSG1Plugin.SortByDistance.Value = !byDistance;
+
+            _scroll = GUILayout.BeginScrollView(_scroll, GUILayout.Height(276f * scale));
             int lastGroup = -1;
             foreach (var gate in candidates)
             {
@@ -239,7 +261,7 @@ namespace PortalHeimSG1
                 string key = GateClient.Key(gate.Id);
                 bool free = GateClient.Dialable(gate.State);
                 bool selected = key == _selected;
-                int meters = Mathf.RoundToInt(Vector3.Distance(gate.Position, self.Position));
+                int meters = Mathf.RoundToInt(Dist(gate));
 
                 if (_renaming == key)
                 {
@@ -249,7 +271,7 @@ namespace PortalHeimSG1
 
                 GUILayout.BeginHorizontal(selected ? _rowSelected : _row);
                 string star = GateClient.IsHome(gate.Id) ? "* " : "";
-                string state = gate.State == GateState.Dialing ? "  (in use)" : (gate.State == GateState.Linked ? "  (paired)" : "");
+                string state = gate.State == GateState.Dialing ? "  (in use)" : (gate.State == GateState.Linked ? "  (pair)" : "");
                 if (GUILayout.Button(star + DisplayName(gate) + "  -  " + meters + " m" + state, _label, GUILayout.ExpandWidth(true)) && free)
                     _selected = key;
 

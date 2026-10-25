@@ -47,7 +47,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.8.0";
+        public const string Version = "0.8.1";
 
         internal static ManualLogSource Log;
 
@@ -60,6 +60,7 @@ namespace PortalHeimSG1
         internal static ConfigEntry<float> RampDepth;
         internal static ConfigEntry<bool> ComboEnabled;
         internal static ConfigEntry<bool> StonePortalStyle;
+        internal static ConfigEntry<bool> SortByDistance;
         internal static ConfigEntry<float> ComboBenchDistance;
         internal static ConfigEntry<bool> SinkRing;
         internal static ConfigEntry<ShadingMode> Shading;
@@ -133,6 +134,8 @@ namespace PortalHeimSG1
             Shading = Config.Bind("Look", "Shading", ShadingMode.PortalShader,
                 "How the stone is shaded. PortalShader reuses the portal's own shader. If the ring looks wrong or is missing, try Standard. " +
                 "Takes effect on next game start.");
+            SortByDistance = Config.Bind("Dialing", "SortByDistance", false,
+                "Sort the dial list nearest first instead of A to Z (favorites and recently dialed gates still come first). Also the button in the dial window.");
             StonePortalStyle = Config.Bind("Look", "StonePortalStyle", true,
                 "Give the game's Stone Portal its own look: thicker, darker stone with chunkier runes, and chevrunes that lock from the top down. Takes effect for portals loaded after this is changed.");
             ComboEnabled = Config.Bind("Portals", "PortalAndWorkbench", true,

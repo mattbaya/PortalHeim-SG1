@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.1
+- **One entry per pair.** Gates paired by name show once in the dial list (with the distance to the nearer of the two), and the gate you're standing at doesn't list its own partner.
+- **A to Z by default**, with a button at the top of the list to sort nearest first instead (`Dialing / SortByDistance`). Favorites and recently dialed gates still come first.
+
 ## 0.8.0
 - **Favorites and recent gates.** Press **Fav** next to a gate in the dial window to keep it at the top, under *Favorites*. The last five gates you dialed are listed next, under *Recently dialed*, latest first, and everything else follows nearest first. Both are remembered per character.
 
