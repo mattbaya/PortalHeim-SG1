@@ -12,6 +12,11 @@ namespace PortalHeimSG1
     {
         private const string SeenKey = "PortalHeimSG1.Seen";
         private const string HomeKey = "PortalHeimSG1.Home";
+        private const string FavoritesKey = "PortalHeimSG1.Favorites";
+        private const string RecentKey = "PortalHeimSG1.Recent";
+        private const int MaxRecent = 5;
+        private static readonly HashSet<string> Favorites = new HashSet<string>();
+        private static readonly List<string> Recent = new List<string>();
         // A gate counts as visited once you've been this close to it.
         private const float VisitRange = 30f;
 
@@ -93,6 +98,16 @@ namespace PortalHeimSG1
                     if (entry.Length > 0) Seen.Add(entry);
             player.m_customData.TryGetValue(HomeKey, out var home);
             _home = home ?? "";
+            Favorites.Clear();
+            Recent.Clear();
+            player.m_customData.TryGetValue(FavoritesKey, out var favorites);
+            if (!string.IsNullOrEmpty(favorites))
+                foreach (var entry in favorites.Split(';'))
+                    if (entry.Length > 0) Favorites.Add(entry);
+            player.m_customData.TryGetValue(RecentKey, out var recent);
+            if (!string.IsNullOrEmpty(recent))
+                foreach (var entry in recent.Split(';'))
+                    if (entry.Length > 0 && Recent.Count < MaxRecent) Recent.Add(entry);
             ServerHasMod = false;
             HelloSentAt = -1f;
             _nextHello = 0f;
@@ -131,6 +146,32 @@ namespace PortalHeimSG1
         /// <summary>Whether a gate in this state can be dialed from or to.</summary>
         public static bool Dialable(GateState state) =>
             state == GateState.Idle || (state == GateState.Linked && PortalHeimSG1Plugin.AllowDialingLinkedGates.Value);
+
+        public static bool IsFavorite(ZDOID id) => Favorites.Contains(Key(id));
+
+        public static void SetFavorite(ZDOID id, bool on)
+        {
+            var player = Player.m_localPlayer;
+            if (player == null) return;
+            if (on) Favorites.Add(Key(id)); else Favorites.Remove(Key(id));
+            player.m_customData[FavoritesKey] = string.Join(";", Favorites);
+            GatesChanged?.Invoke();
+        }
+
+        /// <summary>Where in the recently-dialed list (0 = latest) this gate is, or -1.</summary>
+        public static int RecentRank(ZDOID id) => Recent.IndexOf(Key(id));
+
+        /// <summary>Remembers a gate you dialed, newest first.</summary>
+        public static void NoteDialed(ZDOID id)
+        {
+            var player = Player.m_localPlayer;
+            if (player == null) return;
+            string key = Key(id);
+            Recent.Remove(key);
+            Recent.Insert(0, key);
+            while (Recent.Count > MaxRecent) Recent.RemoveAt(Recent.Count - 1);
+            player.m_customData[RecentKey] = string.Join(";", Recent);
+        }
 
         public static bool IsHome(ZDOID id) => _home.Length > 0 && _home == Key(id);
 

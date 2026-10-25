@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.8.0
+- **Favorites and recent gates.** Press **Fav** next to a gate in the dial window to keep it at the top, under *Favorites*. The last five gates you dialed are listed next, under *Recently dialed*, latest first, and everything else follows nearest first. Both are remembered per character.
+
 ## 0.7.0
 - **The Stone Portal looks different from the wooden one.** Its gate has thicker, darker, cooler stone and chunkier runes, and its chevrunes lock from the top down (the wooden portal's lock from the bottom up). Switch off with `Look / StonePortalStyle`.
 

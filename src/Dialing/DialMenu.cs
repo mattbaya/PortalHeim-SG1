@@ -55,6 +55,7 @@ namespace PortalHeimSG1
             var from = GateRegistry.IdOf(portal);
             if (from == ZDOID.None) return false;
             GateNet.RequestDial(from, target.Id);
+            GateClient.NoteDialed(target.Id);
             Player.m_localPlayer?.Message(MessageHud.MessageType.Center, "Dialing " + DisplayName(target) + "...");
             return true;
         }
@@ -95,7 +96,7 @@ namespace PortalHeimSG1
             float scale = Mathf.Clamp(Screen.height / 1080f, 0.8f, 2.5f);
             EnsureStyles(scale);
 
-            float width = 520f * scale, height = 520f * scale;
+            float width = 620f * scale, height = 520f * scale;
             if (!_placed)
             {
                 var saved = PortalHeimSG1Plugin.DialWindowPos.Value;
@@ -186,7 +187,15 @@ namespace PortalHeimSG1
             }
 
             var origin = self.Position;
-            candidates.Sort((a, b) => Vector3.Distance(a.Position, origin).CompareTo(Vector3.Distance(b.Position, origin)));
+            // Favorites first, then the ones you dialed lately (latest first), then the rest; nearest first within each.
+            int Group(GateInfo g) => GateClient.IsFavorite(g.Id) ? 0 : GateClient.RecentRank(g.Id) >= 0 ? 1 : 2;
+            candidates.Sort((a, b) =>
+            {
+                int byGroup = Group(a).CompareTo(Group(b));
+                if (byGroup != 0) return byGroup;
+                if (Group(a) == 1) return GateClient.RecentRank(a.Id).CompareTo(GateClient.RecentRank(b.Id));
+                return Vector3.Distance(a.Position, origin).CompareTo(Vector3.Distance(b.Position, origin));
+            });
 
             if (!_hadDefault)
             {
@@ -216,8 +225,17 @@ namespace PortalHeimSG1
             GUILayout.Label(note, _small);
 
             _scroll = GUILayout.BeginScrollView(_scroll, GUILayout.Height(300f * scale));
+            int lastGroup = -1;
             foreach (var gate in candidates)
             {
+                int group = GateClient.IsFavorite(gate.Id) ? 0 : GateClient.RecentRank(gate.Id) >= 0 ? 1 : 2;
+                if (group != lastGroup)
+                {
+                    lastGroup = group;
+                    if (candidates.Exists(g => (GateClient.IsFavorite(g.Id) || GateClient.RecentRank(g.Id) >= 0) && g.Id != gate.Id) || group != 2)
+                        GUILayout.Label(group == 0 ? "Favorites" : group == 1 ? "Recently dialed" : "All gates", _small);
+                }
+
                 string key = GateClient.Key(gate.Id);
                 bool free = GateClient.Dialable(gate.State);
                 bool selected = key == _selected;
@@ -238,6 +256,9 @@ namespace PortalHeimSG1
                 bool isHome = GateClient.IsHome(gate.Id);
                 if (GUILayout.Button(isHome ? "Unset home" : "Set home", GUILayout.Width(100f * scale)))
                     GateClient.SetHome(gate.Id, !isHome);
+                bool isFav = GateClient.IsFavorite(gate.Id);
+                if (GUILayout.Button(isFav ? "Unfav" : "Fav", GUILayout.Width(64f * scale)))
+                    GateClient.SetFavorite(gate.Id, !isFav);
                 GUI.enabled = gate.State != GateState.Dialing;
                 if (GUILayout.Button(gate.State == GateState.Linked ? "Rename pair" : "Rename", GUILayout.Width(110f * scale)))
                 {

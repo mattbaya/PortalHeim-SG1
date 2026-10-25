@@ -73,6 +73,8 @@ With the mod on the server too, you aren't limited to portals that share a name.
 
 **Naming.** Give each gate its own name so you can tell them apart in the list (use a gate, then **Rename this gate**). Gates sharing a name pair in twos at random, the way Valheim always has, which is confusing in a list. Unnamed gates pair with each other the same way, so name them all.
 
+**Favorites and recents.** Press **Fav** next to a gate to pin it to the top of the list. Below your favorites are the last five gates you dialed (latest first), then everything else, nearest first. Each character has its own.
+
 **Renaming from anywhere.** Every gate in the dial list has a **Rename** button (**Rename pair** for a paired gate, which renames both so they stay paired). Type the name and press Enter. The name changes for everyone on the server. A gate that's dialed has to be hung up first.
 
 **Portal and Workbench.** The hammer's build list has an extra piece, *Portal and Workbench*, that builds a portal with an ordinary workbench beside it, for the cost of both (and without needing a workbench nearby). The workbench is a separate piece you can take down on its own. It needs the mod on the server.
