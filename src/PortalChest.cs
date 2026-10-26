@@ -30,6 +30,12 @@ namespace PortalHeimSG1
         {
             var container = portal != null ? portal.GetComponent<Container>() : null;
             if (container == null || human == null) return false;
+            if (container.m_nview != null && container.m_nview.IsValid() && container.m_nview.GetZDO().GetInt(StorageSync.KeyBusy) > 0)
+            {
+                Player.m_localPlayer?.Message(MessageHud.MessageType.Center, "The other end's storage is open");
+                return true;
+            }
+
             container.Interact(human, false, false);
             return true;
         }
@@ -37,6 +43,17 @@ namespace PortalHeimSG1
         /// <summary>The gate that owns the chest that's open (so its hatch can lift).</summary>
         public static GateRing RingOf(Container container) =>
             container != null ? container.GetComponentInChildren<GateRing>(true) : null;
+    }
+
+    /// <summary>Whenever a gate's storage changes, note when, so the server knows which end has the newest contents.</summary>
+    [HarmonyPatch(typeof(Container), "Save")]
+    internal static class StorageStampPatch
+    {
+        private static void Postfix(Container __instance)
+        {
+            if (__instance.GetComponent<TeleportWorld>() == null || __instance.m_nview == null || !__instance.m_nview.IsValid()) return;
+            __instance.m_nview.GetZDO().Set(StorageSync.KeyStamp, StorageSync.Now());
+        }
     }
 
     [HarmonyPatch(typeof(InventoryGui), nameof(InventoryGui.Show))]

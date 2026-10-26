@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.0
+- **Paired gates share one chest.** Whatever you put in one gate's storage is in the other's, wherever they are: that's what a pair of gates is for. The server copies the newest contents across every couple of seconds. Only one end can be open at a time. While a pair is set aside for a dial, nothing is copied; it carries on when the pair is back. Needs the mod on the server. (Gates that aren't paired keep their own chest.)
+
 ## 0.9.1
 - **The storage hatch is two lids**, left and right. By default they open like DeLorean gull-wings: hinged down the middle, the outer edges lifting. `Storage / HatchStyle = CellarDoors` hinges them at the outer edges so the middle lifts instead.
 

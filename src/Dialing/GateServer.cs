@@ -67,6 +67,8 @@ namespace PortalHeimSG1
             // Give the world a few seconds to finish loading before looking through it.
             if (Time.time - _serverUpSince < 5f) return;
 
+            StorageSync.Tick();
+
             if (!_repaired)
             {
                 _repaired = true;
