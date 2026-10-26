@@ -111,7 +111,19 @@ namespace PortalHeimSG1
 
             var ring = root.gameObject.AddComponent<GateRing>();
             ring.TopDown = stone;
-            if (PortalHeimSG1Plugin.Ramps.Value && PortalHeimSG1Plugin.StorageEnabled.Value) { var lids = AddHatch(root, stone ? _heavyOuterMaterial : _outerMaterial); ring.LidLeft = lids[0]; ring.LidRight = lids[1]; ring.LidSign = PortalHeimSG1Plugin.HatchStyle.Value == HatchStyles.GullWing ? 1f : -1f; }
+            if (PortalHeimSG1Plugin.Ramps.Value && PortalHeimSG1Plugin.StorageEnabled.Value) {
+                try
+                {
+                    var lids = AddHatch(root, stone ? _heavyOuterMaterial : _outerMaterial);
+                    ring.LidLeft = lids[0];
+                    ring.LidRight = lids[1];
+                    ring.LidSign = PortalHeimSG1Plugin.HatchStyle.Value == HatchStyles.GullWing ? 1f : -1f;
+                }
+                catch (Exception e)
+                {
+                    PortalHeimSG1Plugin.Log.LogError("Couldn't add the storage hatch (the gate itself is fine): " + e);
+                }
+            }
             ring.Setup(portal, inner.transform, chevrunes.ToArray(), water, swirl);
 
             // Say what happened for the first few gates, so problems are easy to diagnose from the log.

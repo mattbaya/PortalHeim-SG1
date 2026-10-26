@@ -54,6 +54,7 @@ namespace PortalHeimSG1
         // This gate's own look (set from its saved data): its own lit/dim materials, if it has a colour.
         private Material _onMaterial, _dimMaterial;
         private string _styleSignature;
+        private bool _styleErrorLogged;
         private float _nextStyleCheck;
 
         /// <summary>The storage hatch in front of the gate, which lifts while its storage is open.</summary>
@@ -197,8 +198,17 @@ namespace PortalHeimSG1
         private void Update()
         {
             if (_portal == null) return;
-            UpdateStyle();
-            UpdateLid();
+            try
+            {
+                UpdateStyle();
+                UpdateLid();
+            }
+            catch (System.Exception e)
+            {
+                // Never let the extras stop the gate working.
+                if (!_styleErrorLogged) PortalHeimSG1Plugin.Log.LogError("Gate style/hatch update failed: " + e);
+                _styleErrorLogged = true;
+            }
 
             bool connected = Connected();
             UpdateLive(connected);

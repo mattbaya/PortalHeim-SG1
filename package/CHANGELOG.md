@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.1
+- The storage hatch and the gate styling can no longer stop a gate from being built or animated: if either fails it is logged and the gate carries on without it.
+
 ## 0.10.0
 - **Paired gates share one chest.** Whatever you put in one gate's storage is in the other's, wherever they are: that's what a pair of gates is for. The server copies the newest contents across every couple of seconds. Only one end can be open at a time. While a pair is set aside for a dial, nothing is copied; it carries on when the pair is back. Needs the mod on the server. (Gates that aren't paired keep their own chest.)
 
