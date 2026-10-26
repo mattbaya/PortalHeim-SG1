@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.2
+- **Fixed: the gates looked like the plain portals.** The game's `PlacePiece` method changed, and the patch for the new Portal and Workbench piece failed, which stopped the gate reskin and the other patches from being applied. The Portal and Workbench piece now finds the portal it just placed another way.
+- Each patch is now applied on its own, so one the game has changed can't stop the others (the log names the one that failed).
+
 ## 0.10.1
 - The storage hatch and the gate styling can no longer stop a gate from being built or animated: if either fails it is logged and the gate carries on without it.
 

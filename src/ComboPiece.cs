@@ -75,10 +75,24 @@ namespace PortalHeimSG1
     [HarmonyPatch(typeof(Player), nameof(Player.PlacePiece))]
     internal static class ComboPlacePatch
     {
-        private static void Postfix(Player __instance, Piece piece, Vector3 pos, Quaternion rot, bool __result)
+        private static readonly int KeyBench = "sg1_bench".GetStableHashCode();
+        private static readonly System.Collections.Generic.List<Piece> Found = new System.Collections.Generic.List<Piece>();
+
+        // PlacePiece doesn't say whether it placed anything, so look for a Portal and Workbench that was just placed here and
+        // hasn't had its workbench built yet.
+        private static void Postfix(Player __instance, Vector3 pos)
         {
-            if (!__result || !ComboPiece.IsCombo(piece)) return;
-            ComboPiece.PlaceBench(__instance, pos, rot);
+            if (!PortalHeimSG1Plugin.ComboEnabled.Value) return;
+            Found.Clear();
+            Piece.GetAllPiecesInRadius(pos, 1.5f, Found);
+            foreach (var piece in Found)
+            {
+                if (!ComboPiece.IsCombo(piece) || piece.m_nview == null || !piece.m_nview.IsValid()) continue;
+                var zdo = piece.m_nview.GetZDO();
+                if (zdo.GetInt(KeyBench) == 1) continue;
+                zdo.Set(KeyBench, 1);
+                ComboPiece.PlaceBench(__instance, piece.transform.position, piece.transform.rotation);
+            }
         }
     }
 }

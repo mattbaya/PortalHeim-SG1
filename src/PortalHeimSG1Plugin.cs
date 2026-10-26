@@ -49,7 +49,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.10.1";
+        public const string Version = "0.10.2";
 
         internal static ManualLogSource Log;
 
@@ -223,7 +223,7 @@ namespace PortalHeimSG1
             }
 
             _harmony = new Harmony(Guid);
-            _harmony.PatchAll(typeof(PortalHeimSG1Plugin).Assembly);
+            SafePatch.All(_harmony, typeof(PortalHeimSG1Plugin).Assembly, Log);
             Log.LogInfo($"{Name} {Version} loaded. Sound files go in {GateSounds.Folder}");
         }
 
