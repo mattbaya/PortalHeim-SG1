@@ -49,7 +49,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.10.4";
+        public const string Version = "0.10.5";
 
         internal static ManualLogSource Log;
 
@@ -60,6 +60,7 @@ namespace PortalHeimSG1
         internal static ConfigEntry<bool> Ramps;
         internal static ConfigEntry<bool> BackRamp;
         internal static ConfigEntry<float> RampDepth;
+        internal static ConfigEntry<float> RampSlope;
         internal static ConfigEntry<bool> ComboEnabled;
         internal static ConfigEntry<bool> StonePortalStyle;
         internal static ConfigEntry<bool> SortByDistance;
@@ -123,6 +124,9 @@ namespace PortalHeimSG1
             RampDepth = Config.Bind("Look", "RampDepth", 2.0f,
                 new ConfigDescription("How far below the portal's base the ramp starts, in meters. Deeper means it also runs further out, at the same gentle angle, so it meets the ground " +
                     "even where the ground falls away in front of the portal and there's no step up onto it. Takes effect for portals loaded after this is changed.", new AcceptableValueRange<float>(0.4f, 3f)));
+            RampSlope = Config.Bind("Look", "RampSlope", 0.7f,
+                new ConfigDescription("How steep the ramp is: height gained for each metre along. 0.7 is about 35 degrees and 1.0 is 45. A steeper ramp is much shorter " +
+                    "for the same RampDepth. If your character slips on it, lower this. Takes effect for portals loaded after this is changed (restart the game).", new AcceptableValueRange<float>(0.15f, 1.2f)));
             BackRamp = Config.Bind("Look", "BackRamp", false,
                 "Also add a ramp on the back of the portal. Off by default. Takes effect for portals loaded after this is changed.");
             SinkRing = Config.Bind("Look", "SinkRing", false,

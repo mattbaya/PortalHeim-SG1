@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.5
+- **Shorter ramps.** The ramp is now steeper (`Look / RampSlope`, default 0.7, about 35 degrees; it was 0.32, about 18). It still starts 2 m below the base, so it reaches the ground in about 3 m instead of nearly 7. If your character slips on it, lower the slope; if you want it even shorter, raise it (up to 1.2).
+
 ## 0.10.4
 - The pointer stays steady in the dial and style windows (the game could take the mouse back every frame, making it flicker).
 

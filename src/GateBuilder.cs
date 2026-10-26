@@ -19,7 +19,7 @@ namespace PortalHeimSG1
         internal const float SlabTop = 0.10f;
         private const float RampHalfWidth = 1.45f;
         // How steep the ramp is (rise over run). It runs out as far as it needs to reach its depth at this gentle angle.
-        internal const float RampSlope = 0.32f;
+        internal static float RampSlope => Mathf.Clamp(PortalHeimSG1Plugin.RampSlope.Value, 0.15f, 1.2f);
         private static Mesh _ramp;
 
         private const int MaxBuildAttempts = 3;

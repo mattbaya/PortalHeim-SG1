@@ -170,6 +170,7 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 | Look / StonePortalStyle | true | The Stone Portal gets thicker, darker stone, chunkier runes and top-down locking |
 | Storage | HatchStyle | GullWing | `GullWing` (hinged down the middle, outer edges lift) or `CellarDoors` (hinged at the outer edges) |
 | Storage | Enabled / Columns / Rows | true / 6 / 4 | The chest built into every gate |
+| Look / RampSlope | 0.7 | How steep the ramp is (0.7 = about 35 degrees, 1.0 = 45). Steeper means shorter |
 | Look / RampDepth | 2.0 | How far below the base the ramp starts (m). Deeper also runs it further out, so it meets the ground even where the ground falls away |
 | Look / BackRamp | false | Also add a ramp on the back |
 | Look / SinkRing | false | Sit the ring low so the opening is level with the ground (off: the ring is at its normal height) |
