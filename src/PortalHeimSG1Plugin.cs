@@ -49,7 +49,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.10.6";
+        public const string Version = "0.10.7";
 
         internal static ManualLogSource Log;
 
@@ -121,11 +121,11 @@ namespace PortalHeimSG1
             Ramps = Config.Bind("Look", "Ramps", true,
                 "Add a gentle ramp up to the portal's base on the front (the side you step out of), so anyone can walk in, even when overencumbered. " +
                 "Takes effect for portals loaded after this is changed.");
-            RampDepth = Config.Bind("Look", "RampDepth", 2.0f,
+            RampDepth = Config.Bind("Look", "RampDepth", 1.5f,
                 new ConfigDescription("How far below the portal's base the ramp starts, in meters. Deeper means it also runs further out, at the same gentle angle, so it meets the ground " +
                     "even where the ground falls away in front of the portal and there's no step up onto it. Takes effect for portals loaded after this is changed.", new AcceptableValueRange<float>(0.4f, 3f)));
-            RampSlope = Config.Bind("Look", "RampSlope", 0.7f,
-                new ConfigDescription("How steep the ramp is: height gained for each metre along. 0.7 is about 35 degrees and 1.0 is 45. A steeper ramp is much shorter " +
+            RampSlope = Config.Bind("Look", "RampSlope", 1.0f,
+                new ConfigDescription("How steep the ramp is: height gained for each metre along. 1.0 is 45 degrees (the default) and 0.7 is about 35. A steeper ramp is much shorter " +
                     "for the same RampDepth. If your character slips on it, lower this. Takes effect for portals loaded after this is changed (restart the game).", new AcceptableValueRange<float>(0.15f, 1.2f)));
             BackRamp = Config.Bind("Look", "BackRamp", false,
                 "Also add a ramp on the back of the portal. Off by default. Takes effect for portals loaded after this is changed.");
@@ -134,12 +134,14 @@ namespace PortalHeimSG1
                 "instead of having a stone lip to step over. Takes effect for portals loaded after this is changed.");
             // One-time move to the current layout: the ring back at its normal height, the ramp doing the work of going down into the ground.
             var layout = Config.Bind("Look", "LayoutVersion", 0, "Internal: used to move old settings to new defaults. Leave it alone.");
-            if (layout.Value < 1)
+            if (layout.Value < 1) SinkRing.Value = false;
+            if (layout.Value < 2)
             {
-                SinkRing.Value = false;
-                RampDepth.Value = 2.0f;
-                layout.Value = 1;
+                RampDepth.Value = 1.5f;
+                RampSlope.Value = 1.0f;
             }
+
+            layout.Value = 2;
 
             DormantGlow = Config.Bind("Look", "DormantGlow", 0.3f,
                 new ConfigDescription("How brightly a connected gate's Chevrunes glow while nobody is near it (0 = dark, 1 = fully lit). " +

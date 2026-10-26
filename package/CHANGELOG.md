@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.7
+- **A shorter ramp by default.** The slope is 1.0 (45 degrees) and it starts 1.5 m below the base, so it reaches the ground in about 1.6 m (it was 6.6 m in 0.10.4). `Look / RampSlope` and `Look / RampDepth` change it; your existing settings are moved to these once. Includes the steeper-ramp setting (0.10.5) and the Portal and Workbench menu fix (0.10.6).
+
 ## 0.10.6
 - **Fixed: the Portal and Workbench piece didn't show in the build menu.** It's now put in the hammer's list every time the game rebuilds it, and unlocked as soon as you know portals.
 
