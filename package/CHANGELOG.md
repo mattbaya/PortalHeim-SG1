@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.4
+- The pointer stays steady in the dial and style windows (the game could take the mouse back every frame, making it flicker).
+
 ## 0.10.3
 - **The gate is back at its normal height; the ramp goes lower instead.** The ring no longer sits sunk into the ground (`Look / SinkRing` is off), and the ramp now starts 2 m below the base (`Look / RampDepth`, was 1.5) so it still meets the ground, even on a slope. Your existing settings are moved to these once; change them after that if you like.
 

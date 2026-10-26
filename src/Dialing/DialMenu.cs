@@ -437,4 +437,16 @@ namespace PortalHeimSG1
             if (DialMenu.IsOpen) __result = false;
         }
     }
+
+    /// <summary>Keeps the pointer steady while the dial or style window is up (the game otherwise takes the mouse back every frame).</summary>
+    [HarmonyPatch(typeof(GameCamera), "UpdateMouseCapture")]
+    internal static class KeepCursorPatch
+    {
+        private static void Postfix()
+        {
+            if (!DialMenu.IsOpen && !StyleWindow.IsOpen) return;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+    }
 }
