@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.3
+- **The gate is back at its normal height; the ramp goes lower instead.** The ring no longer sits sunk into the ground (`Look / SinkRing` is off), and the ramp now starts 2 m below the base (`Look / RampDepth`, was 1.5) so it still meets the ground, even on a slope. Your existing settings are moved to these once; change them after that if you like.
+
 ## 0.10.2
 - **Fixed: the gates looked like the plain portals.** The game's `PlacePiece` method changed, and the patch for the new Portal and Workbench piece failed, which stopped the gate reskin and the other patches from being applied. The Portal and Workbench piece now finds the portal it just placed another way.
 - Each patch is now applied on its own, so one the game has changed can't stop the others (the log names the one that failed).

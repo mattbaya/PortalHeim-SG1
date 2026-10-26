@@ -170,9 +170,9 @@ Built from CC0 recordings by **rubberduck** (100 CC0 SFX #2), **BMacZero / Brian
 | Look / StonePortalStyle | true | The Stone Portal gets thicker, darker stone, chunkier runes and top-down locking |
 | Storage | HatchStyle | GullWing | `GullWing` (hinged down the middle, outer edges lift) or `CellarDoors` (hinged at the outer edges) |
 | Storage | Enabled / Columns / Rows | true / 6 / 4 | The chest built into every gate |
-| Look / RampDepth | 1.5 | How far below the base the ramp starts (m). Deeper also runs it further out, so it meets the ground even where the ground falls away |
+| Look / RampDepth | 2.0 | How far below the base the ramp starts (m). Deeper also runs it further out, so it meets the ground even where the ground falls away |
 | Look / BackRamp | false | Also add a ramp on the back |
-| Look / SinkRing | true | The ring sits low so the opening is level with the ground |
+| Look / SinkRing | false | Sit the ring low so the opening is level with the ground (off: the ring is at its normal height) |
 | Look / DormantGlow | 0.3 | How brightly a connected but idle gate's Chevrunes glow (0 = dark) |
 | Look / SecondsPerChevrune | 0.5 | Seconds between start-up steps (five steps: bottom pair, then up the sides, top last) |
 | Look / TravelScreen | Tunnel | `Tunnel` = endless swirling tunnel, `Gate` = a miniature gate, `Vanilla` = the game's own spinner (reload a world to apply) |

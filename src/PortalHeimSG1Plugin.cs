@@ -49,7 +49,7 @@ namespace PortalHeimSG1
     {
         public const string Guid = "mbaya.PortalHeimSG1";
         public const string Name = "PortalHeim SG1";
-        public const string Version = "0.10.2";
+        public const string Version = "0.10.3";
 
         internal static ManualLogSource Log;
 
@@ -120,14 +120,23 @@ namespace PortalHeimSG1
             Ramps = Config.Bind("Look", "Ramps", true,
                 "Add a gentle ramp up to the portal's base on the front (the side you step out of), so anyone can walk in, even when overencumbered. " +
                 "Takes effect for portals loaded after this is changed.");
-            RampDepth = Config.Bind("Look", "RampDepth", 1.5f,
+            RampDepth = Config.Bind("Look", "RampDepth", 2.0f,
                 new ConfigDescription("How far below the portal's base the ramp starts, in meters. Deeper means it also runs further out, at the same gentle angle, so it meets the ground " +
                     "even where the ground falls away in front of the portal and there's no step up onto it. Takes effect for portals loaded after this is changed.", new AcceptableValueRange<float>(0.4f, 3f)));
             BackRamp = Config.Bind("Look", "BackRamp", false,
                 "Also add a ramp on the back of the portal. Off by default. Takes effect for portals loaded after this is changed.");
-            SinkRing = Config.Bind("Look", "SinkRing", true,
+            SinkRing = Config.Bind("Look", "SinkRing", false,
                 "Sit the ring low so the bottom of the opening is level with the ground (the lower part of the outer ring is buried), " +
                 "instead of having a stone lip to step over. Takes effect for portals loaded after this is changed.");
+            // One-time move to the current layout: the ring back at its normal height, the ramp doing the work of going down into the ground.
+            var layout = Config.Bind("Look", "LayoutVersion", 0, "Internal: used to move old settings to new defaults. Leave it alone.");
+            if (layout.Value < 1)
+            {
+                SinkRing.Value = false;
+                RampDepth.Value = 2.0f;
+                layout.Value = 1;
+            }
+
             DormantGlow = Config.Bind("Look", "DormantGlow", 0.3f,
                 new ConfigDescription("How brightly a connected gate's Chevrunes glow while nobody is near it (0 = dark, 1 = fully lit). " +
                     "They light up fully, one at a time, when someone walks up.", new AcceptableValueRange<float>(0f, 1f)));
