@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.11.0
+- **Dialing a pair asks which end.** A pair of gates shows once in the dial list; pressing **Dial** on it (or Enter) now asks which of the two ends you want, with how far each is.
+- **Storage follows the gate you dialed.** While you're dialed from a gate to another, opening the gate you dialed *from* shows the *destination's* storage, and changes go to the destination. When the dial ends, the gate you dialed from gets its own contents back, exactly as they were, and anything put in or taken out through it stays with the destination. Needs the mod on the server.
+
 ## 0.10.7
 - **A shorter ramp by default.** The slope is 1.0 (45 degrees) and it starts 1.5 m below the base, so it reaches the ground in about 1.6 m (it was 6.6 m in 0.10.4). `Look / RampSlope` and `Look / RampDepth` change it; your existing settings are moved to these once. Includes the steeper-ramp setting (0.10.5) and the Portal and Workbench menu fix (0.10.6).
 

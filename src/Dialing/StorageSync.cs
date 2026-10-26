@@ -27,13 +27,62 @@ namespace PortalHeimSG1
             var seen = new HashSet<ZDOID>();
             foreach (var zdo in ZDOMan.instance.GetPortalList())
             {
-                if (zdo == null || seen.Contains(zdo.m_uid) || GateServer.StateOf(zdo) != GateState.Linked) continue;
+                // Paired gates share a chest, and so do two gates in a dial (while it lasts).
+                var state = GateServer.StateOf(zdo);
+                if (zdo == null || seen.Contains(zdo.m_uid) || (state != GateState.Linked && state != GateState.Dialing)) continue;
                 var other = ZDOMan.instance.GetZDO(GateServer.PartnerOf(zdo));
-                if (other == null || GateServer.StateOf(other) != GateState.Linked || GateServer.PartnerOf(other) != zdo.m_uid) continue;
+                if (other == null || GateServer.StateOf(other) != state || GateServer.PartnerOf(other) != zdo.m_uid) continue;
                 seen.Add(zdo.m_uid);
                 seen.Add(other.m_uid);
                 SyncPair(zdo, other);
             }
+        }
+
+        // While a dial is open, the gate dialed from keeps its own contents aside here.
+        private static readonly int KeyStash = "sg1_stash".GetStableHashCode();
+        private static readonly int KeyStashStamp = "sg1_stashstamp".GetStableHashCode();
+        private static readonly int KeyStashed = "sg1_stashed".GetStableHashCode();
+
+        /// <summary>A gate dialing another puts its own contents aside and shows the dialed gate's contents instead.</summary>
+        public static void Stash(ZDO source, ZDO destination)
+        {
+            if (!PortalHeimSG1Plugin.StorageEnabled.Value || source == null || destination == null || source.GetInt(KeyStashed) == 1) return;
+
+            source.SetOwner(ZDOMan.GetSessionID());
+            source.Set(KeyStash, source.GetByteArray(ZDOVars.s_items) ?? new byte[0]);
+            source.Set(KeyStashStamp, source.GetLong(KeyStamp));
+            source.Set(KeyStashed, 1);
+            source.Set(ZDOVars.s_items, destination.GetByteArray(ZDOVars.s_items) ?? new byte[0]);
+            source.Set(KeyStamp, destination.GetLong(KeyStamp));
+            source.SetOwner(0L);
+            ZDOMan.instance.ForceSendZDO(source.m_uid);
+        }
+
+        /// <summary>At the end of a dial: anything changed through the source gate goes to the destination.</summary>
+        public static void Finish(ZDO source, ZDO destination)
+        {
+            if (!PortalHeimSG1Plugin.StorageEnabled.Value || source.GetInt(KeyStashed) != 1) return;
+            if (source.GetLong(KeyStamp) > destination.GetLong(KeyStamp))
+            {
+                destination.SetOwner(ZDOMan.GetSessionID());
+                destination.Set(ZDOVars.s_items, source.GetByteArray(ZDOVars.s_items) ?? new byte[0]);
+                destination.Set(KeyStamp, source.GetLong(KeyStamp));
+                destination.SetOwner(0L);
+                ZDOMan.instance.ForceSendZDO(destination.m_uid);
+            }
+        }
+
+        /// <summary>Gives a gate its own contents back (also used to clean up after a restart mid-dial).</summary>
+        public static void RestoreStash(ZDO zdo)
+        {
+            if (zdo == null || zdo.GetInt(KeyStashed) != 1) return;
+            zdo.SetOwner(ZDOMan.GetSessionID());
+            zdo.Set(ZDOVars.s_items, zdo.GetByteArray(KeyStash) ?? new byte[0]);
+            zdo.Set(KeyStamp, zdo.GetLong(KeyStashStamp));
+            zdo.Set(KeyStash, new byte[0]);
+            zdo.Set(KeyStashed, 0);
+            zdo.SetOwner(0L);
+            ZDOMan.instance.ForceSendZDO(zdo.m_uid);
         }
 
         private static void SetIfChanged(ZDO zdo, int key, int value)

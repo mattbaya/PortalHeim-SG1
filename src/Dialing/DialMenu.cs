@@ -21,6 +21,7 @@ namespace PortalHeimSG1
         private static bool _hadDefault;
         private static string _renaming = "";
         private static string _expanded = "";
+        private static string _choosing = "";
         private static GUIStyle _nameStyle;
         private static string _renameText = "";
         private static CursorLockMode _lockBefore;
@@ -39,6 +40,7 @@ namespace PortalHeimSG1
             _hadDefault = false;
             _renaming = "";
             _expanded = "";
+            _choosing = "";
             _lockBefore = Cursor.lockState;
             _visibleBefore = Cursor.visible;
             GateNet.RequestGates();
@@ -314,6 +316,28 @@ namespace PortalHeimSG1
                     _expanded = _expanded == key ? "" : key;
                 GUILayout.EndHorizontal();
 
+                if (_choosing == key && PartnerOf(gate, out var other))
+                {
+                    GUILayout.BeginHorizontal(_rowSelected);
+                    GUILayout.Label("Which end?", _small, GUILayout.Width(100f * scale));
+                    foreach (var end in new[] { gate, other })
+                    {
+                        float away = Vector3.Distance(end.Position, self.Position);
+                        GUI.enabled = GateClient.Dialable(end.State);
+                        if (GUILayout.Button(Mathf.RoundToInt(away) + " m away", GUILayout.Height(30f * scale)))
+                        {
+                            var portal = _source;
+                            Close();
+                            DialFrom(portal, end);
+                            return;
+                        }
+                    }
+
+                    GUI.enabled = true;
+                    if (GUILayout.Button("Cancel", GUILayout.Width(80f * scale), GUILayout.Height(30f * scale))) _choosing = "";
+                    GUILayout.EndHorizontal();
+                }
+
                 if (_expanded == key)
                 {
                     GUILayout.BeginHorizontal();
@@ -367,12 +391,34 @@ namespace PortalHeimSG1
             GUILayout.EndHorizontal();
         }
 
+        /// <summary>The other gate of a pair, if this gate is half of one and both are on your list.</summary>
+        private static bool PartnerOf(GateInfo gate, out GateInfo partner)
+        {
+            partner = default;
+            if (gate.State != GateState.Linked || gate.Partner == ZDOID.None) return false;
+            foreach (var other in GateClient.Gates)
+                if (other.Id == gate.Partner)
+                {
+                    partner = other;
+                    return true;
+                }
+
+            return false;
+        }
+
         private static bool TryDialSelected()
         {
             if (_source == null || _selected.Length == 0) return false;
             foreach (var gate in GateClient.Gates)
             {
                 if (GateClient.Key(gate.Id) != _selected || !GateClient.Dialable(gate.State)) continue;
+                // A pair is two gates: ask which end before dialing.
+                if (PartnerOf(gate, out _))
+                {
+                    _choosing = _selected;
+                    return true;
+                }
+
                 var portal = _source;
                 Close();
                 return DialFrom(portal, gate);

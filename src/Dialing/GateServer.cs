@@ -192,6 +192,9 @@ namespace PortalHeimSG1
             ZDOMan.instance.ForceSendZDO(src.m_uid);
             ZDOMan.instance.ForceSendZDO(dst.m_uid);
 
+            // The gate you dialed from now shows the gate you dialed's storage (its own is kept safe until the dial ends).
+            StorageSync.Stash(src, dst);
+
             Dials.Add(dial);
             PortalHeimSG1Plugin.Log.LogInfo($"Dialed '{NameOf(src)}' -> '{NameOf(dst)}'.");
             GateNet.BroadcastGates();
@@ -311,6 +314,9 @@ namespace PortalHeimSG1
                 if (parked != null) gates.Add(parked);
             }
 
+            // Changes made through the dialed gate's storage land in the destination; the source gets its own contents back.
+            if (a != null && b != null) StorageSync.Finish(a, b);
+
             RestoreAll(gates);
         }
 
@@ -330,6 +336,7 @@ namespace PortalHeimSG1
 
         private static void Restore(ZDO zdo)
         {
+            StorageSync.RestoreStash(zdo);
             string stored = zdo.GetString(KeyOriginalName, "");
             if (stored.Length == 0) return;
 
