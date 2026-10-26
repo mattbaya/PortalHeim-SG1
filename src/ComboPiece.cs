@@ -12,6 +12,8 @@ namespace PortalHeimSG1
     {
         public const string PrefabName = "portal_wood_sg1";
         private static GameObject _holder;
+        /// <summary>The combined piece, once made.</summary>
+        public static GameObject Prefab { get; private set; }
 
         public static bool IsCombo(Piece piece) => piece != null && Utils.GetPrefabName(piece.gameObject) == PrefabName;
 
@@ -39,13 +41,14 @@ namespace PortalHeimSG1
             piece.m_craftingStation = null; // the workbench comes with it
             piece.m_resources = piece.m_resources.Concat(benchPiece.m_resources).ToArray();
 
+            Prefab = clone;
             scene.m_prefabs.Add(clone);
             scene.m_namedPrefabs[PrefabName.GetStableHashCode()] = clone;
 
             var hammer = ObjectDB.instance != null ? ObjectDB.instance.GetItemPrefab("Hammer") : null;
             var pieces = hammer != null ? hammer.GetComponent<ItemDrop>().m_itemData.m_shared.m_buildPieces : null;
             if (pieces != null && !pieces.m_pieces.Contains(clone)) pieces.m_pieces.Add(clone);
-            PortalHeimSG1Plugin.Log.LogInfo("Added the 'Portal and Workbench' piece to the build list.");
+            PortalHeimSG1Plugin.Log.LogInfo(pieces != null ? "Added the 'Portal and Workbench' piece to the hammer's build list." : "Made the 'Portal and Workbench' piece (it will be added to the build list when the hammer is used).");
         }
 
         /// <summary>Builds the workbench beside a combo portal that was just placed.</summary>
@@ -93,6 +96,27 @@ namespace PortalHeimSG1
                 zdo.Set(KeyBench, 1);
                 ComboPiece.PlaceBench(__instance, piece.transform.position, piece.transform.rotation);
             }
+        }
+    }
+
+    /// <summary>
+    /// Makes sure the combined piece is in the hammer's list whenever the game rebuilds the list of pieces you can place, and
+    /// unlocked if you already know portals (the hammer may not have been ready when the piece was made).
+    /// </summary>
+    [HarmonyPatch(typeof(Player), nameof(Player.UpdateAvailablePiecesList))]
+    internal static class ComboAvailablePatch
+    {
+        private static void Prefix(Player __instance)
+        {
+            var combo = ComboPiece.Prefab;
+            var table = __instance.m_buildPieces;
+            if (combo == null || table == null || table.m_pieces == null) return;
+            if (!table.m_pieces.Exists(p => p != null && p.name == "portal_wood")) return;   // only the hammer's list
+
+            if (!table.m_pieces.Contains(combo)) table.m_pieces.Add(combo);
+            var piece = combo.GetComponent<Piece>();
+            if (piece != null && __instance.m_knownRecipes != null && __instance.m_knownRecipes.Contains("$piece_portal"))
+                __instance.m_knownRecipes.Add(piece.m_name);
         }
     }
 }
